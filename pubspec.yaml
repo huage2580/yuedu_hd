@@ -32,6 +32,7 @@ dependencies:
   yuedu_parser:
     git:
       url: https://github.com/huage2580/reader_parser.git
+  provider: ^4.3.2+2
 
 dev_dependencies:
   flutter_test:

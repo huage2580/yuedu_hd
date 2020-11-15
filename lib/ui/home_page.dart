@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,6 +17,12 @@ class HomeState extends State<HomePage> {
   static const PAGE_SETTINGS = 3;
 
   int currPage = 0;
+  var homeContainerKey = GlobalKey<NavigatorState>();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,19 +35,19 @@ class HomeState extends State<HomePage> {
             width: 100,
             decoration: BoxDecoration(
                 color: themeData.cardColor,
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: themeData.shadowColor,
-                    offset: Offset(-1, 1),
-                    blurRadius: 8.0,
-                  ),
-                ],
+                // boxShadow: <BoxShadow>[
+                //   BoxShadow(
+                //     color: themeData.shadowColor,
+                //     offset: Offset(-1, 1),
+                //     blurRadius: 8.0,
+                //   ),
+                // ],
                 borderRadius: BorderRadius.only(
                     topRight: Radius.circular(15),
                     bottomRight: Radius.circular(15))),
             child: _buildMenu(context),
           ),
-          Expanded(child: Container())
+          Expanded(child: _buildHomeContainer(context))
         ],
       ),
     );
@@ -113,7 +120,26 @@ class HomeState extends State<HomePage> {
       return;
     }
     currPage = target;
-    setState(() {});
+    setState(() {
+      homeContainerKey.currentState.pushReplacementNamed("测试页面$currPage");
+    });
+  }
+
+  MaterialApp _buildHomeContainer(BuildContext ctx) {
+    return MaterialApp(
+      navigatorKey: homeContainerKey,
+      theme: Theme.of(ctx),
+      onGenerateRoute: (RouteSettings settings){
+        return MaterialPageRoute(builder: (ctx){
+          return Scaffold(
+            body: Center(child: Text(settings.name),),
+          );
+        });
+      },
+      home: Scaffold(
+        body: Placeholder(),
+      ),
+    );
   }
 }
 
