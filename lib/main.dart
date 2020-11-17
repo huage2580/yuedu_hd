@@ -3,6 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:yuedu_hd/ui/home_page.dart';
 import 'package:yuedu_hd/ui/style/ycolors.dart';
 
+import 'ui/style/ycolors.dart';
+import 'ui/style/ycolors.dart';
+import 'ui/style/ycolors.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([ 	 //强制横屏
@@ -34,6 +38,9 @@ class MyApp extends StatelessWidget {
         primaryColorLight: YColors.primary_light,
         backgroundColor: YColors.background,
         cardColor: YColors.background_card,
+        hintColor: YColors.text_hint,
+        scaffoldBackgroundColor: YColors.background,
+        canvasColor: YColors.background_input,
         // This makes the visual density adapt to the platform that you run
         // the app on. For desktop platforms, the controls will be smaller and
         // closer together (more dense) than on mobile platforms.

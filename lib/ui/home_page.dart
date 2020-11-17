@@ -1,6 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
+import 'package:yuedu_hd/ui/YDRouter.dart';
+import 'package:yuedu_hd/ui/book_source/page_source_add.dart';
+import 'package:yuedu_hd/ui/book_source/page_source_list.dart';
+import 'package:yuedu_hd/ui/bookshelf/page_bookshelf.dart';
+import 'package:yuedu_hd/ui/explore/page_explore.dart';
+import 'package:yuedu_hd/ui/settings/page_settings.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,11 +34,13 @@ class HomeState extends State<HomePage> {
   Widget build(BuildContext context) {
     ThemeData themeData = Theme.of(context);
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       backgroundColor: themeData.backgroundColor,
       body: Row(
         children: [
           Container(
-            width: 100,
+            width: 180,
             decoration: BoxDecoration(
                 color: themeData.cardColor,
                 // boxShadow: <BoxShadow>[
@@ -66,12 +74,12 @@ class HomeState extends State<HomePage> {
             children: [
               Text(
                 "阅读",
-                style: themeData.textTheme.subtitle1,
+                style: themeData.textTheme.headline4,
               ),
               HSpace(4),
               Text(
                 "HD",
-                style: TextStyle(fontSize: 8),
+                style: TextStyle(fontSize: 18),
               )
             ],
           ),
@@ -120,24 +128,46 @@ class HomeState extends State<HomePage> {
       return;
     }
     currPage = target;
-    setState(() {
-      homeContainerKey.currentState.pushReplacementNamed("测试页面$currPage");
-    });
-  }
-
-  MaterialApp _buildHomeContainer(BuildContext ctx) {
-    return MaterialApp(
-      navigatorKey: homeContainerKey,
-      theme: Theme.of(ctx),
-      onGenerateRoute: (RouteSettings settings){
-        return MaterialPageRoute(builder: (ctx){
-          return Scaffold(
-            body: Center(child: Text(settings.name),),
-          );
+    switch(target){
+      case PAGE_BOOK:
+        setState(() {
+          homeContainerKey.currentState.pushReplacementNamed(YDRouter.BOOKSHELF);
         });
-      },
-      home: Scaffold(
-        body: Placeholder(),
+        break;
+      case PAGE_SOURCE:
+        setState(() {
+          homeContainerKey.currentState.pushReplacementNamed(YDRouter.BOOK_SOURCE_LIST);
+        });
+        break;
+      case PAGE_EXPLORE:
+        setState(() {
+          homeContainerKey.currentState.pushReplacementNamed(YDRouter.EXPLORE);
+        });
+        break;
+      case PAGE_SETTINGS:
+        setState(() {
+          homeContainerKey.currentState.pushReplacementNamed(YDRouter.SETTINGS);
+        });
+        break;
+
+
+    }
+
+  }
+  ///右边的内容区域
+  Widget _buildHomeContainer(BuildContext ctx) {
+    return Container(
+      child: MaterialApp(
+        navigatorKey: homeContainerKey,
+        theme: Theme.of(ctx),
+        initialRoute: YDRouter.BOOKSHELF,
+        routes: <String,WidgetBuilder>{
+          YDRouter.BOOKSHELF:(context)=>PageBookShelf(),
+          YDRouter.BOOK_SOURCE_LIST:(context)=>PageSourceList(),
+          YDRouter.BOOK_SOURCE_ADD:(context)=>PageSourceAdd(),
+          YDRouter.EXPLORE:(context)=>PageExplore(),
+          YDRouter.SETTINGS:(context)=>PageSettings(),
+        },
       ),
     );
   }
@@ -162,8 +192,9 @@ class _HomeMenuItem extends StatelessWidget {
     ThemeData themeData = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: EdgeInsets.only(left: 8, top: 4, bottom: 4),
+        padding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
         margin: EdgeInsets.only(left: 8, right: 8, top: 4),
         decoration: isSelected
             ? BoxDecoration(
@@ -175,7 +206,7 @@ class _HomeMenuItem extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: 16,
+              size: 32,
               color: isSelected ? themeData.primaryColor : null,
             ),
             HSpace(4),
@@ -183,7 +214,7 @@ class _HomeMenuItem extends StatelessWidget {
                 child: Text(
               text,
               style: TextStyle(
-                  fontSize: 13,
+                  fontSize: themeData.textTheme.headline5.fontSize,
                   color: isSelected ? themeData.primaryColor : null),
             )),
           ],
