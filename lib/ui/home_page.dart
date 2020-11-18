@@ -131,22 +131,22 @@ class HomeState extends State<HomePage> {
     switch(target){
       case PAGE_BOOK:
         setState(() {
-          homeContainerKey.currentState.pushReplacementNamed(YDRouter.BOOKSHELF);
+          homeContainerKey.currentState.pushNamedAndRemoveUntil(YDRouter.BOOKSHELF,ModalRoute.withName(YDRouter.BOOKSHELF));
         });
         break;
       case PAGE_SOURCE:
         setState(() {
-          homeContainerKey.currentState.pushReplacementNamed(YDRouter.BOOK_SOURCE_LIST);
+          homeContainerKey.currentState.pushNamedAndRemoveUntil(YDRouter.BOOK_SOURCE_LIST,ModalRoute.withName(YDRouter.BOOK_SOURCE_LIST));
         });
         break;
       case PAGE_EXPLORE:
         setState(() {
-          homeContainerKey.currentState.pushReplacementNamed(YDRouter.EXPLORE);
+          homeContainerKey.currentState.pushNamedAndRemoveUntil(YDRouter.EXPLORE,ModalRoute.withName(YDRouter.EXPLORE));
         });
         break;
       case PAGE_SETTINGS:
         setState(() {
-          homeContainerKey.currentState.pushReplacementNamed(YDRouter.SETTINGS);
+          homeContainerKey.currentState.pushNamedAndRemoveUntil(YDRouter.SETTINGS,ModalRoute.withName(YDRouter.SETTINGS));
         });
         break;
 

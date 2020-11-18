@@ -29,28 +29,11 @@ class _StateSourceList extends State<PageSourceList>{
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  height: 40,
-                  width: 220,
-                  padding: EdgeInsets.only(left: 8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    color: theme.canvasColor,
-                  ),
-                  child: TextField(
-                    maxLines: 1,
-                    decoration: InputDecoration(
-                      hintText: '根据标题 搜索书源',
-                      prefixIconConstraints: BoxConstraints(minWidth: 24, maxHeight: 24),
-                      prefixIcon: Icon(Icons.search_outlined,color: theme.hintColor,size: 24,),
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ),
+                _buildSearch(theme),
                 Spacer(),
                 TextButton.icon(
                     onPressed: (){
-                      Navigator.of(context).pushReplacementNamed(YDRouter.BOOK_SOURCE_ADD);
+                      Navigator.of(context).pushNamed(YDRouter.BOOK_SOURCE_ADD);
                     },
                     icon: Icon(Icons.add_outlined,color: theme.primaryColor,),
                     label: Text('添加书源',style: TextStyle(color:theme.primaryColor,fontSize: theme.textTheme.subtitle2.fontSize),)
@@ -63,6 +46,27 @@ class _StateSourceList extends State<PageSourceList>{
         ),
       ),
     );
+  }
+
+  Container _buildSearch(ThemeData theme) {
+    return Container(
+                height: 40,
+                width: 320,
+                padding: EdgeInsets.only(left: 8,right: 20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  color: theme.canvasColor,
+                ),
+                child: TextField(
+                  maxLines: 1,
+                  decoration: InputDecoration(
+                    hintText: '根据标题 搜索书源',
+                    prefixIconConstraints: BoxConstraints(minWidth: 24, maxHeight: 24),
+                    prefixIcon: Icon(Icons.search_outlined,color: theme.hintColor,size: 24,),
+                    border: InputBorder.none,
+                  ),
+                ),
+              );
   }
 
 }

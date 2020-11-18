@@ -9,5 +9,8 @@ class YColors{
   static const primary = Color(0xFF597CEC);
   static const background_input = Color(0xFFECEDF3);
   static const text_hint = Color(0xFFCCCCCC);
+  static const text_normal = Color(0xFF151920);
+  static const text_btn_color = Color(0xFFFFFFFF);
+
 
 }

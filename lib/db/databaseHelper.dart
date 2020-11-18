@@ -6,14 +6,16 @@ import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper{
   static const DB_PATH = "yuedu.db";
+  static const TABLE_SOURCE = 'book_sources';
 
   static const SQL_CREATE_BOOK_SOURCES= '''
   CREATE TABLE "book_sources" (
-	"_id"	INTEGER NOT NULL,
+	"_id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	"bookSourceName"	TEXT NOT NULL,
 	"bookSourceGroup"	TEXT,
 	"bookSourceUrl"	TEXT,
 	"bookUrlPattern"	TEXT,
+	"bookSourceType" INTEGER NOT NULL DEFAULT 0,
 	"customOrder"	INTEGER DEFAULT 0,
 	"enabled"	INTEGER NOT NULL DEFAULT 0,
 	"enabledExplore"	INTEGER NOT NULL DEFAULT 0,
@@ -28,15 +30,14 @@ class DatabaseHelper{
 	"ruleSearch"	TEXT,
 	"ruleBookInfo"	TEXT,
 	"ruleToc"	TEXT,
-	"ruleContent"	TEXT,
-	PRIMARY KEY("_id","bookSourceUrl")
+	"ruleContent"	TEXT
 );
   ''';
 
   static const SQL_INDEX_SOURCE = '''
   CREATE UNIQUE INDEX "sources_id_index" ON "book_sources" (
 	"_id");
-	CREATE INDEX "sources_url_index" ON "book_sources" (
+	CREATE UNIQUE INDEX "sources_url_index" ON "book_sources" (
 	"bookSourceUrl");
   ''';
 
@@ -62,11 +63,19 @@ class DatabaseHelper{
       return Future.value(database);
     }
     return await openDatabase(DB_PATH,version: 1,onCreate: (Database db, int version) async {
-      await db.execute('''
-      $SQL_CREATE_BOOK_SOURCES
-      $SQL_INDEX_SOURCE
-      ''');
+      await executeMultiSQL(db,SQL_CREATE_BOOK_SOURCES);
+      await executeMultiSQL(db,SQL_INDEX_SOURCE);
     });
+  }
+
+  Future<int> executeMultiSQL(Database db,String sql) async{
+    var list = sql.split(';');
+    for(var each in list){
+      if(each.trim().isNotEmpty){
+        await db.execute(each);
+      }
+    }
+    return Future.value(0);
   }
 
 
