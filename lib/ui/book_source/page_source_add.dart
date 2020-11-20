@@ -2,6 +2,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:yuedu_hd/db/book_source_helper.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 import 'dart:developer' as developer;
@@ -13,6 +14,14 @@ class PageSourceAdd extends StatefulWidget{
 
 class _PageSourceAddState extends State<PageSourceAdd> {
   bool showLoading = false;
+  String _log='';
+  TextEditingController _textEditingController;
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController = TextEditingController();
+    _textEditingController.text = 'https://gitee.com/vpq/codes/9ji1mged7v54brhspz3of71/raw?blob_name=sy.json';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +42,16 @@ class _PageSourceAddState extends State<PageSourceAdd> {
                 }),
                 Expanded(child: _buildSearch(theme),),
                 HSpace(8),
-                FlatButton(onPressed: (){},
+                FlatButton(onPressed: (){
+                  _fromNetWork();
+                },
                   child: Text('导入',style: TextStyle(color: theme.accentColor),),
                   color: theme.primaryColorDark,
                   shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
                 ),
                 HSpace(8),
                 FlatButton(onPressed: (){
-                  _testParseData();
+                  _fromClipboard();
                 },
                   child: Text('粘贴板导入',style: TextStyle(color: theme.accentColor),),
                   color: theme.primaryColorDark,
@@ -58,12 +69,12 @@ class _PageSourceAddState extends State<PageSourceAdd> {
 暂不支持编辑和修改，同网址书源每次导入均覆盖内容。
               ''',style: theme.textTheme.headline6,),
             ),
-            VSpace(20),
+            VSpace(10),
             Text('调试日志:',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12),),
-            VSpace(20),
+            VSpace(10),
             Expanded(
                 child: SingleChildScrollView(
-                  child: Text(''),
+                  child: Text(_log),
                 ),
             ),
 
@@ -82,6 +93,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
         color: theme.canvasColor,
       ),
       child: TextField(
+        controller: _textEditingController,
         maxLines: 1,
         decoration: InputDecoration(
           hintText: '输入网址，从网络导入',
@@ -95,20 +107,56 @@ class _PageSourceAddState extends State<PageSourceAdd> {
   }
 
 
-  dynamic _testParseData()async{
+  dynamic _fromClipboard() async{
+    _log = '';
     setState(() {
       showLoading = true;
 
     });
-    var req = await Dio().get('https://gitee.com/vpq/codes/9ji1mged7v54brhspz3of71/raw?blob_name=sy.json');
-    var jsonStr = req.data;
+    try{
+      var jsonStr = await Clipboard.getData(Clipboard.kTextPlain);
+      await _parserData(jsonStr.text);
+    }catch(e){
+      _log += '剪切板解析异常->\n$e\n';
+    }finally{
+      setState(() {
+        showLoading = false;
+      });
+    }
+
+  }
+
+  dynamic _fromNetWork() async{
+    _log = '';
+    setState(() {
+      showLoading = true;
+
+    });
+    try{
+      var req = await Dio().get(_textEditingController.text.trim());
+      var jsonStr = req.data;
+      setState(() {
+        _log += '网络请求成功->${_textEditingController.text}\n';
+      });
+      await _parserData(jsonStr);
+    }catch(e){
+      _log += '网络请求异常->${_textEditingController.text}\n$e\n';
+    }finally{
+      setState(() {
+        showLoading = false;
+      });
+    }
+
+  }
+
+
+  dynamic _parserData(String json) async{
     var helper = BookSourceHelper.getInstance();
-    var list = await helper.parseSourceString(jsonStr);
+    var list = await helper.parseSourceString(json);
     await helper.updateDataBases(list);
     developer.log(helper.getLog());
-
+    _log += helper.getLog();
     setState(() {
-      showLoading = false;
 
     });
   }
