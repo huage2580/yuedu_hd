@@ -20,11 +20,14 @@ class PageSourceList extends StatefulWidget {
 class _StateSourceList extends State<PageSourceList> {
   List<BookSourceBean> bookSourceList = List<BookSourceBean>();
   bool showLoading = true;
+  int _selectCount = 0;
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 1)).then((value) => _fetchListAndUpdate());
+    Future.delayed(Duration(seconds: 1))
+        .then((value) => _fetchListAndUpdate(null));
   }
 
   @override
@@ -45,7 +48,9 @@ class _StateSourceList extends State<PageSourceList> {
                 Spacer(),
                 TextButton.icon(
                     onPressed: () {
-                      Navigator.of(context).pushNamed(YDRouter.BOOK_SOURCE_ADD);
+                      Navigator.of(context)
+                          .pushNamed(YDRouter.BOOK_SOURCE_ADD)
+                          .then((value) => _fetchListAndUpdate(null));
                     },
                     icon: Icon(
                       Icons.add_outlined,
@@ -62,8 +67,14 @@ class _StateSourceList extends State<PageSourceList> {
             VSpace(10),
             Expanded(
               child: Container(
-                decoration: BoxDecoration(color: theme.cardColor,borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20))),
-                child: showLoading?_buildLoading(context):_buildListContainer(context),
+                decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20))),
+                child: showLoading
+                    ? _buildLoading(context)
+                    : _buildListContainer(context),
               ),
             )
           ],
@@ -74,96 +85,142 @@ class _StateSourceList extends State<PageSourceList> {
 
   Column _buildListContainer(BuildContext context) {
     return Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Row(
-                      children: [
-                        HSpace(60),
-                        Text('名称/分组'),
-                        HSpace(140),
-                        Text('网站源'),
-                        Spacer(),
-                        Text('启用'),
-                        HSpace(20),
-                      ],
-                    ),
-                  ),
-                  Divider(thickness: 1,height: 1,),
-                  Expanded(
-                    child: CupertinoScrollbar(
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        itemBuilder: (ctx, index) {
-                          return _buildSourceItem(ctx, bookSourceList[index]);
-                        },
-                        separatorBuilder: (c, i) => Divider(),
-                        itemCount: bookSourceList.length,
-                      ),
-                    ),
-                  ),
-                  Divider(height: 1,thickness: 1,),
-                  _buildBottomBar(context),
-                ],
-              );
-  }
-
-  Widget _buildBottomBar(BuildContext context){
-    var theme = Theme.of(context);
-    return Row(
       children: [
-        Checkbox(
-          value: false,
-          onChanged: (b) {
-
-          },
-          activeColor: theme.primaryColor,
+        Container(
+          padding: EdgeInsets.symmetric(vertical: 16),
+          child: Row(
+            children: [
+              HSpace(60),
+              Text('名称/分组'),
+              HSpace(140),
+              Text('网站源'),
+              Spacer(),
+              Text('启用'),
+              HSpace(20),
+            ],
+          ),
         ),
-        Text('全选 (0/${bookSourceList.length})',),
-        Spacer(),
-        OutlineButton(onPressed: (){},child: Text('反选'),),
-        OutlineButton(onPressed: (){},child: Text('删除'),),
-        PopupMenuButton(offset: Offset(0, -180),itemBuilder:(ctx){
-          return [
-            PopupMenuItem(child: Text('启用所选')),
-            PopupMenuItem(child: Text('禁用所选')),
-            PopupMenuItem(child: Text('校验所选')),
-
-          ];
-        }),
+        Divider(
+          thickness: 1,
+          height: 1,
+        ),
+        Expanded(
+          child: CupertinoScrollbar(
+            child: ListView.separated(
+              shrinkWrap: true,
+              itemBuilder: (ctx, index) {
+                return _buildSourceItem(ctx, bookSourceList[index]);
+              },
+              separatorBuilder: (c, i) => Divider(),
+              itemCount: bookSourceList.length,
+            ),
+          ),
+        ),
+        Divider(
+          height: 1,
+          thickness: 1,
+        ),
+        _buildBottomBar(context),
       ],
     );
   }
 
-  Widget _buildLoading(BuildContext context){
+  Widget _buildBottomBar(BuildContext context) {
+    var theme = Theme.of(context);
+    return Row(
+      children: [
+        Checkbox(
+          value: _selectCount == bookSourceList.length && _selectCount > 0,
+          onChanged: (b) {
+            _selectAllSource(b);
+          },
+          activeColor: theme.primaryColor,
+        ),
+        Text(
+          '全选 ($_selectCount/${bookSourceList.length})',
+        ),
+        Spacer(),
+        OutlineButton(
+          onPressed: () {
+            _reverseSelect();
+          },
+          child: Text('反选'),
+        ),
+        HSpace(8),
+        OutlineButton(
+          onPressed: () {},
+          child: Text('删除'),
+        ),
+        PopupMenuButton(
+            offset: Offset(0, -180),
+            itemBuilder: (ctx) {
+              return [
+                PopupMenuItem(child: Text('启用所选')),
+                PopupMenuItem(child: Text('禁用所选')),
+                PopupMenuItem(child: Text('校验所选')),
+              ];
+            }),
+      ],
+    );
+  }
+
+  Widget _buildLoading(BuildContext context) {
     var theme = Theme.of(context);
     return Center(
-      child: CircularProgressIndicator(backgroundColor: theme.primaryColor,),
+      child: CircularProgressIndicator(
+        backgroundColor: theme.primaryColor,
+      ),
     );
   }
 
   Container _buildSearch(ThemeData theme) {
     return Container(
       height: 40,
-      width: 320,
-      padding: EdgeInsets.only(left: 8, right: 20),
+      width: 300,
+      padding: EdgeInsets.only(left: 8, right: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(20)),
         color: theme.canvasColor,
       ),
-      child: TextField(
-        autofocus: false,
-        maxLines: 1,
-        decoration: InputDecoration(
-          hintText: '根据标题 搜索书源',
-          prefixIconConstraints: BoxConstraints(minWidth: 24, maxHeight: 24),
-          prefixIcon: Icon(
-            Icons.search_outlined,
-            color: theme.hintColor,
-            size: 24,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              textInputAction: TextInputAction.search,
+              onEditingComplete: () {
+                _fetchListAndUpdate(_searchController.text);
+              },
+              autofocus: false,
+              maxLines: 1,
+              decoration: InputDecoration(
+                hintText: '根据标题 搜索书源',
+                prefixIconConstraints:
+                    BoxConstraints(minWidth: 24, maxHeight: 24),
+                prefixIcon: Icon(
+                  Icons.search_outlined,
+                  color: theme.hintColor,
+                  size: 24,
+                ),
+                border: InputBorder.none,
+              ),
+            ),
           ),
-          border: InputBorder.none,
-        ),
+          Visibility(
+            visible: _searchController.text.isNotEmpty,
+            child: GestureDetector(
+              onTap: () {
+                _searchController.clear();
+                _fetchListAndUpdate(null);
+              },
+              child: Icon(
+                CupertinoIcons.clear_circled_solid,
+                color: theme.hintColor,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -178,17 +235,18 @@ class _StateSourceList extends State<PageSourceList> {
           value: bean.localSelect,
           onChanged: (b) {
             setState(() {
+              _selectCount += b ? 1 : -1;
               bean.localSelect = b;
             });
           },
           activeColor: theme.primaryColor,
         ),
         Container(
-          width: 180,
+            width: 180,
             child: Text(
-          "${bean.bookSourceName}${bean.bookSourceGroup != null ? '(${bean.bookSourceGroup})' : ''}",
-          style: theme.textTheme.subtitle1,
-        )),
+              "${bean.bookSourceName}${bean.bookSourceGroup != null ? '(${bean.bookSourceGroup})' : ''}",
+              style: theme.textTheme.subtitle1,
+            )),
         HSpace(20),
         Expanded(child: Text(bean.bookSourceUrl)),
         Switch(
@@ -203,15 +261,41 @@ class _StateSourceList extends State<PageSourceList> {
     );
   }
 
-  dynamic _fetchListAndUpdate() async {
+  dynamic _fetchListAndUpdate(String title) async {
+    if (title != null) {
+      // _searchController.text = title.trim();
+      if (title.trim().isEmpty) {
+        title = null;
+      }
+    }
     showLoading = true;
-    setState(() {
-
-    });
+    setState(() {});
     var helper = DatabaseHelper();
-    bookSourceList = await helper.queryAllBookSource();
+    bookSourceList = await helper.queryAllBookSource(title: title);
     setState(() {
       showLoading = false;
+      _selectCount = 0;
     });
+  }
+
+  void _selectAllSource(bool select) {
+    for (var s in bookSourceList) {
+      s.localSelect = select;
+    }
+    if (select) {
+      _selectCount = bookSourceList.length;
+    } else {
+      _selectCount = 0;
+    }
+    setState(() {});
+  }
+
+  void _reverseSelect() {
+    _selectCount = 0;
+    for (var s in bookSourceList) {
+      s.localSelect = !s.localSelect;
+      _selectCount += s.localSelect ? 1 : 0;
+    }
+    setState(() {});
   }
 }

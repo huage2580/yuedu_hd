@@ -37,7 +37,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
           children: [
             Row(
               children: [
-                IconButton(icon: Icon(Icons.arrow_back_ios_outlined,color: theme.primaryColor,),padding: EdgeInsets.all(0), onPressed: (){
+                IconButton(icon: Icon(CupertinoIcons.back,color: theme.primaryColor,),padding: EdgeInsets.all(0), onPressed: (){
                   Navigator.of(context).pop();
                 }),
                 Expanded(child: _buildSearch(theme),),
@@ -87,7 +87,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
   Container _buildSearch(ThemeData theme) {
     return Container(
       height: 40,
-      padding: EdgeInsets.only(left: 8),
+      padding: EdgeInsets.only(left: 8,right: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(5)),
         color: theme.canvasColor,
@@ -96,8 +96,9 @@ class _PageSourceAddState extends State<PageSourceAdd> {
         controller: _textEditingController,
         maxLines: 1,
         decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(0),
           hintText: '输入网址，从网络导入',
-          prefixIconConstraints: BoxConstraints(minWidth: 24, maxHeight: 24),
+          prefixIconConstraints: BoxConstraints(minWidth: 30, maxHeight: 30),
           prefixIcon: Icon(Icons.link_outlined,color: theme.hintColor,size: 24,),
           suffixIcon: showLoading?CupertinoActivityIndicator():null,
           border: InputBorder.none,
