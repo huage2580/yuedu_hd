@@ -148,16 +148,26 @@ class _StateSourceList extends State<PageSourceList> {
         ),
         HSpace(8),
         OutlineButton(
-          onPressed: () {},
+          onPressed: () {_deleteSelect();},
           child: Text('删除'),
         ),
         PopupMenuButton(
+            onSelected: (k){
+              switch(k){
+                case 0:
+                  _stateSelect(true);
+                  break;
+                case 1:
+                  _stateSelect(false);
+                  break;
+              }
+            },
             offset: Offset(0, -180),
             itemBuilder: (ctx) {
               return [
-                PopupMenuItem(child: Text('启用所选')),
-                PopupMenuItem(child: Text('禁用所选')),
-                PopupMenuItem(child: Text('校验所选')),
+                PopupMenuItem(child: Text('启用所选'),value: 0,),
+                PopupMenuItem(child: Text('禁用所选'),value: 1,),
+                PopupMenuItem(child: Text('校验所选'),value: 2,),
               ];
             }),
       ],
@@ -253,7 +263,10 @@ class _StateSourceList extends State<PageSourceList> {
           value: bean.enabled,
           onChanged: (b) {
             bean.enabled = b;
-            setState(() {});
+            setState((){
+              var helper = DatabaseHelper();
+              helper.updateBookSourceStateById(bean.id,b);
+            });
           },
           activeColor: theme.primaryColor,
         )
@@ -297,5 +310,35 @@ class _StateSourceList extends State<PageSourceList> {
       _selectCount += s.localSelect ? 1 : 0;
     }
     setState(() {});
+  }
+
+  void _deleteSelect() async{
+    if(_selectCount==0){
+      return;
+    }
+    var ids = List<int>();
+    for (var value in bookSourceList) {
+      if(value.localSelect){
+        ids.add(value.id);
+      }
+    }
+    var helper = DatabaseHelper();
+    await helper.deleteBookSourceByIds(ids);
+    await _fetchListAndUpdate(null);
+  }
+
+  void _stateSelect(bool enabled) async{
+    if(_selectCount==0){
+      return;
+    }
+    var ids = List<int>();
+    for (var value in bookSourceList) {
+      if(value.localSelect){
+        ids.add(value.id);
+      }
+    }
+    var helper = DatabaseHelper();
+    await helper.updateBookSourceStateByIds(ids,enabled);
+    await _fetchListAndUpdate(null);
   }
 }
