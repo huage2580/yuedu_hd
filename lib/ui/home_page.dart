@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:yuedu_hd/ui/YDRouter.dart';
 import 'package:yuedu_hd/ui/book_source/page_source_add.dart';
 import 'package:yuedu_hd/ui/book_source/page_source_list.dart';
+import 'package:yuedu_hd/ui/bookshelf/page_add_book.dart';
 import 'package:yuedu_hd/ui/bookshelf/page_bookshelf.dart';
 import 'package:yuedu_hd/ui/explore/page_explore.dart';
 import 'package:yuedu_hd/ui/settings/page_settings.dart';
@@ -167,6 +168,7 @@ class HomeState extends State<HomePage> {
           YDRouter.BOOK_SOURCE_ADD:(context)=>PageSourceAdd(),
           YDRouter.EXPLORE:(context)=>PageExplore(),
           YDRouter.SETTINGS:(context)=>PageSettings(),
+          YDRouter.BOOK_ADD:(context)=>PageAddBook(),
         },
       ),
     );

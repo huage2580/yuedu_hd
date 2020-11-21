@@ -11,6 +11,7 @@ class YColors{
   static const text_hint = Color(0xFFCCCCCC);
   static const text_normal = Color(0xFF151920);
   static const text_btn_color = Color(0xFFFFFFFF);
+  static const border_color = Color(0xFFEFF0F5);
 
 
 }
