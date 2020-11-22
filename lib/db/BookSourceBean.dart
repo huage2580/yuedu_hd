@@ -67,5 +67,37 @@ class BookSourceBean{
   }
 
 
+  BookSearchUrlBean mapUrlBean(){
+    var bean = BookSearchUrlBean();
+    var temp = searchUrl.split(',');
+    bean.url = temp[0];
+    if(!bean.url.startsWith('http')){
+      bean.url = bookSourceUrl + bean.url;
+    }
+    if(temp.length == 2){
+      var map = jsonDecode(temp[1]);
+      bean.headers = map['headers'];
+      bean.method = map['method']==null?'GET':map['method'];
+      bean.body = map['body'];
+      bean.charset = map['charset']==null?'utf8':map['charset'];
+      if(bean.charset.startsWith('gb')){
+        bean.charset = 'gbk';
+      }else{
+        bean.charset = 'utf8';
+      }
+    }
 
+    return bean;
+  }
+
+
+
+}
+
+class BookSearchUrlBean{
+  String url;
+  Map<String,String> headers;
+  String method;
+  String body;
+  String charset;//gbk gb2312,utf8
 }

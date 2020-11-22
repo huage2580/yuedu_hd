@@ -172,6 +172,16 @@ class DatabaseHelper {
     var beanList = result.map((e) => BookSourceBean.fromJson(e));
     return Future.value(beanList.toList());
   }
+
+  /// 全部启用书源
+  Future<List<BookSourceBean>> queryAllBookSourceEnabled() async {
+    var db = await withDB();
+    var result = await db.query(TABLE_SOURCE,
+        where: 'enabled == 1');
+    var beanList = result.map((e) => BookSourceBean.fromJson(e));
+    return Future.value(beanList.toList());
+  }
+
   /// 删除书源
   dynamic deleteBookSourceByIds(List<int> ids) async {
     var args = ids.fold(
