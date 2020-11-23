@@ -1,4 +1,6 @@
 
+import 'package:yuedu_hd/db/BookSourceBean.dart';
+
 class BookInfoBean{
   String name;
   String author;
@@ -8,6 +10,9 @@ class BookInfoBean{
   List<String> kind;
   String lastChapter;
   String wordCount;
+  //关联的书源
+  int source_id;
+  BookSourceBean sourceBean;
 
   @override
   String toString() {

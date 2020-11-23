@@ -154,9 +154,10 @@ class BookSearchRuleBean{
   String kind;
   String lastChapter;
   String wordCount;
+  String tocUrl;
 
   @override
   String toString() {
-    return 'BookSearchRuleBean{name: $name, author: $author, bookList: $bookList, bookUrl: $bookUrl, coverUrl: $coverUrl, intro: $intro, kind: $kind, lastChapter: $lastChapter, wordCount: $wordCount}';
+    return 'BookSearchRuleBean{name: $name, author: $author, bookList: $bookList, bookUrl: ${bookUrl??tocUrl}, coverUrl: $coverUrl, intro: $intro, kind: $kind, lastChapter: $lastChapter, wordCount: $wordCount}';
   }
 }

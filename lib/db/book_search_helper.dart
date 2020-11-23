@@ -121,9 +121,16 @@ class BookSearchHelper{
         bookInfo.lastChapter = bookParser.parseRuleString(ruleBean.lastChapter);
         bookInfo.wordCount = bookParser.parseRuleString(ruleBean.wordCount);
         bookInfo.bookUrl = bookParser.parseRuleString(ruleBean.bookUrl);
+        if(bookInfo.bookUrl == null){
+          bookInfo.bookUrl = bookParser.parseRuleString(ruleBean.tocUrl);
+        }
         bookInfo.coverUrl = bookParser.parseRuleString(ruleBean.coverUrl);
+        //链接修正
+        bookInfo.bookUrl = _checkLink(source.bookSourceUrl, bookInfo.bookUrl);
+        bookInfo.coverUrl = _checkLink(source.bookSourceUrl, bookInfo.coverUrl);
         //-------关联到书源-------------
-        //TODO 关联到书源
+        bookInfo.source_id = source.id;
+        bookInfo.sourceBean = source;
         onBookSearch(bookInfo);
       }
     }catch(e){
@@ -134,6 +141,17 @@ class BookSearchHelper{
 
   String _gbkDecoder(List<int> responseBytes, RequestOptions options, ResponseBody responseBody) {
     return gbk_bytes.decode(responseBytes);
+  }
+
+  String _checkLink(String host,String input){
+    if(input == null || input.isEmpty){
+      return "";
+    }
+    if(input.startsWith('http')){
+      return input;
+    }else{
+      return host + input;
+    }
   }
 
 }
