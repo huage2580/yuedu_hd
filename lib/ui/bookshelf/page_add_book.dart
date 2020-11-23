@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:yuedu_hd/db/book_search_helper.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 
 class PageAddBook extends StatefulWidget{
@@ -7,33 +8,45 @@ class PageAddBook extends StatefulWidget{
   _PageAddBookState createState() => _PageAddBookState();
 }
 
-class _PageAddBookState extends State<PageAddBook> {
+class _PageAddBookState extends State<PageAddBook>{
   TextEditingController _searchController = TextEditingController();
-
+  var _searchHelper = BookSearchHelper.getInstance();
 
 
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomPadding: false,
       body: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Expanded(
-            child: Column(
+            child: Stack(
               children: [
-                Container(
-                  margin: EdgeInsets.only(top: 20),
-                  child: Row(
-                    children: [
-                      IconButton(icon: Icon(CupertinoIcons.back,color: theme.primaryColor,), onPressed: (){
-                        Navigator.of(context).pop();
-                      }),
-                      Expanded(child: _buildSearch(theme)),
-                      HSpace(16),
-                    ],
-                  ),
-                )
+                Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(top: 20),
+                      child: Row(
+                        children: [
+                          IconButton(icon: Icon(CupertinoIcons.back,color: theme.primaryColor,), onPressed: (){
+                            Navigator.of(context).pop();
+                          }),
+                          Expanded(child: _buildSearch(theme)),
+                          HSpace(16),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: FloatingActionButton(onPressed: (){
+                    _searchHelper.cancelSearch('test');
+                  },child: Icon(Icons.stop),backgroundColor: theme.primaryColor,foregroundColor: theme.canvasColor,),
+                ),
               ],
             ),
           ),
@@ -59,8 +72,8 @@ class _PageAddBookState extends State<PageAddBook> {
             child: TextField(
               controller: _searchController,
               textInputAction: TextInputAction.search,
-              onEditingComplete: () {
-
+              onEditingComplete: (){
+                _searchKey();
               },
               onChanged: (s){
                 setState(() {
@@ -101,6 +114,12 @@ class _PageAddBookState extends State<PageAddBook> {
         ],
       ),
     );
+  }
+
+  dynamic _searchKey() async{
+    await _searchHelper.searchBookFromEnabledSource(_searchController.text, 'test',onBookSearch: (book){
+      print(book);
+    });
   }
 
 }

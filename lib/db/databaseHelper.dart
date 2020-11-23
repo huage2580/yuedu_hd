@@ -182,6 +182,13 @@ class DatabaseHelper {
     return Future.value(beanList.toList());
   }
 
+  Future<BookSourceBean> queryBookSourceById(int id) async{
+    return await withDB().then((db) => db.query(TABLE_SOURCE,where: '_id = $id').then((value){
+      if(value.isEmpty){return null;}
+      return BookSourceBean.fromJson(value[0]);
+    }));
+  }
+
   /// 删除书源
   dynamic deleteBookSourceByIds(List<int> ids) async {
     var args = ids.fold(
