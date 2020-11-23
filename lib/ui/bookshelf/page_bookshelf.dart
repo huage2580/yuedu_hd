@@ -23,6 +23,8 @@ class _PageBookShelfState extends State<PageBookShelf>
     ThemeData theme = Theme.of(context);
 
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       body: Container(
         padding: EdgeInsets.all(20),
         child: Column(

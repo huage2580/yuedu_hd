@@ -85,15 +85,19 @@ class BookSourceBean{
     }
     bean.method = 'GET';
     bean.charset = 'utf8';
+    bean.headers = {};
 
     if(temp.length == 2){
       var map = jsonDecode(temp[1]);
+      bean.method = map['method']==null?'GET':map['method'];
       try{
-        bean.headers = map['headers']==null?null:jsonDecode(map['headers']);
+        bean.headers = map['headers']==null?{}:jsonDecode(map['headers']);
+        if(bean.method == 'POST' && bean.headers.isEmpty){
+          bean.headers = {'content-type':r"application/x-www-form-urlencoded"};
+        }
       }catch(e){
         //pass 有些headers没有双引号，不兼容
       }
-      bean.method = map['method']==null?'GET':map['method'];
       bean.body = map['body'];
       bean.charset = map['charset']==null?'utf8':map['charset'];
       if(bean.charset.startsWith('gb')){

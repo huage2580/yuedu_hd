@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:gbk_codec/gbk_codec.dart';
 import 'package:yuedu_hd/db/BookSourceBean.dart';
@@ -38,6 +40,10 @@ class BookSearchHelper{
   ///
   dynamic searchBookFromEnabledSource(String key,String cancelToken,{OnBookSearch onBookSearch}) async{
     var bookSources = await DatabaseHelper().queryAllBookSourceEnabled();
+    if(tokenList.contains(cancelToken)){
+      developer.log('---***搜索结束[token重复]***---');
+      return Future.value(-1);
+    }
     tokenList.add(cancelToken);
     //不做分页了
     var eparser = HEvalParser({'page':1,'key':key});
@@ -51,7 +57,7 @@ class BookSearchHelper{
       developer.log('开启一轮搜索:${tokenList.length}');
       var c = 0;
       var batchList = List<BookSearchUrlBean>();
-      while(searchOptionList.isNotEmpty && c < 4){
+      while(searchOptionList.isNotEmpty && c < 10){// 10个书源一批
         var b = searchOptionList.removeAt(0);
         batchList.add(b);
         c += 1;
@@ -61,7 +67,8 @@ class BookSearchHelper{
       }
       await _batchSearch(batchList, onBookSearch);
     }
-    print('---***搜索结束***---');
+    cancelSearch(cancelToken);
+    developer.log('---***搜索结束***---');
     return Future.value(0);
   }
 
@@ -77,11 +84,11 @@ class BookSearchHelper{
   }
 
   Future<dynamic> _request(BookSearchUrlBean options,OnBookSearch onBookSearch) async{
-    Options requestOptions = Options(method: options.method,headers: options.headers,sendTimeout: 5000,receiveTimeout: 5000);
+    var contentType = options.headers['content-type'];
+    Options requestOptions = Options(method: options.method,headers: options.headers,contentType:contentType ,sendTimeout: 5000,receiveTimeout: 5000);
     if(options.charset == 'gbk'){
       requestOptions.responseDecoder = _gbkDecoder;
     }
-    developer.log("搜索请求->${options.toString()}");
     try{
       var dio = Dio();
       dio.options.connectTimeout = 5000;
