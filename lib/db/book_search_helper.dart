@@ -1,8 +1,11 @@
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:gbk_codec/gbk_codec.dart';
+import 'package:worker_manager/worker_manager.dart';
 import 'package:yuedu_hd/db/BookSourceBean.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
 import 'package:yuedu_parser/h_parser/h_eval_parser.dart';
@@ -39,6 +42,8 @@ class BookSearchHelper{
 
   ///
   dynamic searchBookFromEnabledSource(String key,String cancelToken,{bool exactSearch = false,String author,OnBookSearch onBookSearch}) async{
+    await Executor().warmUp();
+
     var bookSources = await DatabaseHelper().queryAllBookSourceEnabled();
     if(tokenList.contains(cancelToken)){
       developer.log('---***搜索结束[token重复]***---');
@@ -119,46 +124,83 @@ class BookSearchHelper{
 
   dynamic _parseResponse(String response,BookSearchUrlBean options, OnBookSearch onBookSearch) async{
     int sourceId = options.sourceId;
-    developer.log('解析搜索返回内容：$sourceId');
+    developer.log('解析搜索返回内容：$sourceId|${DateTime.now()}');
     BookSourceBean source = await DatabaseHelper().queryBookSourceById(sourceId);
     var ruleBean = source.mapSearchRuleBean();
     try{
-      var bookList = HParser(response).parseRuleElements(ruleBean.bookList);
-      for (var bookElement in bookList) {
-        var bookInfo = BookInfoBean();
-        var bookParser = HParser(bookElement.innerHtml);
-        bookInfo.name = bookParser.parseRuleString(ruleBean.name);
-        bookInfo.author = bookParser.parseRuleString(ruleBean.author);
-        bookInfo.kind = bookParser.parseRuleStrings(ruleBean.kind);
-        bookInfo.intro = bookParser.parseRuleString(ruleBean.intro);
-        bookInfo.lastChapter = bookParser.parseRuleString(ruleBean.lastChapter);
-        bookInfo.wordCount = bookParser.parseRuleString(ruleBean.wordCount);
-        bookInfo.bookUrl = bookParser.parseRuleString(ruleBean.bookUrl);
-        if(bookInfo.bookUrl == null){
-          bookInfo.bookUrl = bookParser.parseRuleString(ruleBean.tocUrl);
-        }
-        bookInfo.coverUrl = bookParser.parseRuleString(ruleBean.coverUrl);
+      //填充需要传输的数据
+      var kv = {
+        'response':response,
+        'rule_bookList':ruleBean.bookList,
+        'rule_name':ruleBean.name,
+        'rule_author':ruleBean.author,
+        'rule_kind':ruleBean.kind,
+        'rule_intro':ruleBean.intro,
+        'rule_lastChapter':ruleBean.lastChapter,
+        'rule_wordCount':ruleBean.wordCount,
+        'rule_bookUrl':ruleBean.bookUrl,
+        'rule_tocUrl':ruleBean.tocUrl,
+        'rule_coverUrl':ruleBean.coverUrl,
+      };
+
+      var str = await Executor().execute(arg1:kv,fun1: _parse);
+      var tmp = jsonDecode(str);
+      List<BookInfoBean> bookInfoList = List<BookInfoBean>();
+      for(var t in tmp){
+        bookInfoList.add(BookInfoBean.fromMap(t));
+      }
+      developer.log('解析搜索返回内容完成：$sourceId|${DateTime.now()}');
+      for (var bookInfo in bookInfoList) {
         //链接修正
         bookInfo.bookUrl = _checkLink(source.bookSourceUrl, bookInfo.bookUrl);
         bookInfo.coverUrl = _checkLink(source.bookSourceUrl, bookInfo.coverUrl);
         //-------关联到书源-------------
         bookInfo.source_id = source.id;
         bookInfo.sourceBean = source;
-        if(bookInfo.name == null || bookInfo.author == null){
-          continue;
-        }
-        bookInfo.name = bookInfo.name.trim();
-        bookInfo.author = bookInfo.author.trim();
-
         if(options.exactSearch){//精确搜索，要求书名和作者完全匹配
           if(bookInfo.name!=options.bookName || bookInfo.author!=options.bookAuthor){
             continue;
           }
         }
-
         DatabaseHelper().insertBookToDB(bookInfo);
         onBookSearch(bookInfo);
       }
+      // var bookList = HParser(response).parseRuleElements(ruleBean.bookList);
+      // for (var bookElement in bookList) {
+      //   var bookInfo = BookInfoBean();
+      //   var bookParser = HParser(bookElement.innerHtml);
+      //   bookInfo.name = bookParser.parseRuleString(ruleBean.name);
+      //   bookInfo.author = bookParser.parseRuleString(ruleBean.author);
+      //   bookInfo.kind = bookParser.parseRuleStrings(ruleBean.kind);
+      //   bookInfo.intro = bookParser.parseRuleString(ruleBean.intro);
+      //   bookInfo.lastChapter = bookParser.parseRuleString(ruleBean.lastChapter);
+      //   bookInfo.wordCount = bookParser.parseRuleString(ruleBean.wordCount);
+      //   bookInfo.bookUrl = bookParser.parseRuleString(ruleBean.bookUrl);
+      //   if(bookInfo.bookUrl == null){
+      //     bookInfo.bookUrl = bookParser.parseRuleString(ruleBean.tocUrl);
+      //   }
+      //   bookInfo.coverUrl = bookParser.parseRuleString(ruleBean.coverUrl);
+      //   //链接修正
+      //   bookInfo.bookUrl = _checkLink(source.bookSourceUrl, bookInfo.bookUrl);
+      //   bookInfo.coverUrl = _checkLink(source.bookSourceUrl, bookInfo.coverUrl);
+      //   //-------关联到书源-------------
+      //   bookInfo.source_id = source.id;
+      //   bookInfo.sourceBean = source;
+      //   if(bookInfo.name == null || bookInfo.author == null){
+      //     continue;
+      //   }
+      //   bookInfo.name = bookInfo.name.trim();
+      //   bookInfo.author = bookInfo.author.trim();
+      //
+      //   if(options.exactSearch){//精确搜索，要求书名和作者完全匹配
+      //     if(bookInfo.name!=options.bookName || bookInfo.author!=options.bookAuthor){
+      //       continue;
+      //     }
+      //   }
+      //
+      //   DatabaseHelper().insertBookToDB(bookInfo);
+      //   onBookSearch(bookInfo);
+      // }
     }catch(e){
       developer.log('搜索解析错误[${source.bookSourceName},${source.bookSourceUrl}]:$e');
     }
@@ -171,16 +213,66 @@ class BookSearchHelper{
     return gbk_bytes.decode(responseBytes);
   }
 
-  String _checkLink(String host,String input){
-    if(input == null || input.isEmpty){
-      return "";
-    }
-    if(input.startsWith('http')){
-      return input;
-    }else{
-      return host + input;
-    }
-  }
+}
 
+String _checkLink(String host,String input){
+  if(input == null || input.isEmpty){
+    return "";
+  }
+  if(input.startsWith('http')){
+    return input;
+  }else{
+    return host + input;
+  }
+}
+
+String _parse(Map map){
+  String response = map['response'];
+  BookSearchRuleBean ruleBean = BookSearchRuleBean();
+  ruleBean.bookList = map['rule_bookList'];
+  ruleBean.name = map['rule_name'];
+  ruleBean.author = map['rule_author'];
+  ruleBean.kind = map['rule_kind'];
+  ruleBean.intro = map['rule_intro'];
+  ruleBean.lastChapter = map['rule_lastChapter'];
+  ruleBean.wordCount = map['rule_wordCount'];
+  ruleBean.bookUrl = map['rule_bookUrl'];
+  ruleBean.tocUrl = map['rule_tocUrl'];
+  ruleBean.coverUrl = map['rule_coverUrl'];
+
+
+  List<BookInfoBean> result = List<BookInfoBean>();
+  try{
+    var bookList = HParser(response).parseRuleElements(ruleBean.bookList);
+    for (var bookElement in bookList) {
+      var bookInfo = BookInfoBean();
+      var bookParser = HParser(bookElement.innerHtml);
+      bookInfo.name = bookParser.parseRuleString(ruleBean.name);
+      bookInfo.author = bookParser.parseRuleString(ruleBean.author);
+      var kinds = bookParser.parseRuleStrings(ruleBean.kind);
+      bookInfo.kind = kinds==null?'':kinds.join('|');
+      bookInfo.intro = bookParser.parseRuleString(ruleBean.intro);
+      bookInfo.lastChapter = bookParser.parseRuleString(ruleBean.lastChapter);
+      bookInfo.wordCount = bookParser.parseRuleString(ruleBean.wordCount);
+      bookInfo.bookUrl = bookParser.parseRuleString(ruleBean.bookUrl);
+      if(bookInfo.bookUrl == null){
+        bookInfo.bookUrl = bookParser.parseRuleString(ruleBean.tocUrl);
+      }
+      bookInfo.coverUrl = bookParser.parseRuleString(ruleBean.coverUrl);
+      if(bookInfo.name == null || bookInfo.author == null){
+        continue;
+      }
+      bookInfo.name = bookInfo.name.trim();
+      bookInfo.author = bookInfo.author.trim();
+      result.add(bookInfo);
+    }
+  }catch(e){
+    developer.log('搜索解析错误:$e');
+  }
+  List<Map<String,String>> temp = List<Map<String,String>>();
+  for (var value in result) {
+    temp.add(value.toMap());
+  }
+  return jsonEncode(temp);
 }
 

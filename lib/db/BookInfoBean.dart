@@ -7,7 +7,7 @@ class BookInfoBean{
   String bookUrl;
   String coverUrl;
   String intro;
-  List<String> kind;
+  String kind;
   String lastChapter;
   String wordCount;
 
@@ -16,9 +16,12 @@ class BookInfoBean{
   BookSourceBean sourceBean;
   int sourceCount = 0;
 
+
+  BookInfoBean();
+
   @override
   String toString() {
-    return 'BookInfoBean{name: $name, author: $author, bookUrl: $bookUrl, coverUrl: $coverUrl, intro: $intro, kind: ${kind.fold('', (previousValue, element) => previousValue+element+',')}, lastChapter: $lastChapter, wordCount: $wordCount}';
+    return 'BookInfoBean{name: $name, author: $author, bookUrl: $bookUrl, coverUrl: $coverUrl, intro: $intro, kind: $kind, lastChapter: $lastChapter, wordCount: $wordCount}';
   }
 
   @override
@@ -31,4 +34,32 @@ class BookInfoBean{
 
   @override
   int get hashCode => name.hashCode ^ author.hashCode;
+
+
+  Map<String,String> toMap(){
+    return{
+      'name':name,
+      'author':author,
+      'bookUrl':bookUrl,
+      'coverUrl':coverUrl,
+      'intro':intro,
+      'kind':kind,
+      'lastChapter':lastChapter,
+      'wordCount':wordCount
+    };
+  }
+
+
+  BookInfoBean.fromMap(Map map){
+    name = map['name'];
+    author = map['author'];
+    bookUrl = map['bookUrl'];
+    coverUrl = map['coverUrl'];
+    intro = map['intro'];
+    kind = map['kind'];
+    lastChapter = map['lastChapter'];
+    wordCount = map['wordCount'];
+
+  }
+
 }

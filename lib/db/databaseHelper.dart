@@ -269,7 +269,7 @@ ON "book" (
           'author':infoBean.author,
           'coverUrl':infoBean.coverUrl,
           'intro':infoBean.intro,
-          'kind':infoBean.kind ==null?'':infoBean.kind.join('|'),
+          'kind':infoBean.kind ?? '',
           'lastChapter':infoBean.lastChapter,
           'wordCount':infoBean.wordCount,
           'inbookShelf':0,

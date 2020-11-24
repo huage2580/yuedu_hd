@@ -240,6 +240,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.1.0-nullsafety.3"
+  worker_manager:
+    dependency: "direct main"
+    description:
+      name: worker_manager
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.1.6"
   yuedu_parser:
     dependency: "direct main"
     description:

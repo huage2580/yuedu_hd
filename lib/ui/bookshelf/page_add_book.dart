@@ -181,7 +181,7 @@ class _PageAddBookState extends State<PageAddBook>{
       if(_searchResultList.contains(book)){
         var index = _searchResultList.indexOf(book);
         temp = _searchResultList[index];
-        if(temp.intro==null || temp.intro.isEmpty || book.intro.length > temp.intro.length){//填充简介
+        if(temp.intro==null || temp.intro.isEmpty){//填充简介
           temp.intro = book.intro;
         }
       }else{
