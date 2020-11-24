@@ -142,7 +142,7 @@ class BookSearchHelper{
         'rule_tocUrl':ruleBean.tocUrl,
         'rule_coverUrl':ruleBean.coverUrl,
       };
-
+      //用线程池执行解析，大概需要400ms
       var str = await Executor().execute(arg1:kv,fun1: _parse);
       var tmp = jsonDecode(str);
       List<BookInfoBean> bookInfoList = List<BookInfoBean>();
@@ -157,6 +157,11 @@ class BookSearchHelper{
         //-------关联到书源-------------
         bookInfo.source_id = source.id;
         bookInfo.sourceBean = source;
+        if(bookInfo.name == null || bookInfo.author == null){
+          continue;
+        }
+        bookInfo.name = bookInfo.name.trim();
+        bookInfo.author = bookInfo.author.trim();
         if(options.exactSearch){//精确搜索，要求书名和作者完全匹配
           if(bookInfo.name!=options.bookName || bookInfo.author!=options.bookAuthor){
             continue;
@@ -165,42 +170,6 @@ class BookSearchHelper{
         DatabaseHelper().insertBookToDB(bookInfo);
         onBookSearch(bookInfo);
       }
-      // var bookList = HParser(response).parseRuleElements(ruleBean.bookList);
-      // for (var bookElement in bookList) {
-      //   var bookInfo = BookInfoBean();
-      //   var bookParser = HParser(bookElement.innerHtml);
-      //   bookInfo.name = bookParser.parseRuleString(ruleBean.name);
-      //   bookInfo.author = bookParser.parseRuleString(ruleBean.author);
-      //   bookInfo.kind = bookParser.parseRuleStrings(ruleBean.kind);
-      //   bookInfo.intro = bookParser.parseRuleString(ruleBean.intro);
-      //   bookInfo.lastChapter = bookParser.parseRuleString(ruleBean.lastChapter);
-      //   bookInfo.wordCount = bookParser.parseRuleString(ruleBean.wordCount);
-      //   bookInfo.bookUrl = bookParser.parseRuleString(ruleBean.bookUrl);
-      //   if(bookInfo.bookUrl == null){
-      //     bookInfo.bookUrl = bookParser.parseRuleString(ruleBean.tocUrl);
-      //   }
-      //   bookInfo.coverUrl = bookParser.parseRuleString(ruleBean.coverUrl);
-      //   //链接修正
-      //   bookInfo.bookUrl = _checkLink(source.bookSourceUrl, bookInfo.bookUrl);
-      //   bookInfo.coverUrl = _checkLink(source.bookSourceUrl, bookInfo.coverUrl);
-      //   //-------关联到书源-------------
-      //   bookInfo.source_id = source.id;
-      //   bookInfo.sourceBean = source;
-      //   if(bookInfo.name == null || bookInfo.author == null){
-      //     continue;
-      //   }
-      //   bookInfo.name = bookInfo.name.trim();
-      //   bookInfo.author = bookInfo.author.trim();
-      //
-      //   if(options.exactSearch){//精确搜索，要求书名和作者完全匹配
-      //     if(bookInfo.name!=options.bookName || bookInfo.author!=options.bookAuthor){
-      //       continue;
-      //     }
-      //   }
-      //
-      //   DatabaseHelper().insertBookToDB(bookInfo);
-      //   onBookSearch(bookInfo);
-      // }
     }catch(e){
       developer.log('搜索解析错误[${source.bookSourceName},${source.bookSourceUrl}]:$e');
     }
