@@ -12,7 +12,7 @@ import 'dart:developer' as developer;
 import 'BookInfoBean.dart';
 
 
-typedef void OnBookSearch(dynamic data);
+typedef void OnBookSearch(BookInfoBean data);
 
 
 ///搜索书籍
@@ -46,15 +46,21 @@ class BookSearchHelper{
     }
     tokenList.add(cancelToken);
     //不做分页了
+    var sourcesNotEmpty = List<BookSourceBean>();
+    for (var value1 in bookSources) {
+      if(value1.searchUrl!=null&&value1.searchUrl.isNotEmpty){
+        sourcesNotEmpty.add(value1);
+      }
+    }
     var eparser = HEvalParser({'page':1,'key':key});
-    var searchOptionList = bookSources.takeWhile((value) => value.searchUrl!=null&&value.searchUrl.isNotEmpty).map((e){
+    var searchOptionList = sourcesNotEmpty.map((e){
       var bean = e.mapSearchUrlBean();
       bean.url = eparser.parse(bean.url);
       bean.body = eparser.parse(bean.body);
       return bean;
     }).toList();
     while(tokenList.contains(cancelToken) && searchOptionList.isNotEmpty){
-      developer.log('开启一轮搜索:${tokenList.length}');
+      developer.log('开启一轮搜索:本次剩余书源->${searchOptionList.length}');
       var c = 0;
       var batchList = List<BookSearchUrlBean>();
       while(searchOptionList.isNotEmpty && c < 10){// 10个书源一批
@@ -131,6 +137,8 @@ class BookSearchHelper{
         //-------关联到书源-------------
         bookInfo.source_id = source.id;
         bookInfo.sourceBean = source;
+
+        //todo 插入数据库，书表 和 [书、书源]关联表
         onBookSearch(bookInfo);
       }
     }catch(e){
