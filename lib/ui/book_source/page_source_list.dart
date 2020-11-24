@@ -198,8 +198,8 @@ class _StateSourceList extends State<PageSourceList> {
             child: TextField(
               controller: _searchController,
               textInputAction: TextInputAction.search,
-              onEditingComplete: () {
-                _fetchListAndUpdate(_searchController.text);
+              onSubmitted: (s){
+                _fetchListAndUpdate(s);
               },
               autofocus: false,
               maxLines: 1,

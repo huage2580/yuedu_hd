@@ -38,7 +38,7 @@ class BookSearchHelper{
   }
 
   ///
-  dynamic searchBookFromEnabledSource(String key,String cancelToken,{OnBookSearch onBookSearch}) async{
+  dynamic searchBookFromEnabledSource(String key,String cancelToken,{bool exactSearch = false,String author,OnBookSearch onBookSearch}) async{
     var bookSources = await DatabaseHelper().queryAllBookSourceEnabled();
     if(tokenList.contains(cancelToken)){
       developer.log('---***搜索结束[token重复]***---');
@@ -57,6 +57,12 @@ class BookSearchHelper{
       var bean = e.mapSearchUrlBean();
       bean.url = eparser.parse(bean.url);
       bean.body = eparser.parse(bean.body);
+      //精确搜索
+      bean.exactSearch = exactSearch;
+      if(bean.exactSearch){
+        bean.bookName = key;
+        bean.bookAuthor = author;
+      }
       return bean;
     }).toList();
     while(tokenList.contains(cancelToken) && searchOptionList.isNotEmpty){
@@ -100,7 +106,7 @@ class BookSearchHelper{
       dio.options.connectTimeout = 5000;
       var response = await dio.request(options.url,options: requestOptions,data: options.body);
       if(response.statusCode == 200){
-        await _parseResponse(response.data,options.sourceId,onBookSearch);
+        await _parseResponse(response.data,options,onBookSearch);
       }else{
         developer.log('搜索错误:书源错误${response.statusCode}');
       }
@@ -111,7 +117,8 @@ class BookSearchHelper{
     return Future.value(0);
   }
 
-  dynamic _parseResponse(String response, int sourceId, OnBookSearch onBookSearch) async{
+  dynamic _parseResponse(String response,BookSearchUrlBean options, OnBookSearch onBookSearch) async{
+    int sourceId = options.sourceId;
     developer.log('解析搜索返回内容：$sourceId');
     BookSourceBean source = await DatabaseHelper().queryBookSourceById(sourceId);
     var ruleBean = source.mapSearchRuleBean();
@@ -137,8 +144,19 @@ class BookSearchHelper{
         //-------关联到书源-------------
         bookInfo.source_id = source.id;
         bookInfo.sourceBean = source;
+        if(bookInfo.name == null || bookInfo.author == null){
+          continue;
+        }
+        bookInfo.name = bookInfo.name.trim();
+        bookInfo.author = bookInfo.author.trim();
 
-        //todo 插入数据库，书表 和 [书、书源]关联表
+        if(options.exactSearch){//精确搜索，要求书名和作者完全匹配
+          if(bookInfo.name!=options.bookName || bookInfo.author!=options.bookAuthor){
+            continue;
+          }
+        }
+
+        DatabaseHelper().insertBookToDB(bookInfo);
         onBookSearch(bookInfo);
       }
     }catch(e){
@@ -146,6 +164,8 @@ class BookSearchHelper{
     }
     return Future.value(0);
   }
+
+
 
   String _gbkDecoder(List<int> responseBytes, RequestOptions options, ResponseBody responseBody) {
     return gbk_bytes.decode(responseBytes);

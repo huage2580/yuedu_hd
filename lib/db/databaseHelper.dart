@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:sqflite/sqflite.dart';
 
+import 'BookInfoBean.dart';
 import 'BookSourceBean.dart';
 
 class DatabaseHelper {
   static const DB_PATH = "yuedu.db";
   static const TABLE_SOURCE = 'book_sources';
+  static const TABLE_BOOK = 'book';
+  static const TABLE_BOOK_COMB_SOURCE = 'book_comb_source';
 
   static const _SQL_CREATE_BOOK_SOURCES = '''
   CREATE TABLE "book_sources" (
@@ -41,6 +44,46 @@ class DatabaseHelper {
 	"bookSourceUrl");
   ''';
 
+  static const _SQL_CREATE_BOOK = '''
+  CREATE TABLE "book" (
+  "_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "name" TEXT NOT NULL,
+  "author" TEXT NOT NULL,
+  "coverUrl" TEXT,
+  "intro" TEXT,
+  "kind" TEXT,
+  "lastChapter" TEXT,
+  "wordCount" TEXT,
+  "inbookShelf" integer,
+  "group_id" INTEGER,
+  "updatetime" integer
+);
+
+CREATE INDEX "book_id_index"
+ON "book" (
+  "_id"
+);
+
+CREATE INDEX "book_name_author_index"
+ON "book" (
+  "name",
+  "author"
+);
+  ''';
+  static const _SQL_CREATE_BOOK_COMB_SOURCE = '''
+  CREATE TABLE "book_comb_source" (
+  "_id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "bookid" INTEGER NOT NULL,
+  "sourceid" INTEGER NOT NULL,
+  "bookurl" TEXT NOT NULL,
+  "used" integer DEFAULT 0,
+  FOREIGN KEY ("bookid") REFERENCES "book" ("_id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("sourceid") REFERENCES "book_sources" ("_id") ON DELETE NO ACTION ON UPDATE NO ACTION
+);
+  
+  ''';
+
+  //----------------------------------------------------------------------
   static DatabaseHelper _instance;
 
   Database _database;
@@ -67,6 +110,8 @@ class DatabaseHelper {
         onCreate: (Database db, int version) async {
       await _executeMultiSQL(db, _SQL_CREATE_BOOK_SOURCES);
       await _executeMultiSQL(db, _SQL_INDEX_SOURCE);
+      await _executeMultiSQL(db, _SQL_CREATE_BOOK);
+      await _executeMultiSQL(db, _SQL_CREATE_BOOK_COMB_SOURCE);
     });
   }
 
@@ -210,6 +255,63 @@ class DatabaseHelper {
             (previousValue, element) =>
         previousValue += (',' + element.toString()));
     return await withDB().then((db) => db.update(TABLE_SOURCE, {'enabled':enabled?1:0},where: '_id in ($args)'));
+  }
+  //-------------书籍管理-----------------
+  dynamic insertBookToDB(BookInfoBean infoBean) async{
+
+    await withDB().then((db) => db.transaction((txn) async{
+      //1书表插数据
+      var bookCheck = await txn.query(TABLE_BOOK,columns: ['_id'],where: 'name=? and author=?',whereArgs: [infoBean.name??'none',infoBean.author??'none']);
+      if(bookCheck.isEmpty){
+        //插入数据
+        await txn.insert(TABLE_BOOK, {
+          'name':infoBean.name,
+          'author':infoBean.author,
+          'coverUrl':infoBean.coverUrl,
+          'intro':infoBean.intro,
+          'kind':infoBean.kind ==null?'':infoBean.kind.join('|'),
+          'lastChapter':infoBean.lastChapter,
+          'wordCount':infoBean.wordCount,
+          'inbookShelf':0,
+          'group_id':0,
+          'updatetime':DateTime.now().millisecondsSinceEpoch,
+        });
+      }
+      bookCheck = await txn.query(TABLE_BOOK,columns: ['_id','lastChapter','wordCount','coverUrl','intro'],where: 'name=? and author=?',whereArgs: [infoBean.name??'none',infoBean.author??'none']);
+      if(bookCheck.isEmpty){
+        throw Exception('书表插入异常!');
+      }
+      var bookBean = bookCheck[0];
+      var id = bookBean['_id'];
+      //check need Update
+      var updateKV = Map<String,dynamic>();
+      if(infoBean.lastChapter != null){
+        updateKV['lastChapter'] = infoBean.lastChapter;
+      }
+      if(infoBean.wordCount != null){
+        updateKV['wordCount'] = infoBean.wordCount;
+      }
+      if(bookBean['coverUrl'] == null){
+        updateKV['coverUrl'] = infoBean.coverUrl;
+      }
+      if(bookBean['intro'] == null){
+        updateKV['intro'] = infoBean.intro;
+      }
+
+      if(updateKV.isNotEmpty){
+        await txn.update(TABLE_BOOK, updateKV,where: '_id = ?',whereArgs: [id]);
+      }
+      //2关联表插数据
+      var bookCombCheck = await txn.query(TABLE_BOOK_COMB_SOURCE,where: 'bookid = ? and sourceid = ?',whereArgs: [id,infoBean.source_id]);
+      if(bookCombCheck.isEmpty){
+        await txn.insert(TABLE_BOOK_COMB_SOURCE, {
+          'bookid':id,
+          'sourceid ':infoBean.source_id,
+          'bookurl':infoBean.bookUrl,
+          'used':0,
+        });
+      }
+    }));
   }
 
 }

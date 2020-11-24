@@ -135,6 +135,11 @@ class BookSearchUrlBean{
   String charset;
   int sourceId;
 
+  //参数
+  bool exactSearch = false;
+  String bookName;
+  String bookAuthor;
+
   @override
   String toString() {
     return 'BookSearchUrlBean{url: $url, headers: $headers, method: $method, body: $body, charset: $charset}';

@@ -87,7 +87,7 @@ class _PageAddBookState extends State<PageAddBook>{
             child: TextField(
               controller: _searchController,
               textInputAction: TextInputAction.search,
-              onEditingComplete: (){
+              onSubmitted: (s){
                 _searchKey();
               },
               onChanged: (s){
