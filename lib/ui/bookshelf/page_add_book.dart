@@ -46,10 +46,11 @@ class _PageAddBookState extends State<PageAddBook>{
                             Navigator.of(context).pop();
                           }),
                           Expanded(child: _buildSearch(theme)),
-                          HSpace(16),
+                          HSpace(8),
                         ],
                       ),
                     ),
+                    Visibility(visible: _canStop,child: LinearProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(theme.primaryColorLight),)),
                     Expanded(child: _buildSearchList(context)),
                   ],
                 ),
@@ -153,7 +154,7 @@ class _PageAddBookState extends State<PageAddBook>{
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 90,width: 60,child: Image.network(infoBean.coverUrl)),
+          SizedBox(height: 100,width: 80,child: Image.network(infoBean.coverUrl)),
           HSpace(8),
           Expanded(child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -175,16 +176,18 @@ class _PageAddBookState extends State<PageAddBook>{
     setState(() {
       _canStop = true;
     });
-    var result = await _searchHelper.searchBookFromEnabledSource(_searchController.text, 'test',onBookSearch: (book){
+    var result = await _searchHelper.searchBookFromEnabledSource(_searchController.text, 'test',onBookSearch: (book) async{
       var temp = book;
       if(_searchResultList.contains(book)){
         var index = _searchResultList.indexOf(book);
         temp = _searchResultList[index];
-        if(temp.intro==null || temp.intro.isEmpty){//填充简介
+        if(temp.intro==null || temp.intro.isEmpty || book.intro.length > temp.intro.length){//填充简介
           temp.intro = book.intro;
         }
       }else{
-        _searchResultList.add(book);
+        if(_searchResultList.length < 200){//不重复结果超过200本书，不继续搜索
+          _searchResultList.add(book);
+        }
       }
       temp.sourceCount += 1;
       //按书源数量排序

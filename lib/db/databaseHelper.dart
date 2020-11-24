@@ -285,16 +285,16 @@ ON "book" (
       var id = bookBean['_id'];
       //check need Update
       var updateKV = Map<String,dynamic>();
-      if(infoBean.lastChapter != null){
+      if(infoBean.lastChapter != null && infoBean.lastChapter.isNotEmpty){
         updateKV['lastChapter'] = infoBean.lastChapter;
       }
-      if(infoBean.wordCount != null){
+      if(infoBean.wordCount != null && infoBean.wordCount.isNotEmpty){
         updateKV['wordCount'] = infoBean.wordCount;
       }
-      if(bookBean['coverUrl'] == null){
+      if(bookBean['coverUrl'] == null || bookBean['coverUrl'].isEmpty){
         updateKV['coverUrl'] = infoBean.coverUrl;
       }
-      if(bookBean['intro'] == null){
+      if(bookBean['intro'] == null || bookBean['intro'].isEmpty){
         updateKV['intro'] = infoBean.intro;
       }
 
