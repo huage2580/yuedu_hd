@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yuedu_hd/db/BookInfoBean.dart';
 import 'package:yuedu_hd/db/book_search_helper.dart';
+import 'package:yuedu_hd/ui/bookshelf/widget_book_detail.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 
 class PageAddBook extends StatefulWidget{
@@ -16,6 +17,8 @@ class _PageAddBookState extends State<PageAddBook>{
   bool _canStop = false;
 
   var _searchResultList = List<BookInfoBean>();
+
+  var _selectBookId = 5;//5 for test,default -1
 
   @override
   void initState() {
@@ -66,8 +69,8 @@ class _PageAddBookState extends State<PageAddBook>{
               ],
             ),
           ),
-          VerticalDivider(),
-          Expanded(child: Container(color: theme.primaryColor,child: Text('data'),)),
+          VerticalDivider(width: 0.5,thickness: 0.5,),
+          Expanded(child: BookDetailWidget(_selectBookId)),
         ],
       ),
     );
@@ -145,28 +148,36 @@ class _PageAddBookState extends State<PageAddBook>{
 
   Widget _buildItem(BuildContext ctx, BookInfoBean infoBean) {
     var theme = Theme.of(ctx);
-    return Container(
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        // color: theme.cardColor,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 100,width: 80,child: Image.network(infoBean.coverUrl)),
-          HSpace(8),
-          Expanded(child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(infoBean.name,style: TextStyle(fontWeight: FontWeight.bold,fontSize: theme.textTheme.subtitle1.fontSize),),
-              Text(infoBean.author),
-              Text('${infoBean.sourceBean.bookSourceName}等${infoBean.sourceCount}个书源'),
-              Text(infoBean.intro??'没有简介内容',maxLines: 3,overflow: TextOverflow.ellipsis,softWrap: true,)
-            ],
-          )),
-        ],
+    return GestureDetector(
+      onTap: (){
+        _selectBookId = infoBean.id;
+        setState(() {
+
+        });
+      },
+      child: Container(
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          // color: theme.cardColor,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 100,width: 80,child: Image.network(infoBean.coverUrl)),
+            HSpace(8),
+            Expanded(child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(infoBean.name,style: TextStyle(fontWeight: FontWeight.bold,fontSize: theme.textTheme.subtitle1.fontSize),),
+                Text(infoBean.author),
+                Text('${infoBean.sourceBean.bookSourceName}等${infoBean.sourceCount}个书源'),
+                Text(infoBean.intro??'没有简介内容',maxLines: 3,overflow: TextOverflow.ellipsis,softWrap: true,)
+              ],
+            )),
+          ],
+        ),
       ),
     );
   }
@@ -185,7 +196,7 @@ class _PageAddBookState extends State<PageAddBook>{
           temp.intro = book.intro;
         }
       }else{
-        if(_searchResultList.length < 200){//不重复结果超过200本书，不继续搜索
+        if(_searchResultList.length < 200){//不重复结果超过200本书，不继续显示
           _searchResultList.add(book);
         }
       }

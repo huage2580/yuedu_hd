@@ -167,7 +167,8 @@ class BookSearchHelper{
             continue;
           }
         }
-        DatabaseHelper().insertBookToDB(bookInfo);
+        var bookId = await DatabaseHelper().insertBookToDB(bookInfo);
+        bookInfo.id = bookId;
         onBookSearch(bookInfo);
       }
     }catch(e){
@@ -238,7 +239,7 @@ String _parse(Map map){
   }catch(e){
     developer.log('搜索解析错误:$e');
   }
-  List<Map<String,String>> temp = List<Map<String,String>>();
+  var temp = List<Map<String,dynamic>>();
   for (var value in result) {
     temp.add(value.toMap());
   }

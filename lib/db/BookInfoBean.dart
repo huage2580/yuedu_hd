@@ -2,6 +2,7 @@
 import 'package:yuedu_hd/db/BookSourceBean.dart';
 
 class BookInfoBean{
+  int id;
   String name;
   String author;
   String bookUrl;
@@ -36,8 +37,9 @@ class BookInfoBean{
   int get hashCode => name.hashCode ^ author.hashCode;
 
 
-  Map<String,String> toMap(){
+  Map<String,dynamic> toMap(){
     return{
+      '_id':id,
       'name':name,
       'author':author,
       'bookUrl':bookUrl,
@@ -51,6 +53,7 @@ class BookInfoBean{
 
 
   BookInfoBean.fromMap(Map map){
+    id = map['_id'];
     name = map['name'];
     author = map['author'];
     bookUrl = map['bookUrl'];

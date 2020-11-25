@@ -259,7 +259,7 @@ ON "book" (
   //-------------书籍管理-----------------
   dynamic insertBookToDB(BookInfoBean infoBean) async{
 
-    await withDB().then((db) => db.transaction((txn) async{
+    return await withDB().then((db) => db.transaction((txn) async{
       //1书表插数据
       var bookCheck = await txn.query(TABLE_BOOK,columns: ['_id'],where: 'name=? and author=?',whereArgs: [infoBean.name??'none',infoBean.author??'none']);
       if(bookCheck.isEmpty){
@@ -311,7 +311,14 @@ ON "book" (
           'used':0,
         });
       }
+      return Future.value(id);
     }));
+  }
+
+  ///id获取书籍信息
+  dynamic queryBookById(int bookId) async{
+    var map = await withDB().then((db) => db.query(TABLE_BOOK,where: '_id = $bookId'));
+    return Future.value(BookInfoBean.fromMap(map[0]));
   }
 
 }
