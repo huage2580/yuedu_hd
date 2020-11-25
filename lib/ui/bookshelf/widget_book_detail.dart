@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yuedu_hd/db/BookInfoBean.dart';
+import 'package:yuedu_hd/db/book_toc_helper.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 
@@ -96,8 +97,15 @@ class BookDetailState extends State<BookDetailWidget> {
   }
 
   void _fetchDetail(int bookId) async {
+    if(bookId <= 0){
+      return;
+    }
     bookDetail = await DatabaseHelper().queryBookById(bookId);
     setState(() {});
+    var chapterList = await BookTocHelper.getInstance().updateChapterList(bookId, -1);
+    for (var value in chapterList) {
+      print(value.toString());
+    }
   }
 }
 

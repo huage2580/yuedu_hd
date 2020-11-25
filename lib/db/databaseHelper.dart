@@ -321,4 +321,37 @@ ON "book" (
     return Future.value(BookInfoBean.fromMap(map[0]));
   }
 
+  ///书籍信息，完整关联
+  ///[sourceId] <=0 表示使用当前指定的书源,没有的话默认一个
+  dynamic queryBookInfoFromBookIdCombSourceId(int bookId,int sourceId) async{
+    var db = await withDB();
+    return await db.transaction((txn) async{
+      var bookInfoQuery = await txn.query(TABLE_BOOK,where: '_id = $bookId');
+      var bookInfo = BookInfoBean.fromMap(bookInfoQuery[0]);
+      var usedSourceId = sourceId;
+      if(usedSourceId <= 0){//未指定书源，先查出所有能用的书源
+        var bookComb = await txn.query(TABLE_BOOK_COMB_SOURCE,where: 'bookid = $bookId');
+        for (var value in bookComb) {
+          if(value['used'] == 1){
+            bookInfo.bookUrl = value['bookurl'];
+            usedSourceId = value['sourceid'];
+            break;
+          }
+        }
+        //没有指定默认书源
+        if(bookInfo.bookUrl == null){
+          var comb = bookComb[0];
+          usedSourceId = comb['sourceid'];
+          var combId = comb['_id'];
+          await txn.update(TABLE_BOOK_COMB_SOURCE, {'used':1},where: '_id = ?',whereArgs: [combId]);
+          bookInfo.bookUrl = comb['bookurl'];
+        }
+      }//check sources
+      var sourceList = await txn.query(TABLE_SOURCE,where: '_id = $usedSourceId').then((list) => list.map((e) => BookSourceBean.fromJson(e)).toList());
+      bookInfo.source_id = usedSourceId;
+      bookInfo.sourceBean = sourceList[0];
+      return Future.value(bookInfo);
+    });
+  }
+
 }

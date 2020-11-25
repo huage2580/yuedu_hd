@@ -252,7 +252,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "8a9a998f50019af67b47ab31c62e33dfe60c39b7"
+      resolved-ref: "2d2c59456e135ab302967a546f15ca8a7cd58aad"
       url: "https://github.com/huage2580/reader_parser.git"
     source: git
     version: "1.0.0+1"

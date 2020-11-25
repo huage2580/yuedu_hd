@@ -1,10 +1,8 @@
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:gbk_codec/gbk_codec.dart';
+
 import 'package:worker_manager/worker_manager.dart';
 import 'package:yuedu_hd/db/BookSourceBean.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
@@ -13,7 +11,7 @@ import 'package:yuedu_parser/h_parser/h_parser.dart';
 import 'dart:developer' as developer;
 
 import 'BookInfoBean.dart';
-
+import 'utils.dart';
 
 typedef void OnBookSearch(BookInfoBean data);
 
@@ -104,7 +102,7 @@ class BookSearchHelper{
     var contentType = options.headers['content-type'];
     Options requestOptions = Options(method: options.method,headers: options.headers,contentType:contentType ,sendTimeout: 5000,receiveTimeout: 5000);
     if(options.charset == 'gbk'){
-      requestOptions.responseDecoder = _gbkDecoder;
+      requestOptions.responseDecoder = Utils.gbkDecoder;
     }
     try{
       var dio = Dio();
@@ -152,8 +150,8 @@ class BookSearchHelper{
       developer.log('解析搜索返回内容完成：$sourceId|${DateTime.now()}');
       for (var bookInfo in bookInfoList) {
         //链接修正
-        bookInfo.bookUrl = _checkLink(source.bookSourceUrl, bookInfo.bookUrl);
-        bookInfo.coverUrl = _checkLink(source.bookSourceUrl, bookInfo.coverUrl);
+        bookInfo.bookUrl = Utils.checkLink(source.bookSourceUrl, bookInfo.bookUrl);
+        bookInfo.coverUrl = Utils.checkLink(source.bookSourceUrl, bookInfo.coverUrl);
         //-------关联到书源-------------
         bookInfo.source_id = source.id;
         bookInfo.sourceBean = source;
@@ -179,22 +177,11 @@ class BookSearchHelper{
 
 
 
-  String _gbkDecoder(List<int> responseBytes, RequestOptions options, ResponseBody responseBody) {
-    return gbk_bytes.decode(responseBytes);
-  }
+
 
 }
 
-String _checkLink(String host,String input){
-  if(input == null || input.isEmpty){
-    return "";
-  }
-  if(input.startsWith('http')){
-    return input;
-  }else{
-    return host + input;
-  }
-}
+
 
 String _parse(Map map){
   String response = map['response'];
@@ -216,7 +203,7 @@ String _parse(Map map){
     var bookList = HParser(response).parseRuleElements(ruleBean.bookList);
     for (var bookElement in bookList) {
       var bookInfo = BookInfoBean();
-      var bookParser = HParser(bookElement.innerHtml);
+      var bookParser = HParser(bookElement.outerHtml);
       bookInfo.name = bookParser.parseRuleString(ruleBean.name);
       bookInfo.author = bookParser.parseRuleString(ruleBean.author);
       var kinds = bookParser.parseRuleStrings(ruleBean.kind);

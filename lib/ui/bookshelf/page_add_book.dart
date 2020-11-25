@@ -18,7 +18,7 @@ class _PageAddBookState extends State<PageAddBook>{
 
   var _searchResultList = List<BookInfoBean>();
 
-  var _selectBookId = 5;//5 for test,default -1
+  var _selectBookId = -1;//5 for test,default -1
 
   @override
   void initState() {

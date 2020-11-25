@@ -75,6 +75,9 @@ class BookSourceHelper{
     if(RegExp(RegexpRule.PARSER_TYPE_JSON).hasMatch(itemStr)){
       return false;
     }
+    if(itemStr.contains('webView')){//不支持
+      return false;
+    }
     return true;
   }
 

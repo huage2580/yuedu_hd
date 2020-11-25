@@ -32,7 +32,7 @@ class BookSourceBean{
     return 'BookSourceBean{_id: $id, bookSourceName: $bookSourceName, bookSourceGroup: $bookSourceGroup, bookSourceUrl: $bookSourceUrl, bookUrlPattern: $bookUrlPattern, bookSourceType: $bookSourceType, enabled: $enabled, enabledExplore: $enabledExplore, header: $header, loginUrl: $loginUrl, bookSourceComment: $bookSourceComment, lastUpdateTime: $lastUpdateTime, weight: $weight, exploreUrl: $exploreUrl, ruleExplore: $ruleExplore, searchUrl: $searchUrl, ruleSearch: $ruleSearch, ruleBookInfo: $ruleBookInfo, ruleToc: $ruleToc, ruleContent: $ruleContent}';
   } //json
 
-  BookSourceBean.fromJson(Map map){
+  BookSourceBean.fromJson(Map<String,dynamic> map){
     id = map['_id'];
     bookSourceName = map['bookSourceName'];
     bookSourceGroup = map['bookSourceGroup'];
@@ -125,6 +125,15 @@ class BookSourceBean{
     return bean;
   }
 
+  BookTocRuleBean mapTocRuleBean(){
+    BookTocRuleBean bean = BookTocRuleBean();
+    var map = jsonDecode(jsonDecode(ruleToc));
+    bean.chapterList = map['chapterList'];
+    bean.chapterName = map['chapterName'];
+    bean.chapterUrl = map['chapterUrl'];
+    return bean;
+  }
+
 }
 
 class BookSearchUrlBean{
@@ -164,5 +173,16 @@ class BookSearchRuleBean{
   @override
   String toString() {
     return 'BookSearchRuleBean{name: $name, author: $author, bookList: $bookList, bookUrl: ${bookUrl??tocUrl}, coverUrl: $coverUrl, intro: $intro, kind: $kind, lastChapter: $lastChapter, wordCount: $wordCount}';
+  }
+}
+
+class BookTocRuleBean{
+  String chapterList;
+  String chapterName;
+  String chapterUrl;
+
+  @override
+  String toString() {
+    return 'BookTocRuleBean{chapterList: $chapterList, chapterName: $chapterName, chapterUrl: $chapterUrl}';
   }
 }
