@@ -57,9 +57,9 @@ class DatabaseHelper {
   "lastChapter" TEXT,
   "wordCount" TEXT,
   "inbookShelf" integer,
-  "group_id" INTEGER,
+  "groupId" INTEGER,
   "updatetime" integer,
-  "lastReadChapter" integer
+  "lastReadChapter" TEXT
 );
 
 CREATE INDEX "book_id_index"
@@ -299,7 +299,7 @@ ON "book_chapter" (
           'lastChapter':infoBean.lastChapter,
           'wordCount':infoBean.wordCount,
           'inbookShelf':0,
-          'group_id':0,
+          'groupId':0,
           'updatetime':DateTime.now().millisecondsSinceEpoch,
         });
       }
@@ -385,7 +385,7 @@ ON "book_chapter" (
     return await withDB().then((db) => db.transaction((txn) async{
       for (var chapter in chapterList) {
         await txn.rawInsert('''
-        INSERT OR IGNORE INTO $TABLE_CHAPTER(
+        INSERT OR REPLACE INTO $TABLE_CHAPTER(
         name,url,bookId,sourceId
         )
         VALUES(?,?,?,?)

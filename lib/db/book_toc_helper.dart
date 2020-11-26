@@ -25,7 +25,7 @@ class BookTocHelper{
     //
   }
 
-  Future<List<BookChapterBean>> updateChapterList(int bookId,int sourceId) async{
+  Future<List<BookChapterBean>> updateChapterList(int bookId,int sourceId,{bool notUpdateDB = false}) async{
     List<BookChapterBean> result = List<BookChapterBean>();
     //1.拿到书源
     //2.书链接
@@ -61,8 +61,9 @@ class BookTocHelper{
       }
     }catch(e){
       developer.log('${book.bookUrl} 目录解析错误[使用规则${ruleBean.toString()}]:$e');
+      return Future.error(e);
     }
-    if(result.isNotEmpty){
+    if(result.isNotEmpty && !notUpdateDB){
       await DatabaseHelper().updateToc(result);
     }
 
@@ -71,6 +72,11 @@ class BookTocHelper{
 
   ///从数据库读取数据,没章节的话从网络获取
   Future<List<BookChapterBean>> getChapterList(int bookId,int sourceId) async{
+
+  }
+
+  dynamic insertChapterToDB(List<BookChapterBean> list) async{
+    return await DatabaseHelper().updateToc(list);
 
   }
 

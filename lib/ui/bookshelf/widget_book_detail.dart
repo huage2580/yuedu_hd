@@ -5,22 +5,21 @@ import 'package:yuedu_hd/db/book_toc_helper.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 
-
-
+///书籍详情
 class BookDetailWidget extends StatefulWidget {
   final int bookId;
 
-  BookDetailWidget(this.bookId):super(key: ValueKey(bookId));
+  BookDetailWidget(this.bookId) : super(key: ValueKey(bookId));
 
   @override
   State<StatefulWidget> createState() {
     return BookDetailState();
   }
-
 }
 
 class BookDetailState extends State<BookDetailWidget> {
   BookInfoBean bookDetail;
+  String firstChapter='获取目录中...';
 
   @override
   void initState() {
@@ -35,7 +34,7 @@ class BookDetailState extends State<BookDetailWidget> {
 
   Widget _buildEmpty() {
     return Container(
-      child: Text('${widget.bookId}'),
+      child: Center(child: Text(widget.bookId>0?'加载中...':'要不你先搜索下\n(*^_^*)',textAlign: TextAlign.center,)),
     );
   }
 
@@ -44,16 +43,18 @@ class BookDetailState extends State<BookDetailWidget> {
     return Column(
       children: [
         SizedBox(
-          height: 160,
+          height: 180,
           child: Stack(
             children: [
               Align(
                   alignment: Alignment.bottomCenter,
                   child: SizedBox(
-                      height: 80,
-                      width: double.maxFinite,
-                      child: CustomPaint(painter: _ArcPainter(context),),
-                      )),
+                    height: 80,
+                    width: double.maxFinite,
+                    child: CustomPaint(
+                      painter: _ArcPainter(context),
+                    ),
+                  )),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: SizedBox(
@@ -64,15 +65,57 @@ class BookDetailState extends State<BookDetailWidget> {
             ],
           ),
         ),
-        Expanded(child: Container(
+        Expanded(
+            child: Container(
           width: double.maxFinite,
           color: theme.cardColor,
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              Text(bookDetail.name,style: theme.textTheme.headline6,),
+              Text(
+                bookDetail.name,
+                style: theme.textTheme.headline5,
+              ),
               VSpace(8),
               _buildTags(context),
+              VSpace(16),
+              Expanded(child: _buildInfo(context)),
+              Divider(
+                height: 0.5,
+                thickness: 0.5,
+              ),
+              Container(
+                height: 50,
+                child: Row(
+                  children: [
+                    GestureDetector(
+                        onTap: () {},
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          child: Icon(Icons.sync),
+                        )),
+                    VerticalDivider(width: 0.5,thickness: 1,),
+                    Expanded(
+                        child: SizedBox(
+                            height: 50,
+                            child: FlatButton(
+                                onPressed: () {},
+                                child: Text('加入书架'),
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap))),
+                    Expanded(
+                        child: SizedBox(
+                            height: 50,
+                            child: FlatButton(
+                                onPressed: () {},
+                                child: Text('开始阅读'),
+                                color: theme.primaryColor,
+                                textColor: theme.canvasColor,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap))),
+                  ],
+                ),
+              ),
             ],
           ),
         )),
@@ -80,7 +123,7 @@ class BookDetailState extends State<BookDetailWidget> {
     );
   }
 
-  Widget _buildTags(BuildContext context){
+  Widget _buildTags(BuildContext context) {
     var theme = Theme.of(context);
     var tags = bookDetail.kind.split('|');
     return Wrap(
@@ -88,37 +131,120 @@ class BookDetailState extends State<BookDetailWidget> {
       children: [
         for (var tag in tags)
           Container(
-            padding: EdgeInsets.only(left: 4,right: 4),
-            decoration: BoxDecoration(color: theme.primaryColor,borderRadius: BorderRadius.all(Radius.circular(2))),
-              child: Text(tag,style: TextStyle(color: theme.accentColor,fontSize: 13),),
+            padding: EdgeInsets.only(left: 4, right: 4),
+            decoration: BoxDecoration(
+                color: theme.primaryColor,
+                borderRadius: BorderRadius.all(Radius.circular(2))),
+            child: Text(
+              tag,
+              style: TextStyle(color: theme.accentColor, fontSize: 13),
+            ),
           )
       ],
     );
   }
 
+  Widget _buildInfo(BuildContext context) {
+    var theme = Theme.of(context);
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        child: ListView(
+          children: [
+            Container(
+              padding: EdgeInsets.all(4),
+              child: Row(
+                children: [
+                  Icon(CupertinoIcons.person_circle,),
+                  HSpace(8),
+                  Text('作者: ${bookDetail.author}',style: theme.textTheme.headline6,maxLines: 1,overflow: TextOverflow.ellipsis,),
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(4),
+              child: Row(
+                children: [
+                  Icon(Icons.explore_outlined),
+                  HSpace(8),
+                  Expanded(child: Text('来源: ${bookDetail.sourceBean.bookSourceName}',style: theme.textTheme.headline6,maxLines: 1,overflow: TextOverflow.ellipsis,)),
+                  SizedBox(height: 26,width: 60,child: FlatButton(onPressed: (){}, child: Text('换源'), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,color: theme.primaryColor,textColor: theme.canvasColor,)),
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(4),
+              child: Row(
+                children: [
+                  Icon(CupertinoIcons.bolt_circle),
+                  HSpace(8),
+                  Expanded(child: Text('最新章节: ${bookDetail.lastChapter}',style: theme.textTheme.subtitle1,maxLines: 1,overflow: TextOverflow.ellipsis,)),
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(4),
+              child: Row(
+                children: [
+                  Icon(CupertinoIcons.book_circle),
+                  HSpace(8),
+                  Expanded(child: Text('目录: $firstChapter',style: theme.textTheme.subtitle1,maxLines: 1,overflow: TextOverflow.ellipsis,)),
+                  SizedBox(height: 26,child: FlatButton(onPressed: (){}, child: Text('查看目录'), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,color: theme.primaryColor,textColor: theme.canvasColor,)),
+
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(4),
+              child: Row(
+                children: [
+                  Icon(CupertinoIcons.folder_circle),
+                  HSpace(8),
+                  Expanded(child: Text('分组: 还没做呢${bookDetail.groupId}',style: theme.textTheme.subtitle1,maxLines: 1,overflow: TextOverflow.ellipsis,)),
+                  SizedBox(height: 26,child: FlatButton(onPressed: (){}, child: Text('设置分组'), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,color: theme.primaryColor,textColor: theme.canvasColor,)),
+                ],
+              ),
+            ),
+            VSpace(16),
+            Text(bookDetail.intro??'简介为空'),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _fetchDetail(int bookId) async {
-    if(bookId <= 0){
+    if (bookId <= 0) {
       return;
     }
-    bookDetail = await DatabaseHelper().queryBookById(bookId);
+    bookDetail = await DatabaseHelper().queryBookInfoFromBookIdCombSourceId(bookId,-1);
     setState(() {});
-    var chapterList = await BookTocHelper.getInstance().updateChapterList(bookId, -1);
-    for (var value in chapterList) {
-      print(value.toString());
+    var chapterList = await BookTocHelper.getInstance()
+        .updateChapterList(bookId, -1, notUpdateDB: true).catchError((e) => null);
+    // for (var value in chapterList) {
+    //   print(value.toString());
+    // }
+    if(chapterList==null || chapterList.isEmpty){
+      firstChapter = '目录空,请重试或换源';
+    }else{
+      firstChapter = chapterList[0].name;
+      bookDetail.lastChapter = chapterList.last.name;
     }
-    print('done!');
+    setState(() {
+
+    });
   }
 }
 
-class _ArcPainter extends CustomPainter{
-
+class _ArcPainter extends CustomPainter {
   Paint _mPaint;
-
 
   @override
   void paint(Canvas canvas, Size size) {
     var rectDraw = Rect.fromLTWH(0, 0, size.width, size.height);
-    var rect = Rect.fromLTWH(0, 0, size.width, size.height*2);
+    var rect = Rect.fromLTWH(0, 0, size.width, size.height * 2);
     canvas.clipRect(rectDraw);
     canvas.drawOval(rect, _mPaint);
   }
@@ -128,9 +254,8 @@ class _ArcPainter extends CustomPainter{
     return true;
   }
 
-  _ArcPainter(BuildContext context){
+  _ArcPainter(BuildContext context) {
     _mPaint = Paint();
     _mPaint.color = Theme.of(context).cardColor;
   }
-
 }

@@ -12,6 +12,7 @@ class BookInfoBean{
   String lastChapter;
   String wordCount;
   int lastReadChapter;
+  int groupId = -1;
 
   //关联的书源
   int source_id;
@@ -64,7 +65,7 @@ class BookInfoBean{
     lastChapter = map['lastChapter'];
     wordCount = map['wordCount'];
     lastReadChapter = map['lastReadChapter'];
-
+    groupId = map['groupId'];
   }
 
 }

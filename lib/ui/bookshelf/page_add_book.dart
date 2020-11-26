@@ -137,10 +137,14 @@ class _PageAddBookState extends State<PageAddBook>{
 
   Widget _buildSearchList(BuildContext context){
     return Container(
-      child: CupertinoScrollbar(
-        child: ListView.separated(itemBuilder: (ctx,index){
-          return _buildItem(ctx,_searchResultList[index]);
-        }, separatorBuilder: (c,i)=>Divider(height: 0.5,thickness: 0.5,), itemCount: _searchResultList.length),
+      child: MediaQuery.removePadding(
+        removeTop: true,
+        context: context,
+        child: CupertinoScrollbar(
+          child: ListView.separated(itemBuilder: (ctx,index){
+            return _buildItem(ctx,_searchResultList[index]);
+          }, separatorBuilder: (c,i)=>Divider(height: 0.5,thickness: 0.5,), itemCount: _searchResultList.length),
+        ),
       ),
     );
   }
@@ -185,6 +189,7 @@ class _PageAddBookState extends State<PageAddBook>{
   dynamic _searchKey() async{
     _searchResultList.clear();
     setState(() {
+      _selectBookId = -1;
       _canStop = true;
     });
     var result = await _searchHelper.searchBookFromEnabledSource(_searchController.text, 'test',onBookSearch: (book) async{
