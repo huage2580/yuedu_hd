@@ -10,6 +10,7 @@ class DatabaseHelper {
   static const TABLE_SOURCE = 'book_sources';
   static const TABLE_BOOK = 'book';
   static const TABLE_BOOK_COMB_SOURCE = 'book_comb_source';
+  static const TABLE_CHAPTER = 'book_chapter';
 
   static const _SQL_CREATE_BOOK_SOURCES = '''
   CREATE TABLE "book_sources" (
@@ -56,7 +57,8 @@ class DatabaseHelper {
   "wordCount" TEXT,
   "inbookShelf" integer,
   "group_id" INTEGER,
-  "updatetime" integer
+  "updatetime" integer,
+  "lastReadChapter" integer,
 );
 
 CREATE INDEX "book_id_index"
@@ -82,6 +84,28 @@ ON "book" (
 );
   
   ''';
+  static const _SQL_CREATE_CHAPTER ='''
+  CREATE TABLE "book_chapter" (
+  "_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "index" integer NOT NULL,
+  "bookid" INTEGER,
+  "sourceid" INTEGER,
+  "name" TEXT,
+  "content" TEXT,
+  "hasRead" integer
+);
+
+CREATE INDEX "chapter_id_index"
+ON "book_chapter" (
+  "_id"
+);
+
+CREATE INDEX "chapter_index_index"
+ON "book_chapter" (
+  "index"
+);
+  ''';
+
 
   //----------------------------------------------------------------------
   static DatabaseHelper _instance;
@@ -112,6 +136,7 @@ ON "book" (
       await _executeMultiSQL(db, _SQL_INDEX_SOURCE);
       await _executeMultiSQL(db, _SQL_CREATE_BOOK);
       await _executeMultiSQL(db, _SQL_CREATE_BOOK_COMB_SOURCE);
+      await _executeMultiSQL(db, _SQL_CREATE_CHAPTER);
     });
   }
 
