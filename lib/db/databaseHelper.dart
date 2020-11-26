@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 
 import 'BookInfoBean.dart';
 import 'BookSourceBean.dart';
+import 'bookChapterBean.dart';
 
 class DatabaseHelper {
   static const DB_PATH = "yuedu.db";
@@ -58,7 +59,7 @@ class DatabaseHelper {
   "inbookShelf" integer,
   "group_id" INTEGER,
   "updatetime" integer,
-  "lastReadChapter" integer,
+  "lastReadChapter" integer
 );
 
 CREATE INDEX "book_id_index"
@@ -87,12 +88,12 @@ ON "book" (
   static const _SQL_CREATE_CHAPTER ='''
   CREATE TABLE "book_chapter" (
   "_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  "index" integer NOT NULL,
-  "bookid" INTEGER,
-  "sourceid" INTEGER,
+  "bookId" INTEGER,
+  "sourceId" INTEGER,
   "name" TEXT,
+  "url" TEXT, 
   "content" TEXT,
-  "hasRead" integer
+  "hasRead" integer DEFAULT 0
 );
 
 CREATE INDEX "chapter_id_index"
@@ -100,9 +101,9 @@ ON "book_chapter" (
   "_id"
 );
 
-CREATE INDEX "chapter_index_index"
+CREATE UNIQUE INDEX "chapter_url_index"
 ON "book_chapter" (
-  "index"
+  "url"
 );
   ''';
 
@@ -328,6 +329,7 @@ ON "book_chapter" (
       }
       //2关联表插数据
       var bookCombCheck = await txn.query(TABLE_BOOK_COMB_SOURCE,where: 'bookid = ? and sourceid = ?',whereArgs: [id,infoBean.source_id]);
+
       if(bookCombCheck.isEmpty){
         await txn.insert(TABLE_BOOK_COMB_SOURCE, {
           'bookid':id,
@@ -377,6 +379,19 @@ ON "book_chapter" (
       bookInfo.sourceBean = sourceList[0];
       return Future.value(bookInfo);
     });
+  }
+
+  dynamic updateToc(List<BookChapterBean> chapterList) async{
+    return await withDB().then((db) => db.transaction((txn) async{
+      for (var chapter in chapterList) {
+        await txn.rawInsert('''
+        INSERT OR IGNORE INTO $TABLE_CHAPTER(
+        name,url,bookId,sourceId
+        )
+        VALUES(?,?,?,?)
+        ''',[chapter.name,chapter.url,chapter.bookId,chapter.sourceId]);
+      }
+    }));
   }
 
 }

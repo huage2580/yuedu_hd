@@ -39,17 +39,23 @@ class BookTocHelper{
     }
     //3.请求网络
     try{
+      developer.log('目录请求 ${book.bookUrl}');
       var dio = Dio();
       dio.options.connectTimeout = 5000;
       var response = await dio.get(book.bookUrl,options: requestOptions);
       if(response.statusCode == 200){
+        developer.log('目录解析 ${book.bookUrl}');
         var chapters = await _parseResponse(response.data,ruleBean);
+        if(chapters.isEmpty){
+          throw Exception('目录为空');
+        }
         for (var chapter in chapters) {
           chapter.url = Utils.checkLink(sourceBean.bookSourceUrl, chapter.url);
           chapter.bookId = book.id;
           chapter.sourceId = book.source_id;
         }
         result.addAll(chapters);
+        developer.log('目录解析完成 ${book.bookUrl}');
       }else{
         developer.log('目录解析错误:${book.bookUrl},网络错误${response.statusCode}');
       }
@@ -57,7 +63,7 @@ class BookTocHelper{
       developer.log('${book.bookUrl} 目录解析错误[使用规则${ruleBean.toString()}]:$e');
     }
     if(result.isNotEmpty){
-      //todo 更新到数据库
+      await DatabaseHelper().updateToc(result);
     }
 
     return Future.value(result);

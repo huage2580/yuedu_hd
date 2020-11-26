@@ -4,6 +4,7 @@ class BookChapterBean{
   String name;
   String url;
   String content;
+  int hasRead;
 
   int bookId;
   int sourceId;

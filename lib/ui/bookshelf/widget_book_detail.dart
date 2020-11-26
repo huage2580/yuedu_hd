@@ -106,6 +106,7 @@ class BookDetailState extends State<BookDetailWidget> {
     for (var value in chapterList) {
       print(value.toString());
     }
+    print('done!');
   }
 }
 

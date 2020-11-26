@@ -221,6 +221,9 @@ String _parse(Map map){
       }
       bookInfo.name = bookInfo.name.trim();
       bookInfo.author = bookInfo.author.trim();
+      if(bookInfo.name.isEmpty || bookInfo.author.isEmpty){
+        continue;
+      }
       result.add(bookInfo);
     }
   }catch(e){
