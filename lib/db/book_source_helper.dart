@@ -49,16 +49,18 @@ class BookSourceHelper{
   Future<int> updateDataBases(List<BookSourceBean> beanList) async{
     _log.writeln("准备更新数据库:数量${beanList.length}");
     var result = 0;
-    for(var i in beanList){
-      try{
-        await DatabaseHelper().insertOrUpdateBookSource(i);
-        result += 1;
-        _log.writeln("更新数据:${i.bookSourceUrl}");
-      }catch(e){
-        _log.writeln(e.toString());
-        break;
+    await DatabaseHelper().withDB().then((value) => value.transaction((txn) async{
+      for(var i in beanList){
+        try{
+          await DatabaseHelper().insertOrUpdateBookSource(i,txn);
+          result += 1;
+          _log.writeln("更新数据:${i.bookSourceUrl}");
+        }catch(e){
+          _log.writeln(e.toString());
+          break;
+        }
       }
-    }
+    }));
     _log.writeln("更新数据库结束:更新数量$result");
     return Future.value(result);
   }

@@ -155,10 +155,9 @@ ON "book_chapter" (
   //------书源管理----------
 
   ///没记录插入，有记录更新数据库,通过书源url索引
-  Future<int> insertOrUpdateBookSource(BookSourceBean input) async {
-    var db = await withDB();
+  Future<int> insertOrUpdateBookSource(BookSourceBean input,Transaction txn) async {
     //被迫采用这种方式
-    var update = await db.rawInsert('''
+    var update = await txn.rawInsert('''
       INSERT OR IGNORE INTO book_sources(
       _id,
       bookSourceName,
@@ -208,7 +207,7 @@ ON "book_chapter" (
       input.ruleContent
     ]);
 
-    db.update(
+    txn.update(
         DatabaseHelper.TABLE_SOURCE,
         {
           "bookSourceName": input.bookSourceName,

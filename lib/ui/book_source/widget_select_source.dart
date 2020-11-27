@@ -50,6 +50,11 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
                 FlatButton.icon(icon: Icon(_searching?Icons.stop:CupertinoIcons.refresh,size: 18,),label: Text(_searching?'终止搜索书源':'重新搜索书源',style: theme.textTheme.bodyText1,),onPressed: (){
                   _fetchMoreSource();
                 },),
+                Spacer(),
+                IconButton(icon: Icon(Icons.sync,size: 18,), onPressed: (){
+                  sourceList.clear();
+                  _fetchSourceList();
+                })
               ],
             ),
             Divider(height: 1,thickness: 1,),
