@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:yuedu_hd/db/BookInfoBean.dart';
 import 'package:yuedu_hd/db/book_toc_helper.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
+import 'package:yuedu_hd/ui/book_source/widget_select_source.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 
 ///书籍详情
@@ -170,7 +171,9 @@ class BookDetailState extends State<BookDetailWidget> {
                   Icon(Icons.explore_outlined),
                   HSpace(8),
                   Expanded(child: Text('来源: ${bookDetail.sourceBean.bookSourceName}',style: theme.textTheme.headline6,maxLines: 1,overflow: TextOverflow.ellipsis,)),
-                  SizedBox(height: 26,width: 60,child: FlatButton(onPressed: (){}, child: Text('换源'), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,color: theme.primaryColor,textColor: theme.canvasColor,)),
+                  SizedBox(height: 26,width: 60,child: FlatButton(onPressed: (){
+                    _showSelectSource(context);
+                  }, child: Text('换源'), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,color: theme.primaryColor,textColor: theme.canvasColor,)),
                 ],
               ),
             ),
@@ -220,7 +223,9 @@ class BookDetailState extends State<BookDetailWidget> {
       return;
     }
     bookDetail = await DatabaseHelper().queryBookInfoFromBookIdCombSourceId(bookId,-1);
-    setState(() {});
+    setState(() {
+      firstChapter = '获取中...';
+    });
     var chapterList = await BookTocHelper.getInstance()
         .updateChapterList(bookId, -1, notUpdateDB: true).catchError((e) => null);
     // for (var value in chapterList) {
@@ -235,6 +240,13 @@ class BookDetailState extends State<BookDetailWidget> {
     setState(() {
 
     });
+  }
+
+  void _showSelectSource(context) async{
+    var result = await showDialog(context:context,child: Dialog(child: WidgetSelectSource(widget.bookId),));
+    if(result != null){
+      _fetchDetail(widget.bookId);
+    }
   }
 }
 

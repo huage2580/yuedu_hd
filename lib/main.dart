@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:worker_manager/worker_manager.dart';
 import 'package:yuedu_hd/ui/home_page.dart';
 import 'package:yuedu_hd/ui/style/ycolors.dart';
 
@@ -7,13 +8,14 @@ import 'ui/style/ycolors.dart';
 import 'ui/style/ycolors.dart';
 import 'ui/style/ycolors.dart';
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([ 	 //强制横屏
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight
   ]);
   SystemChrome.setEnabledSystemUIOverlays([]);
+  await Executor().warmUp();
   runApp(MyApp());
 }
 

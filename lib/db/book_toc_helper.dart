@@ -1,7 +1,9 @@
 
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:worker_manager/worker_manager.dart';
 import 'package:yuedu_hd/db/BookInfoBean.dart';
 import 'package:yuedu_hd/db/BookSourceBean.dart';
 import 'package:yuedu_hd/db/bookChapterBean.dart';
@@ -26,6 +28,7 @@ class BookTocHelper{
   }
 
   Future<List<BookChapterBean>> updateChapterList(int bookId,int sourceId,{bool notUpdateDB = false}) async{
+    //warmup
     List<BookChapterBean> result = List<BookChapterBean>();
     //1.拿到书源
     //2.书链接
@@ -33,7 +36,7 @@ class BookTocHelper{
     BookSourceBean sourceBean = book.sourceBean;
     BookTocRuleBean ruleBean = book.sourceBean.mapTocRuleBean();
     var charset = sourceBean.mapSearchUrlBean().charset;
-    Options requestOptions = Options(contentType:ContentType.html.toString() ,sendTimeout: 5000,receiveTimeout: 5000);
+    Options requestOptions = Options(contentType:ContentType.html.toString() ,sendTimeout: 10000,receiveTimeout: 5000);
     if(charset == 'gbk'){
       requestOptions.responseDecoder = Utils.gbkDecoder;
     }
@@ -41,11 +44,11 @@ class BookTocHelper{
     try{
       developer.log('目录请求 ${book.bookUrl}');
       var dio = Dio();
-      dio.options.connectTimeout = 5000;
+      dio.options.connectTimeout = 10000;
       var response = await dio.get(book.bookUrl,options: requestOptions);
       if(response.statusCode == 200){
         developer.log('目录解析 ${book.bookUrl}');
-        var chapters = await _parseResponse(response.data,ruleBean);
+        var chapters = await Executor().execute(arg1: response.data as String,arg2: ruleBean,fun2: _parseResponse);
         if(chapters.isEmpty){
           throw Exception('目录为空');
         }
@@ -55,7 +58,7 @@ class BookTocHelper{
           chapter.sourceId = book.source_id;
         }
         result.addAll(chapters);
-        developer.log('目录解析完成 ${book.bookUrl}');
+        developer.log('目录解析完成 ${book.bookUrl},目录数量:${result.length}');
       }else{
         developer.log('目录解析错误:${book.bookUrl},网络错误${response.statusCode}');
       }
@@ -64,7 +67,7 @@ class BookTocHelper{
       return Future.error(e);
     }
     if(result.isNotEmpty && !notUpdateDB){
-      await DatabaseHelper().updateToc(result);
+      await insertChapterToDB(result);
     }
 
     return Future.value(result);
@@ -80,21 +83,38 @@ class BookTocHelper{
 
   }
 
+}
 
-
-  Future<List<BookChapterBean>> _parseResponse(String data, BookTocRuleBean ruleBean) async{
-    var parser = HParser(data);
-    var result = List<BookChapterBean>();
-    var eles = parser.parseRuleElements(ruleBean.chapterList);
-    for (var ele in eles) {
-      var chapterBean = BookChapterBean();
-      var eParser = HParser(ele.outerHtml);
-      chapterBean.name = eParser.parseRuleString(ruleBean.chapterName);
-      chapterBean.url = eParser.parseRuleString(ruleBean.chapterUrl);
-      result.add(chapterBean);
+List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean){
+  var parser = HParser(data);
+  var result = List<BookChapterBean>();
+  var eles = parser.parseRuleElements(ruleBean.chapterList);
+  for (var ele in eles) {
+    var chapterBean = BookChapterBean();
+    var eParser = HParser(ele.outerHtml);
+    chapterBean.name = eParser.parseRuleString(ruleBean.chapterName);
+    chapterBean.url = eParser.parseRuleString(ruleBean.chapterUrl);
+    if(chapterBean.name == null || chapterBean.name.isEmpty){
+      continue;
     }
-    return Future.value(result);
+    result.add(chapterBean);
   }
-
-
+  if(result.isNotEmpty){
+    if(result.lastIndexOf(result[0]) > 0){
+      var subIndex = 0;
+      for(var i=1; i<result.length;i++){
+        var t = result[i];
+        if(result.lastIndexOf(t) == i){
+          subIndex = i;
+          break;
+        }
+      }
+      result = result.sublist(subIndex);
+    }
+  }
+  // for(var t in result){
+  //   developer.log(t.toString());
+  // }
+  developer.log('解析的总目录${result.length}');
+  return result;
 }

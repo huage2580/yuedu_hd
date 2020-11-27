@@ -40,7 +40,7 @@ class BookSearchHelper{
 
   ///
   dynamic searchBookFromEnabledSource(String key,String cancelToken,{bool exactSearch = false,String author,OnBookSearch onBookSearch}) async{
-    await Executor().warmUp();
+    // await Executor().warmUp();
 
     var bookSources = await DatabaseHelper().queryAllBookSourceEnabled();
     if(tokenList.contains(cancelToken)){

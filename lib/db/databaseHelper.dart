@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 
 import 'BookInfoBean.dart';
 import 'BookSourceBean.dart';
+import 'BookSourceCombBean.dart';
 import 'bookChapterBean.dart';
 
 class DatabaseHelper {
@@ -343,7 +344,7 @@ ON "book_chapter" (
   }
 
   ///id获取书籍信息
-  dynamic queryBookById(int bookId) async{
+  Future<BookInfoBean> queryBookById(int bookId) async{
     var map = await withDB().then((db) => db.query(TABLE_BOOK,where: '_id = $bookId'));
     return Future.value(BookInfoBean.fromMap(map[0]));
   }
@@ -356,8 +357,8 @@ ON "book_chapter" (
       var bookInfoQuery = await txn.query(TABLE_BOOK,where: '_id = $bookId');
       var bookInfo = BookInfoBean.fromMap(bookInfoQuery[0]);
       var usedSourceId = sourceId;
+      var bookComb = await txn.query(TABLE_BOOK_COMB_SOURCE,where: 'bookid = $bookId');
       if(usedSourceId <= 0){//未指定书源，先查出所有能用的书源
-        var bookComb = await txn.query(TABLE_BOOK_COMB_SOURCE,where: 'bookid = $bookId');
         for (var value in bookComb) {
           if(value['used'] == 1){
             bookInfo.bookUrl = value['bookurl'];
@@ -365,7 +366,7 @@ ON "book_chapter" (
             break;
           }
         }
-        //没有指定默认书源
+        //没有指定默认书源,先把第一个指定成默认书源
         if(bookInfo.bookUrl == null){
           var comb = bookComb[0];
           usedSourceId = comb['sourceid'];
@@ -374,6 +375,11 @@ ON "book_chapter" (
           bookInfo.bookUrl = comb['bookurl'];
         }
       }//check sources
+      else{//指定了书源
+        var query = await txn.query(TABLE_BOOK_COMB_SOURCE,where: 'sourceid = $usedSourceId');
+        bookInfo.bookUrl = query[0]['bookurl'];
+      }
+
       var sourceList = await txn.query(TABLE_SOURCE,where: '_id = $usedSourceId').then((list) => list.map((e) => BookSourceBean.fromJson(e)).toList());
       bookInfo.source_id = usedSourceId;
       bookInfo.sourceBean = sourceList[0];
@@ -381,16 +387,55 @@ ON "book_chapter" (
     });
   }
 
+
+  ///更新章节目录
   dynamic updateToc(List<BookChapterBean> chapterList) async{
     return await withDB().then((db) => db.transaction((txn) async{
       for (var chapter in chapterList) {
         await txn.rawInsert('''
-        INSERT OR REPLACE INTO $TABLE_CHAPTER(
+        INSERT OR IGNORE INTO $TABLE_CHAPTER(
         name,url,bookId,sourceId
         )
         VALUES(?,?,?,?)
         ''',[chapter.name,chapter.url,chapter.bookId,chapter.sourceId]);
       }
+    }));
+  }
+
+  ///查询书籍关联可用的所有书源
+  dynamic queryAllEnabledSource(int bookId) async{
+    var queryResult = await withDB().then((db){
+      return db.rawQuery('''
+      SELECT
+      	book_comb_source.*,
+      	book_sources.bookSourceName,
+      	book_sources.bookSourceUrl,
+      	book_sources.enabled,
+      	book_sources.header,
+      	book_sources.searchUrl,
+      	book_sources.ruleToc 
+      FROM
+      	"book_comb_source"
+      	JOIN book_sources ON book_comb_source.sourceid = book_sources._id 
+      WHERE
+      	book_comb_source.bookid = $bookId
+      	AND book_sources.enabled = 1
+      ''');
+    } );
+    var result = List<BookSourceCombBean>();
+    for (var data in queryResult) {
+      var info = BookSourceCombBean.fromMap(data);
+      info.sourceBean = BookSourceBean.fromJson(data);//id会出错,不能使用里面的id
+      result.add(info);
+    }
+    return Future.value(result);
+  }
+
+  ///切换书源
+  dynamic switchUsedSource(int bookId,int sourceId) async{
+    return await withDB().then((db) => db.transaction((txn) async{
+      await txn.update(TABLE_BOOK_COMB_SOURCE, {'used':0},where: 'bookid = $bookId');
+      await txn.update(TABLE_BOOK_COMB_SOURCE, {'used':1},where: 'bookid = $bookId and sourceid = $sourceId');
     }));
   }
 
