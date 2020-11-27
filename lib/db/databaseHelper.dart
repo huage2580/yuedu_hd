@@ -375,7 +375,7 @@ ON "book_chapter" (
         }
       }//check sources
       else{//指定了书源
-        var query = await txn.query(TABLE_BOOK_COMB_SOURCE,where: 'sourceid = $usedSourceId');
+        var query = await txn.query(TABLE_BOOK_COMB_SOURCE,where: 'sourceid = $usedSourceId and bookid = $bookId');
         bookInfo.bookUrl = query[0]['bookurl'];
       }
 
