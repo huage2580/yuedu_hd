@@ -74,6 +74,7 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
 
   Widget _buildItem(BuildContext ctx,BookSourceCombBean bean){
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () async{
         await dbHelper.switchUsedSource(bean.bookid, bean.sourceid);
         Navigator.of(context).pop(bean.id);
