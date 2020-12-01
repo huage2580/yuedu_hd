@@ -39,6 +39,8 @@ dependencies:
   dio: 3.0.10
   # 线程管理
   worker_manager: ^3.1.6
+  # 可拖动的scrollbar
+  draggable_scrollbar: ^0.0.4
 
 dev_dependencies:
   flutter_test:

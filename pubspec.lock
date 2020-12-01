@@ -64,6 +64,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.10"
+  draggable_scrollbar:
+    dependency: "direct main"
+    description:
+      name: draggable_scrollbar
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.0.4"
   expressions:
     dependency: transitive
     description:

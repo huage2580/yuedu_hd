@@ -14,6 +14,9 @@ import 'package:yuedu_parser/h_parser/h_parser.dart';
 
 import 'utils.dart';
 
+
+typedef void OnChaptersLoad(List<BookChapterBean> chapters);
+
 ///目录更新!
 class BookTocHelper{
   static BookTocHelper _instance;
@@ -73,14 +76,17 @@ class BookTocHelper{
     return Future.value(result);
   }
 
-  ///从数据库读取数据,没章节的话从网络获取
-  Future<List<BookChapterBean>> getChapterList(int bookId,int sourceId) async{
-
+  ///从数据库读取数据
+  dynamic getChapterList(int bookId,OnChaptersLoad onChaptersLoad) async{
+    List<BookChapterBean> chaptersFromDB = await DatabaseHelper().queryBookChapters(bookId);
+    onChaptersLoad(chaptersFromDB);
+    var chaptersFromNetWork = await updateChapterList(bookId,-1,notUpdateDB: false);
+    onChaptersLoad(chaptersFromNetWork);
   }
+
 
   dynamic insertChapterToDB(List<BookChapterBean> list) async{
     return await DatabaseHelper().updateToc(list);
-
   }
 
 }

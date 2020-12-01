@@ -4,6 +4,7 @@ import 'package:yuedu_hd/db/BookInfoBean.dart';
 import 'package:yuedu_hd/db/book_toc_helper.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
 import 'package:yuedu_hd/ui/book_source/widget_select_source.dart';
+import 'package:yuedu_hd/ui/bookshelf/widget_chapters.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 
 ///书籍详情
@@ -90,7 +91,9 @@ class BookDetailState extends State<BookDetailWidget> {
                 child: Row(
                   children: [
                     GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          _fetchDetail(widget.bookId);
+                        },
                         child: Padding(
                           padding: const EdgeInsets.only(left: 20, right: 20),
                           child: Icon(Icons.sync),
@@ -100,8 +103,13 @@ class BookDetailState extends State<BookDetailWidget> {
                         child: SizedBox(
                             height: 50,
                             child: FlatButton(
-                                onPressed: () {},
-                                child: Text('加入书架'),
+                                onPressed: () async{
+                                  await DatabaseHelper().addToBookShelf(widget.bookId);
+                                  setState(() {
+                                    bookDetail.inbookShelf = 1;
+                                  });
+                                },
+                                child: Text(bookDetail.inbookShelf == 0?'加入书架':'已在书架'),
                                 materialTapTargetSize:
                                     MaterialTapTargetSize.shrinkWrap))),
                     Expanded(
@@ -194,7 +202,9 @@ class BookDetailState extends State<BookDetailWidget> {
                   Icon(CupertinoIcons.book_circle),
                   HSpace(8),
                   Expanded(child: Text('目录: $firstChapter',style: theme.textTheme.subtitle1,maxLines: 1,overflow: TextOverflow.ellipsis,)),
-                  SizedBox(height: 26,child: FlatButton(onPressed: (){}, child: Text('查看目录'), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,color: theme.primaryColor,textColor: theme.canvasColor,)),
+                  SizedBox(height: 26,child: FlatButton(onPressed: (){
+                    _showChapters(context);
+                  }, child: Text('查看目录'), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,color: theme.primaryColor,textColor: theme.canvasColor,)),
 
                 ],
               ),
@@ -248,7 +258,13 @@ class BookDetailState extends State<BookDetailWidget> {
       _fetchDetail(widget.bookId);
     }
   }
+
+  void _showChapters(BuildContext context)async{
+    var result = await showDialog(context:context,child: Dialog(child: ChaptersWidget(widget.bookId),));
+  }
+
 }
+
 
 class _ArcPainter extends CustomPainter {
   Paint _mPaint;

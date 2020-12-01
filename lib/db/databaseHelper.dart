@@ -438,4 +438,25 @@ ON "book_chapter" (
     }));
   }
 
+  ///查询所有章节目录
+  Future<List<BookChapterBean>> queryBookChapters(int bookId) async{
+    return await withDB().then((db) => db.transaction((txn) async{
+      var usedSource = await txn.query(TABLE_BOOK_COMB_SOURCE,where: 'bookid = $bookId and used = 1');
+      var usedSourceId = usedSource[0]['sourceid'];
+      var query = await txn.query(TABLE_CHAPTER,columns: [
+        '_id',
+        'name',
+        'url',
+        'hasRead',
+        'LENGTH(content) as length',
+      ],where: 'bookId = $bookId and sourceId = $usedSourceId');
+      var beanList = query.map((e) => BookChapterBean.fromJson(e)).toList();
+      return Future.value(beanList);
+    }));
+  }
+
+  dynamic addToBookShelf(int bookId) async{
+    return await withDB().then((db) => db.update(TABLE_BOOK, {'inbookShelf':1},where: '_id = $bookId'));
+  }
+
 }

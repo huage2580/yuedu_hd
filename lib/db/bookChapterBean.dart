@@ -9,9 +9,23 @@ class BookChapterBean{
   int bookId;
   int sourceId;
 
+  int length;
+
   @override
   String toString() {
     return 'BookChapterBean{id: $id, name: $name, url: $url, content: $content}';
+  }
+
+
+  BookChapterBean();
+
+  BookChapterBean.fromJson(Map map){
+    id = map['_id'];
+    name = map['name'];
+    url = map['url'];
+    content = map['content'];
+    hasRead = map['hasRead'];
+    length = map['length'];
   }
 
   @override
