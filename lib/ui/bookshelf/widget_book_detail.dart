@@ -237,7 +237,7 @@ class BookDetailState extends State<BookDetailWidget> {
       firstChapter = '获取中...';
     });
     var chapterList = await BookTocHelper.getInstance()
-        .updateChapterList(bookId, -1, notUpdateDB: true).catchError((e) => null);
+        .updateChapterList(bookId, -1, notUpdateDB: false).catchError((e) => null);
     // for (var value in chapterList) {
     //   print(value.toString());
     // }

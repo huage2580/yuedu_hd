@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:worker_manager/worker_manager.dart';
+import 'package:yuedu_hd/ui/YDRouter.dart';
 import 'package:yuedu_hd/ui/home_page.dart';
 import 'package:yuedu_hd/ui/style/ycolors.dart';
 
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: YDRouter.mainRouter,
       title: '阅读hd',
       theme: ThemeData(
         // This is the theme of your application.

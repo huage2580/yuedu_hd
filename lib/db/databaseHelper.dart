@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:sqflite/sqflite.dart';
+import 'package:yuedu_hd/db/BookShelfBean.dart';
 
 import 'BookInfoBean.dart';
 import 'BookSourceBean.dart';
@@ -348,6 +349,44 @@ ON "book_chapter" (
     return Future.value(BookInfoBean.fromMap(map[0]));
   }
 
+  ///查询在书架的书籍
+  Future<List<BookShelfBean>> queryBookInBookShelf() async{
+    return await withDB().then((db) => db.transaction((txn) async{
+      var bookList = await txn.rawQuery('''
+      SELECT
+      	book.name,
+      	book.author,
+      	book.coverUrl,
+      	book.lastChapter,
+      	book.lastReadChapter,
+      	book.updatetime,
+      	book_comb_source.bookid,
+      	book_comb_source.sourceid
+      FROM
+      	"book"
+      	JOIN book_comb_source ON book._id = book_comb_source.bookid 
+      WHERE
+      	book.inbookShelf = 1 
+      	AND book_comb_source.used = 1
+      ''').then((value) => value.map((e) => BookShelfBean.fromMap(e)).toList());
+      //章节信息补充
+      for (var book in bookList) {
+        var count = await txn.rawQuery('''
+        SELECT COUNT(*) AS chaptersCount FROM "book_chapter" WHERE book_chapter.bookId = ${book.bookId} AND book_chapter.sourceId = ${book.sourceId}
+        ''');
+        book.chaptersCount = count[0]['chaptersCount'];
+        var notReadCount = await txn.rawQuery('''
+        SELECT COUNT(*) AS notReadChapterCount FROM "book_chapter" WHERE book_chapter.bookId = ${book.bookId} AND book_chapter.sourceId = ${book.sourceId} AND _id > (SELECT _id FROM book_chapter WHERE book_chapter.name LIKE '%${book.lastReadChapter??''}%' LIMIT 1)
+        ''');
+        book.notReadChapterCount = notReadCount[0]['notReadChapterCount'];
+      }
+      return Future.value(bookList);
+    })
+    );
+
+  }
+
+
   ///书籍信息，完整关联
   ///[sourceId] <=0 表示使用当前指定的书源,没有的话默认一个
   dynamic queryBookInfoFromBookIdCombSourceId(int bookId,int sourceId) async{
@@ -397,6 +436,11 @@ ON "book_chapter" (
         )
         VALUES(?,?,?,?)
         ''',[chapter.name,chapter.url,chapter.bookId,chapter.sourceId]);
+      }
+      //更新书籍最新章节
+      if(chapterList.isNotEmpty){
+        var c = chapterList.last;
+        await txn.update(TABLE_BOOK, {'lastChapter':c.name},where: '_id = ${c.bookId}');
       }
     }));
   }
