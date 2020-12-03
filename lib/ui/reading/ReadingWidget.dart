@@ -6,6 +6,7 @@ import 'package:yuedu_hd/db/bookChapterBean.dart';
 import 'package:yuedu_hd/db/book_content_helper.dart';
 import 'package:yuedu_hd/db/book_toc_helper.dart';
 import 'package:yuedu_hd/ui/reading/DisplayPage.dart';
+import 'package:yuedu_hd/ui/reading/DisplayCache.dart';
 
 class ReadingWidget extends StatefulWidget{
   final int bookId;
@@ -19,6 +20,10 @@ class ReadingWidget extends StatefulWidget{
 }
 
 class _ReadingWidgetState extends State<ReadingWidget> {
+  static const MAX_PAGE = 1999999999;
+  static final INIT_PAGE = (MAX_PAGE/2).ceil();
+
+
   var tocHelper = BookTocHelper.getInstance();
   var contentHelper = BookContentHelper.getInstance();
   var chaptersList = List<BookChapterBean>();
@@ -26,30 +31,53 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   var initChapterId = -1;
   var displayPageList = LinkedHashMap<int,DisplayPage>();//页码对应显示页面
 
+  var sizeKey = GlobalKey();
+  var size = Size(-1, -1);
+
   PageController _controller;
-  static const MAX_PAGE = 1999999999;
-  static final INIT_PAGE = (MAX_PAGE/2).ceil();
+  var firstPage = 0;
 
   @override
   void initState() {
     _controller = PageController(initialPage: INIT_PAGE);
-    _fetchChapters();
+    Future.delayed(Duration.zero,(){_setupData();});
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: PageView.builder(itemBuilder: (ctx,index){
-        return Center(
-          child: Text("测试$index"),
-        );
-      },controller: _controller,
-        itemCount: MAX_PAGE,
+      key: sizeKey,
+      child: SizedBox(
+        width: double.maxFinite,
+        height: double.maxFinite,
+        child: PageView.builder(itemBuilder: (ctx,index){
+          if(index < firstPage){
+            return _buildErrorIndex();
+          }
+          return DisplayCache.getInstance().get(index);
+        },controller: _controller,
+          itemCount: MAX_PAGE,onPageChanged: (i){
+            print(i);
+            //todo 10张页面判断加载上下章节。
+          },
+        ),
       ),
     );
   }
 
+  Widget _buildErrorIndex(){
+    return Center(
+      child: Text('没有了啦'),
+    );
+  }
+
+
+  void _setupData() async{
+    size = Size.copy(sizeKey.currentContext.size);
+    print(size);
+    await _fetchChapters();
+  }
 
   void _fetchChapters() async{
     //只从数据库获取目录
@@ -79,26 +107,41 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       currChapterIndex = 0;
     }
     //获取章节内容
-    _loadChapter(currChapterIndex);
+    _loadChapter(currChapterIndex,INIT_PAGE,false);
+    //本章，上下章节
 
 
   }
+  ///[fromEnd]为true,[initIndex]为最后一页，需要从后往前填充内容
+  void _loadChapter(int chapterIndex,int pageIndex,bool fromEnd) async{
+    //先占位加载中页面
+    DisplayCache.getInstance().put(pageIndex, DisplayPage(DisplayPage.STATUS_LOADING, null));
+    //确定上一页为最开始的第一页
+    DisplayCache.getInstance().put(pageIndex-1, DisplayPage(DisplayPage.STATUS_LOADING, null));
+    DisplayCache.getInstance().put(pageIndex-2, DisplayPage(DisplayPage.STATUS_LOADING, '我是最前一页'));
+    firstPage = pageIndex - 2;
+    setState(() {
 
-  void _loadChapter(int chapterIndex) async{
+    });
+    //获取正文
     String chapterContent = await contentHelper.getChapterContent(chaptersList[chapterIndex].id);
     print(chapterContent);
-  }
+    DisplayCache.getInstance().put(pageIndex, DisplayPage(DisplayPage.STATUS_SUCCESS, chapterContent));
+    setState(() {
 
-  ///[fromEnd]为true,[initIndex]为最后一页，需要从后往前填充内容
-  void _fillChapter(int chapterId,int initIndex,bool fromEnd){
-    //先占位加载中页面
-    //数据库获取正文
+    });
     //失败?
+
     //成功开始分页
+
     //分页完成填充数据
+
     //通知该章节加载完成
 
+
   }
+
+
 
 
 }

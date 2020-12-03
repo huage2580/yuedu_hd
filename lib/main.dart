@@ -7,8 +7,6 @@ import 'package:yuedu_hd/ui/reading/page_reading.dart';
 import 'package:yuedu_hd/ui/style/ycolors.dart';
 
 import 'ui/style/ycolors.dart';
-import 'ui/style/ycolors.dart';
-import 'ui/style/ycolors.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();

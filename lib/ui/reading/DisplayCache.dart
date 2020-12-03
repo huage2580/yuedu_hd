@@ -16,16 +16,17 @@ class DisplayCache{
   }
 
   //-----------------限制容量的缓存-----------
-  var cache = Map<int,DisplayPage>();
+  var _cache = Map<int,DisplayPage>();
 
 
   /// maybe null
   DisplayPage get(int index){
-    return cache[index];
+    return _cache[index];
   }
 
   ///limit max cache size
   void put(int index,DisplayPage page){
-    cache[index] = page;
+    _cache[index] = page;
   }
+
 }
