@@ -503,4 +503,38 @@ ON "book_chapter" (
     return await withDB().then((db) => db.update(TABLE_BOOK, {'inbookShelf':1},where: '_id = $bookId'));
   }
 
+  ///查询章节内容
+  Future<String> queryChapterContent(int chapterId) async{
+    return await withDB().then((db) => db.query(TABLE_CHAPTER,columns: ['content'],where: '_id = $chapterId')).then((value){
+      if(value.isEmpty){
+        return null;
+      }
+      return value[0]['content'];
+    });
+  }
+
+  ///查询章节解析用的书源
+  Future<BookSourceBean> queryBookSourceByChapterId(int chapterId) async{
+    return await withDB().then((db) => db.rawQuery('''
+    SELECT
+    	* 
+    FROM
+    	book_sources 
+    WHERE
+    	_id = ( SELECT sourceid FROM book_chapter WHERE book_chapter._id = $chapterId )
+    ''')).then((value) => BookSourceBean.fromJson(value[0]));
+  }
+
+
+  ///查询章节的地址
+  Future<String> queryChapterUrl(int chapterId) async{
+    return withDB().then((db) => db.query(TABLE_CHAPTER,columns: ['url'],where: '_id = $chapterId'))
+        .then((value) => value[0]['url']);
+  }
+
+  ///更新章节内容
+  dynamic updateChapterContent(int chapterId,String content) async{
+    return withDB().then((db) => db.update(TABLE_CHAPTER, {'content':content},where: '_id = $chapterId'));
+  }
+
 }

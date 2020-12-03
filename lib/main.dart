@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'package:yuedu_hd/ui/YDRouter.dart';
 import 'package:yuedu_hd/ui/home_page.dart';
+import 'package:yuedu_hd/ui/reading/page_reading.dart';
 import 'package:yuedu_hd/ui/style/ycolors.dart';
 
 import 'ui/style/ycolors.dart';
@@ -44,6 +45,9 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
 
       ),
+      routes: <String,WidgetBuilder>{
+        YDRouter.READING_PAGE:(context)=>PageReading(),
+      },
       home: HomePage(),
     );
   }

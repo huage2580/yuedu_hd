@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 class YDRouter{
-  static const String READING_PAGE = 'reading';//{'bookId':bean.bookId,'chapterId':-1}
+  static const String READING_PAGE = 'reading';//{'bookId':bean.bookId,'initChapterName':'??'}
 
   static const String BOOKSHELF = "bookshelf";
   static const String EXPLORE = "explore";

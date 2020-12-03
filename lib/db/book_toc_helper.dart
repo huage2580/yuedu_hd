@@ -71,12 +71,13 @@ class BookTocHelper{
     }
     if(result.isNotEmpty && !notUpdateDB){
       await insertChapterToDB(result);
+      result = await DatabaseHelper().queryBookChapters(bookId);
     }
 
     return Future.value(result);
   }
 
-  ///从数据库读取数据
+  ///从数据库读取数据,再从网络更新
   dynamic getChapterList(int bookId,OnChaptersLoad onChaptersLoad) async{
     List<BookChapterBean> chaptersFromDB = await DatabaseHelper().queryBookChapters(bookId);
     onChaptersLoad(chaptersFromDB);
@@ -84,6 +85,10 @@ class BookTocHelper{
     onChaptersLoad(chaptersFromNetWork);
   }
 
+  ///仅从数据库读取数据
+  dynamic getChapterListOnlyDB(int bookId) async{
+    return await DatabaseHelper().queryBookChapters(bookId);
+  }
 
   dynamic insertChapterToDB(List<BookChapterBean> list) async{
     return await DatabaseHelper().updateToc(list);
