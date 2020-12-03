@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:waterfall_flow/waterfall_flow.dart';
 import 'package:yuedu_hd/db/BookShelfBean.dart';
 import 'package:yuedu_hd/db/book_toc_helper.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
@@ -102,7 +103,7 @@ class _PageBookShelfState extends State<PageBookShelf>
               ),
               child: Stack(
                 children: [
-                  Container(margin: EdgeInsets.all(8),child: _buildList()),
+                  Container(margin: EdgeInsets.all(8),child: _buildList(context)),
                   Container(
                     margin: EdgeInsets.all(16),
                     child: Align(
@@ -127,15 +128,18 @@ class _PageBookShelfState extends State<PageBookShelf>
     );
   }
 
-  Widget _buildList() {
+  Widget _buildList(context) {
     return RefreshIndicator(
       color: YColors.primary,
       onRefresh: ()async{
         return await _updateToc();
       },
-      child: GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,childAspectRatio: 2.4,crossAxisSpacing: 4,mainAxisSpacing: 8,
-      ), itemBuilder: (ctx,index)=>_buildBookItem(ctx, _bookList[index]),itemCount: _bookList.length,),
+      child: WaterfallFlow.builder(gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2
+      ),itemBuilder: (ctx,index)=>_buildBookItem(ctx, _bookList[index]),itemCount: _bookList.length,),
+      // child: GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      //   crossAxisCount: 2,childAspectRatio: 2.4,crossAxisSpacing: 2,mainAxisSpacing: 8,
+      // ), itemBuilder: (ctx,index)=>_buildBookItem(ctx, _bookList[index]),itemCount: _bookList.length,),
     );
   }
 
@@ -150,7 +154,7 @@ class _PageBookShelfState extends State<PageBookShelf>
         padding: EdgeInsets.all(8),
         child: Row(
           children: [
-            SizedBox(width: 80,child: Image.network(bean.coverUrl)),
+            SizedBox(height: 120,width: 100,child: Image.network(bean.coverUrl)),
             HSpace(8),
             Expanded(
               child: Column(
@@ -171,21 +175,21 @@ class _PageBookShelfState extends State<PageBookShelf>
                     children: [
                       Icon(CupertinoIcons.person_circle,size: 18,color: theme.disabledColor),
                       HSpace(4),
-                      Text(bean.bookAuthor),
+                      Text(bean.bookAuthor,style: theme.textTheme.headline6,),
                     ],
                   ),
                   Row(
                     children: [
                       Icon(CupertinoIcons.bolt_circle,size: 18,color: theme.disabledColor),
                       HSpace(4),
-                      Expanded(child: Text(bean.lastReadChapter??'未阅读',overflow: TextOverflow.ellipsis,),),
+                      Expanded(child: Text(bean.lastReadChapter??'未阅读',overflow: TextOverflow.ellipsis,style: theme.textTheme.headline6),),
                     ],
                   ),
                   Row(
                     children: [
                       Icon(CupertinoIcons.book_circle,size: 18,color: theme.disabledColor,),
                       HSpace(4),
-                      Expanded(child: Text(bean.lastChapter??'目录为空',overflow: TextOverflow.ellipsis,)),
+                      Expanded(child: Text(bean.lastChapter??'目录为空',overflow: TextOverflow.ellipsis,style: theme.textTheme.headline6)),
                     ],
                   ),
 

@@ -182,7 +182,7 @@ void main(){
     var req = await Dio().get('https://gitee.com/vpq/codes/9ji1mged7v54brhspz3of71/raw?blob_name=sy.json');
     var jsonStr = req.data;
     var sources = await helper.parseSourceString(data);
-    helper.updateDataBase(sources[0]);
+    // helper.updateDataBase(sources[0]);
     print(helper.getLog());
   });
 }
