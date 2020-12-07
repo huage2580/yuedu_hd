@@ -5,8 +5,10 @@ import 'package:flutter/widgets.dart';
 import 'package:yuedu_hd/db/bookChapterBean.dart';
 import 'package:yuedu_hd/db/book_content_helper.dart';
 import 'package:yuedu_hd/db/book_toc_helper.dart';
+import 'package:yuedu_hd/ui/reading/DisplayConfig.dart';
 import 'package:yuedu_hd/ui/reading/DisplayPage.dart';
 import 'package:yuedu_hd/ui/reading/DisplayCache.dart';
+import 'package:yuedu_hd/ui/reading/PageBreaker.dart';
 
 class ReadingWidget extends StatefulWidget{
   final int bookId;
@@ -116,26 +118,44 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   void _loadChapter(int chapterIndex,int pageIndex,bool fromEnd) async{
     //先占位加载中页面
     DisplayCache.getInstance().put(pageIndex, DisplayPage(DisplayPage.STATUS_LOADING, null));
-    //确定上一页为最开始的第一页
-    DisplayCache.getInstance().put(pageIndex-1, DisplayPage(DisplayPage.STATUS_LOADING, null));
-    DisplayCache.getInstance().put(pageIndex-2, DisplayPage(DisplayPage.STATUS_LOADING, '我是最前一页'));
-    firstPage = pageIndex - 2;
     setState(() {
-
+      firstPage = pageIndex;
     });
     //获取正文
     String chapterContent = await contentHelper.getChapterContent(chaptersList[chapterIndex].id);
     print(chapterContent);
-    DisplayCache.getInstance().put(pageIndex, DisplayPage(DisplayPage.STATUS_SUCCESS, chapterContent));
-    setState(() {
-
-    });
     //失败?
 
-    //成功开始分页
+    //成功开始分页,制造显示页面
+    DisplayConfig config = DisplayConfig.getDefault();
+    //标题，正文
+    final textStyle = TextStyle(
+      color: Color(config.textColor),
+      fontSize: config.textSize,
+    );
 
+    final textSpan = TextSpan(
+      text: chapterContent,
+      style: textStyle,
+    );
+    final titleStyle = TextStyle(
+      color: Color(config.titleColor),
+      fontSize: config.titleSize,
+      fontWeight: FontWeight.bold,
+    );
+    final titleSpan = TextSpan(
+      text: chaptersList[chapterIndex].name,
+      style: titleStyle,
+    );
+    var pageBreaker = PageBreaker(textSpan, titleSpan, size);
+    var pagesList = pageBreaker.splitPage();
     //分页完成填充数据
-
+    for(var i = 0;i< pagesList.length;i++){
+      DisplayCache.getInstance().put(pageIndex + i, DisplayPage(DisplayPage.STATUS_SUCCESS, pagesList[i]));
+    }
+    setState(() {
+      print('done!');
+    });
     //通知该章节加载完成
 
 
