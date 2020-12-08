@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yuedu_hd/ui/reading/DisplayConfig.dart';
 import 'package:yuedu_hd/ui/reading/PageBreaker.dart';
-import 'package:yuedu_hd/ui/reading/ReloadEvent.dart';
+import 'file:///G:/demo/yuedu_hd/lib/ui/reading/event/ReloadEvent.dart';
 import 'package:yuedu_hd/ui/reading/TextPage.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 

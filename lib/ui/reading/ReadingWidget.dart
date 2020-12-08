@@ -11,14 +11,14 @@ import 'package:yuedu_hd/ui/reading/DisplayConfig.dart';
 import 'package:yuedu_hd/ui/reading/DisplayPage.dart';
 import 'package:yuedu_hd/ui/reading/DisplayCache.dart';
 import 'package:yuedu_hd/ui/reading/PageBreaker.dart';
-import 'package:yuedu_hd/ui/reading/ReloadEvent.dart';
+import 'file:///G:/demo/yuedu_hd/lib/ui/reading/event/ReloadEvent.dart';
 
 class ReadingWidget extends StatefulWidget{
   final int bookId;
   final String initChapterName;
 
 
-  ReadingWidget(this.bookId, this.initChapterName);
+  ReadingWidget(this.bookId, this.initChapterName):super(key: ValueKey(initChapterName));
 
   @override
   _ReadingWidgetState createState() => _ReadingWidgetState();
@@ -50,7 +50,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   @override
   void initState() {
     _controller = PageController(initialPage: INIT_PAGE);
-    Future.delayed(Duration.zero,(){_setupData();});
+    Future.delayed(Duration(milliseconds: 400),(){_setupData();});
     reloadCallBack = () {
       var errorPage = DisplayCache.getInstance().get(ReloadEvent.getInstance().pageIndex);
       print('重新加载...${ReloadEvent.getInstance().pageIndex}');
@@ -65,21 +65,28 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   Widget build(BuildContext context) {
     return Container(
       key: sizeKey,
-      child: SizedBox(
-        width: double.maxFinite,
-        height: double.maxFinite,
-        child: PageView.builder(itemBuilder: (ctx,index){
-          if(index < firstPage){
-            return _buildErrorIndex();
-          }
-          return DisplayCache.getInstance().get(index);
-        },controller: _controller,
-          itemCount: MAX_PAGE,onPageChanged: (i){
-            Future.delayed(Duration(milliseconds: 500),(){
-              notifyPageChanged(i);
-            });
-          },
-        ),
+      child: Stack(
+        children: [
+          Center(
+            child: Text("(●'◡'●)\n加载中..."),
+          ),
+          SizedBox(
+            width: double.maxFinite,
+            height: double.maxFinite,
+            child: PageView.builder(itemBuilder: (ctx,index){
+              if(index < firstPage){
+                return _buildErrorIndex();
+              }
+              return DisplayCache.getInstance().get(index);
+            },controller: _controller,
+              itemCount: MAX_PAGE,onPageChanged: (i){
+                Future.delayed(Duration(milliseconds: 500),(){
+                  notifyPageChanged(i);
+                });
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
