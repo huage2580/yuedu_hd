@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:yuedu_hd/db/bookChapterBean.dart';
 import 'package:yuedu_hd/db/book_toc_helper.dart';
 
+typedef ItemCallback = void Function(BookChapterBean chapterBean);
+
 ///先从数据库读取，再从网络获取
 class ChaptersWidget extends StatefulWidget {
   final int bookId;
+  final ItemCallback onTap;
 
-  ChaptersWidget(this.bookId) : super(key: ValueKey(bookId));
+  ChaptersWidget(this.bookId, this.onTap) : super(key: ValueKey(bookId));
 
   @override
   _ChaptersWidgetState createState() => _ChaptersWidgetState();
@@ -62,12 +65,21 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
   }
 
   Widget _buildChapterItem(BuildContext context, BookChapterBean bean) {
-    return Container(
-      padding: EdgeInsets.all(10),
-      child: Row(
-        children: [
-          Text('${bean.name}'),
-        ],
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: (){
+        widget.onTap(bean);
+        Navigator.of(context).pop(bean.name);
+      },
+      child: Container(
+        padding: EdgeInsets.all(10),
+        child: Row(
+          children: [
+            Expanded(child: Text('${bean.name}')),
+            if(bean.length != null)
+              Icon(Icons.cloud_done,size: 16,color: Colors.grey,)
+          ],
+        ),
       ),
     );
   }

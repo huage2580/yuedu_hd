@@ -12,6 +12,10 @@ import 'package:yuedu_hd/ui/reading/DisplayPage.dart';
 import 'package:yuedu_hd/ui/reading/DisplayCache.dart';
 import 'package:yuedu_hd/ui/reading/PageBreaker.dart';
 import 'file:///G:/demo/yuedu_hd/lib/ui/reading/event/ReloadEvent.dart';
+import 'package:yuedu_hd/ui/reading/event/NextChapterEvent.dart';
+import 'package:yuedu_hd/ui/reading/event/NextPageEvent.dart';
+import 'package:yuedu_hd/ui/reading/event/PreviousChapterEvent.dart';
+import 'package:yuedu_hd/ui/reading/event/PreviousPageEvent.dart';
 
 class ReadingWidget extends StatefulWidget{
   final int bookId;
@@ -46,17 +50,46 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   BookInfoBean bookInfoBean;
 
   var reloadCallBack;
+  var nextChapterCallBack;
+  var previousChapterCallBack;
+  var nextPageCallBack;
+  var previousPageCallBack;
+
 
   @override
   void initState() {
     _controller = PageController(initialPage: INIT_PAGE);
     Future.delayed(Duration(milliseconds: 400),(){_setupData();});
+    //事件监听
     reloadCallBack = () {
       var errorPage = DisplayCache.getInstance().get(ReloadEvent.getInstance().pageIndex);
       print('重新加载...${ReloadEvent.getInstance().pageIndex}');
       _loadChapter(errorPage.chapterIndex, errorPage.viewPageIndex, errorPage.fromEnd);
     };
     ReloadEvent.getInstance().addListener(reloadCallBack);
+    nextChapterCallBack = (){
+      _nextChapter();
+    };
+    NextChapterEvent.getInstance().addListener(nextChapterCallBack);
+    previousChapterCallBack = (){
+      _previousChapter();
+    };
+    PreviousChapterEvent.getInstance().addListener(previousChapterCallBack);
+    nextPageCallBack = (){
+      var target = _controller.page.ceil() + 1;
+      if(DisplayCache.getInstance().get(target)!=null){
+        _controller.animateToPage(target,duration: Duration(milliseconds: 300),curve: Curves.ease);
+      }
+    };
+    NextPageEvent.getInstance().addListener(nextPageCallBack);
+    previousPageCallBack = (){
+      var target = _controller.page.ceil() - 1;
+      if(DisplayCache.getInstance().get(target)!=null){
+        _controller.animateToPage(target,duration: Duration(milliseconds: 300),curve: Curves.ease);
+      }
+    };
+    PreviousPageEvent.getInstance().addListener(previousPageCallBack);
+
 
     super.initState();
   }
@@ -97,11 +130,19 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     super.dispose();
     DisplayCache.getInstance().clear();
     ReloadEvent.getInstance().removeListener(reloadCallBack);
+    NextChapterEvent.getInstance().removeListener(nextChapterCallBack);
+    PreviousChapterEvent.getInstance().removeListener(previousChapterCallBack);
+    NextPageEvent.getInstance().removeListener(nextPageCallBack);
+    PreviousPageEvent.getInstance().removeListener(previousPageCallBack);
   }
 
   Widget _buildErrorIndex(){
-    return Center(
-      child: Text('没有了啦'),
+    DisplayConfig config = DisplayConfig.getDefault();
+    return Container(
+      color: Color(config.backgroundColor),
+      child: Center(
+        child: Text('没有了啦'),
+      ),
     );
   }
 
@@ -253,6 +294,28 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       _loadChapter(displayPage.chapterIndex+1, index+1, false);
     }
 
+  }
+
+  void _nextChapter() async{
+    var displayPage = DisplayCache.getInstance().get(_controller.page.ceil());
+    if(displayPage.status == DisplayPage.STATUS_SUCCESS && displayPage.chapterIndex < chaptersList.length - 1){
+      DisplayCache.getInstance().clear();
+      firstPage = INIT_PAGE;
+      await _loadChapter(displayPage.chapterIndex+1, INIT_PAGE, false);
+      _controller.jumpToPage(INIT_PAGE);
+      notifyPageChanged(INIT_PAGE);
+    }
+  }
+
+  void _previousChapter() async{
+    var displayPage = DisplayCache.getInstance().get(_controller.page.ceil());
+    if(displayPage.status == DisplayPage.STATUS_SUCCESS && displayPage.chapterIndex > 0){
+      DisplayCache.getInstance().clear();
+      firstPage = INIT_PAGE;
+      await _loadChapter(displayPage.chapterIndex - 1, INIT_PAGE, false);
+      _controller.jumpToPage(INIT_PAGE);
+      notifyPageChanged(INIT_PAGE);
+    }
   }
 
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:yuedu_hd/db/BookInfoBean.dart';
 import 'package:yuedu_hd/db/book_toc_helper.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
+import 'package:yuedu_hd/ui/YDRouter.dart';
 import 'package:yuedu_hd/ui/book_source/widget_select_source.dart';
 import 'package:yuedu_hd/ui/bookshelf/widget_chapters.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
@@ -260,7 +261,12 @@ class BookDetailState extends State<BookDetailWidget> {
   }
 
   void _showChapters(BuildContext context)async{
-    var result = await showDialog(context:context,child: Dialog(child: ChaptersWidget(widget.bookId),));
+    var result = await showDialog(context:context,child: Dialog(child: ChaptersWidget(widget.bookId,(bean){
+
+    }),));
+    if(result!=null){
+      YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':widget.bookId,'initChapterName':result});
+    }
   }
 
 }
