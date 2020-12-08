@@ -11,7 +11,7 @@ import 'package:yuedu_hd/ui/reading/DisplayConfig.dart';
 import 'package:yuedu_hd/ui/reading/DisplayPage.dart';
 import 'package:yuedu_hd/ui/reading/DisplayCache.dart';
 import 'package:yuedu_hd/ui/reading/PageBreaker.dart';
-import 'file:///G:/demo/yuedu_hd/lib/ui/reading/event/ReloadEvent.dart';
+import 'package:yuedu_hd/ui/reading/event/ReloadEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/NextChapterEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/NextPageEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/PreviousChapterEvent.dart';
