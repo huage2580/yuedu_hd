@@ -1,6 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:yuedu_hd/ui/reading/DisplayConfig.dart';
 import 'package:yuedu_hd/ui/reading/PageBreaker.dart';
 import 'package:yuedu_hd/ui/reading/TextPage.dart';
 
@@ -14,13 +15,19 @@ class DisplayPage extends StatelessWidget{
 
   final int status;
   final YDPage text;
+  final YDPage text2;
+  final int chapterIndex;
+  final int currPage;
+  final int maxPage;
 
-  DisplayPage(this.status, this.text):super(key: ValueKey(text));
+  DisplayPage(this.status, this.text,{this.text2, this.chapterIndex, this.currPage, this.maxPage}):super(key: ValueKey(text));
 
   @override
   Widget build(BuildContext context) {
+
+    var config = DisplayConfig.getDefault();
     return Container(
-      color: Colors.black45,
+      color: Color(config.backgroundColor),
       child: Stack(
         children: [
           if(status == STATUS_SUCCESS)
@@ -37,7 +44,21 @@ class DisplayPage extends StatelessWidget{
   }
 
   Widget _buildContent(){
-    return TextPage(ydPage: text,);
+    var config = DisplayConfig.getDefault();
+    return Stack(
+      children: [
+        Container(
+          padding: EdgeInsets.all(config.margin),
+          child:TextPage(ydPage: text,),
+        ),
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Text('$currPage/$maxPage'),
+        )
+
+      ],
+    );
+
   }
 
 }

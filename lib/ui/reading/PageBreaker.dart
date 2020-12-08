@@ -2,6 +2,7 @@
 import 'dart:developer' as developer;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
+import 'package:yuedu_hd/ui/reading/DisplayConfig.dart';
 
 ///指定显示区域宽高
 ///对于长文本进行分页（二分法）
@@ -30,7 +31,8 @@ class PageBreaker{
         titlePainter = TextPainter(text: titleString,textDirection: TextDirection.ltr,textAlign: TextAlign.center);
         titlePainter.layout(minWidth:drawSize.width,maxWidth: drawSize.width);
       }
-      var titleOffset = titlePainter==null?0.0:titlePainter.height+30;
+      var titleMargin = DisplayConfig.getDefault().titleMargin;
+      var titleOffset = titlePainter==null?0.0:titlePainter.height + titleMargin;
       //计算内容
       var maxIndex = currText.length - 1;
       var minIndex = 0;
@@ -58,9 +60,9 @@ class PageBreaker{
       if(currText.trim().isEmpty){
         break;
       }
-      developer.log('-----------------------------------');
-      developer.log(currText);
-      developer.log('-----------------------------------');
+      // developer.log('-----------------------------------');
+      // developer.log(currText);
+      // developer.log('-----------------------------------');
       var textPainter = TextPainter(text: TextSpan(text: currText,style: contentString.style),textDirection: TextDirection.ltr,);
       textPainter.layout(maxWidth: drawSize.width);
       var tempPage = YDPage(titleOffset,titlePainter, textPainter);

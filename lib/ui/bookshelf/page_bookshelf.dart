@@ -148,7 +148,7 @@ class _PageBookShelfState extends State<PageBookShelf>
     var theme = Theme.of(context);
     return GestureDetector(
       onTap: (){
-        YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':bean.bookId,'chapterId':-1});
+        YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':bean.bookId});
       },
       child: Container(
         padding: EdgeInsets.all(8),

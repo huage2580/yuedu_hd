@@ -2,6 +2,7 @@
 
 import 'package:yuedu_hd/ui/reading/DisplayPage.dart';
 
+///缓存清除的时候，按章节来清除,每次清除都要保证清空了一个章节
 class DisplayCache{
   static DisplayCache _instance;
   static const MAX_CACHE_SIZE = 200;
@@ -27,6 +28,10 @@ class DisplayCache{
   ///limit max cache size
   void put(int index,DisplayPage page){
     _cache[index] = page;
+  }
+
+  void clear(){
+    _cache.clear();
   }
 
 }

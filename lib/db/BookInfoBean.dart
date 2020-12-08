@@ -11,7 +11,7 @@ class BookInfoBean{
   String kind;
   String lastChapter;
   String wordCount;
-  int lastReadChapter;
+  String lastReadChapter;
   int groupId = -1;
   int inbookShelf = 0;
 
