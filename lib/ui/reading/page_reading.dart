@@ -37,8 +37,10 @@ class _PageReadingState extends State<PageReading> {
           var width = sizeKey.currentContext.size.width;
           var threshold = width/3;
           if(tapX < threshold){//上一页
+            _hideMenuBar();
             PreviousPageEvent.getInstance().emit();
           }else if(tapX > threshold * 2){//下一页
+            _hideMenuBar();
             NextPageEvent.getInstance().emit();
           }else{//菜单
             _switchMenuBar();
@@ -139,10 +141,18 @@ class _PageReadingState extends State<PageReading> {
   }
 
   void _nextChapter(){
+    _hideMenuBar();
     NextChapterEvent.getInstance().emit();
   }
 
   void _previousChapter(){
+    _hideMenuBar();
     PreviousChapterEvent.getInstance().emit();
+  }
+
+  void _hideMenuBar(){
+    setState(() {
+      showMenuBar = false;
+    });
   }
 }
