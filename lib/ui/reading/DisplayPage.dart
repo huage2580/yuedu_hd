@@ -3,7 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yuedu_hd/ui/reading/DisplayConfig.dart';
 import 'package:yuedu_hd/ui/reading/PageBreaker.dart';
+import 'package:yuedu_hd/ui/reading/ReloadEvent.dart';
 import 'package:yuedu_hd/ui/reading/TextPage.dart';
+import 'package:yuedu_hd/ui/widget/space.dart';
 
 
 //单双页，页眉页脚，左右中间间距
@@ -19,8 +21,10 @@ class DisplayPage extends StatelessWidget{
   final int chapterIndex;
   final int currPage;
   final int maxPage;
+  final int viewPageIndex;//指代在pagerView里面的序号
+  final bool fromEnd;
 
-  DisplayPage(this.status, this.text,{this.text2, this.chapterIndex, this.currPage, this.maxPage}):super(key: ValueKey(text));
+  DisplayPage(this.status, this.text,{this.text2, this.chapterIndex, this.currPage, this.maxPage, this.viewPageIndex, this.fromEnd}):super(key: ValueKey(text));
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +42,23 @@ class DisplayPage extends StatelessWidget{
                 child: Text('加载中'),
               ),
             ),
+          if(status == STATUS_ERROR)
+            _buildError(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildError(){
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('加载失败/(ㄒoㄒ)/~~'),
+          VSpace(20),
+          RaisedButton(onPressed: (){
+            ReloadEvent.getInstance().reload(viewPageIndex);
+          },child: Text('重新加载'),)
         ],
       ),
     );

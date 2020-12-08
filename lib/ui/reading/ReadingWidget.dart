@@ -11,6 +11,7 @@ import 'package:yuedu_hd/ui/reading/DisplayConfig.dart';
 import 'package:yuedu_hd/ui/reading/DisplayPage.dart';
 import 'package:yuedu_hd/ui/reading/DisplayCache.dart';
 import 'package:yuedu_hd/ui/reading/PageBreaker.dart';
+import 'package:yuedu_hd/ui/reading/ReloadEvent.dart';
 
 class ReadingWidget extends StatefulWidget{
   final int bookId;
@@ -44,10 +45,19 @@ class _ReadingWidgetState extends State<ReadingWidget> {
 
   BookInfoBean bookInfoBean;
 
+  var reloadCallBack;
+
   @override
   void initState() {
     _controller = PageController(initialPage: INIT_PAGE);
     Future.delayed(Duration.zero,(){_setupData();});
+    reloadCallBack = () {
+      var errorPage = DisplayCache.getInstance().get(ReloadEvent.getInstance().pageIndex);
+      print('重新加载...${ReloadEvent.getInstance().pageIndex}');
+      _loadChapter(errorPage.chapterIndex, errorPage.viewPageIndex, errorPage.fromEnd);
+    };
+    ReloadEvent.getInstance().addListener(reloadCallBack);
+
     super.initState();
   }
 
@@ -79,6 +89,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   void dispose() {
     super.dispose();
     DisplayCache.getInstance().clear();
+    ReloadEvent.getInstance().removeListener(reloadCallBack);
   }
 
   Widget _buildErrorIndex(){
@@ -150,10 +161,15 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     });
     //获取正文
     String chapterContent = await contentHelper.getChapterContent(chaptersList[chapterIndex].id).catchError((e){
-      DisplayCache.getInstance().put(pageIndex, DisplayPage(DisplayPage.STATUS_ERROR, null,chapterIndex: chapterIndex,));
+      DisplayCache.getInstance().put(pageIndex, DisplayPage(DisplayPage.STATUS_ERROR, null,chapterIndex: chapterIndex,fromEnd: fromEnd,viewPageIndex: pageIndex,));
+      setState(() {
+
+      });
     });
     //失败?
-
+    if(chapterContent == null){
+      return;
+    }
     //成功开始分页,制造显示页面
     DisplayConfig config = DisplayConfig.getDefault();
     //内容中每个段落开头的空格
