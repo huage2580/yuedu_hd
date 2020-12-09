@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 import 'package:yuedu_hd/db/BookShelfBean.dart';
 import 'package:yuedu_hd/db/book_toc_helper.dart';
@@ -149,7 +150,14 @@ class _PageBookShelfState extends State<PageBookShelf>
     return GestureDetector(
       onTap: (){
         YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':bean.bookId})
-            .then((value) => _fetchBookShelf());//更新阅读记录
+            .then((value){
+          SystemChrome.setPreferredOrientations([ 	 //强制横屏
+            DeviceOrientation.landscapeLeft,
+            DeviceOrientation.landscapeRight
+          ]);
+          SystemChrome.setEnabledSystemUIOverlays([]);
+          _fetchBookShelf();
+        });//更新阅读记录
       },
       child: Container(
         padding: EdgeInsets.all(8),

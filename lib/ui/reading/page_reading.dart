@@ -1,7 +1,6 @@
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:yuedu_hd/db/BookInfoBean.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
 import 'package:yuedu_hd/ui/book_source/widget_select_source.dart';
@@ -16,10 +15,7 @@ import 'package:yuedu_hd/ui/widget/PopupMenu.dart';
 
 import 'StyleMenuWidget.dart';
 
-
-
-class PageReading extends StatefulWidget{
-
+class PageReading extends StatefulWidget {
   @override
   _PageReadingState createState() => _PageReadingState();
 }
@@ -36,29 +32,40 @@ class _PageReadingState extends State<PageReading> {
   BookInfoBean bookInfo;
   int bookId = -1;
 
+  var orientation = Orientation.landscape;
+
   var _readingWidgetKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
-    chapterChangedCallBack = (){
+    //可以竖屏
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.portraitUp
+    ]);
+    SystemChrome.setEnabledSystemUIOverlays([]);
+
+    chapterChangedCallBack = () {
       currChapterName = ChapterChangedEvent.getInstance().chapterName;
-      setState(() {
-      });
+      setState(() {});
     };
     ChapterChangedEvent.getInstance().addListener(chapterChangedCallBack);
   }
 
   @override
   Widget build(BuildContext context) {
-    var args= ModalRoute.of(context).settings.arguments as Map;
-    if(bookId == -1){
+    var args = ModalRoute.of(context).settings.arguments as Map;
+    if (bookId == -1) {
       bookId = args['bookId'];
       _fetchBookInfo();
     }
-    if(initChapterName == null){
+    if (initChapterName == null) {
       initChapterName = args['initChapterName'];
-      if(initChapterName!=null){//没指定阅读章节，要从上次阅读加载
+      if (initChapterName != null) {
+        //没指定阅读章节，要从上次阅读加载
         _readingWidgetKey = GlobalKey();
       }
     }
@@ -66,149 +73,212 @@ class _PageReadingState extends State<PageReading> {
     return Scaffold(
       key: _scaffoldKey,
       body: GestureDetector(
-        onTapUp: (d){
+        onTapUp: (d) {
           var tapX = d.localPosition.dx;
           var width = sizeKey.currentContext.size.width;
-          var threshold = width/3;
-          if(tapX < threshold){//上一页
+          var threshold = width / 3;
+          if (tapX < threshold) {
+            //上一页
             _hideMenuBar();
             PreviousPageEvent.getInstance().emit();
-          }else if(tapX > threshold * 2){//下一页
+          } else if (tapX > threshold * 2) {
+            //下一页
             _hideMenuBar();
             NextPageEvent.getInstance().emit();
-          }else{//菜单
+          } else {
+            //菜单
             _switchMenuBar();
           }
         },
         child: Stack(
           key: sizeKey,
           children: [
-            ReadingWidget(bookId, initChapterName,key: _readingWidgetKey,),
+            OrientationBuilder(builder: (ctx, or) {
+              if (or != orientation) {
+                //横竖屏切换重新渲染阅读页
+                _readingWidgetKey = GlobalKey();
+                orientation = or;
+              }
+              return ReadingWidget(
+                bookId,
+                initChapterName,
+                key: _readingWidgetKey,
+              );
+            }),
             _buildMenuBar(context, theme),
           ],
         ),
       ),
       endDrawerEnableOpenDragGesture: false,
       endDrawer: Drawer(
-        child: ChaptersWidget(bookId,(bean){
-          initChapterName = bean.name;
-          _readingWidgetKey = GlobalKey();
-          setState(() {
-            showMenuBar = false;
-            //选取章节
-          });
-        },readChapterName: currChapterName,),
+        child: ChaptersWidget(
+          bookId,
+          (bean) {
+            initChapterName = bean.name;
+            _readingWidgetKey = GlobalKey();
+            setState(() {
+              showMenuBar = false;
+              //选取章节
+            });
+          },
+          readChapterName: currChapterName,
+        ),
       ),
     );
   }
 
   Visibility _buildMenuBar(BuildContext context, ThemeData theme) {
     return Visibility(
-            visible: showMenuBar,
-            child: Container(
-              width: double.maxFinite,
-              height: double.maxFinite,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      visible: showMenuBar,
+      child: Container(
+        width: double.maxFinite,
+        height: double.maxFinite,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              color: theme.primaryColor,
+              padding: EdgeInsets.all(8),
+              child: Stack(
                 children: [
-                  Container(
-                    color: theme.primaryColor,
-                    padding: EdgeInsets.all(8),
-                    child: Stack(
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                        icon: Icon(Icons.close),
+                        color: theme.accentColor,
+                        iconSize: 28,
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        }),
+                  ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: IconButton(icon: Icon(Icons.close),color: theme.accentColor,iconSize: 28, onPressed: (){
-                            Navigator.of(context).pop();
-                          }),
+                        IconButton(
+                            icon: Icon(Icons.chevron_left_outlined,
+                                color: theme.accentColor),
+                            onPressed: () {
+                              _previousChapter();
+                            }),
+                        OrientationBuilder(
+                         builder:(ctx,orn){
+                           return  Container(
+                           constraints: BoxConstraints(maxWidth:orientation == Orientation.landscape?400:80),
+                           child: Text(
+                           currChapterName ?? '加载中...',
+                           style: TextStyle(
+                           color: theme.accentColor, fontSize: 22),
+                           maxLines: 1,
+                           overflow: TextOverflow.ellipsis,
+                           ));
+                         },
                         ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(icon: Icon(Icons.chevron_left_outlined,color: theme.accentColor), onPressed: (){
-                                _previousChapter();
-                              }),
-                              Text(currChapterName??'加载中...',style: TextStyle(color: theme.accentColor,fontSize: 22),),
-                              IconButton(icon: Icon(Icons.chevron_right_outlined,color: theme.accentColor), onPressed: (){
-                                _nextChapter();
-                              }),
-                            ],
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(icon: Icon(CupertinoIcons.repeat,color: theme.accentColor), onPressed: (){
-                                _showSourceSelectDialog();
-                              }),
-                              IconButton(icon: Icon(Icons.cloud_download_outlined,color: theme.accentColor), onPressed: (){}),
-                              IconButton(key: _styleMenuKey,icon:Icon(Icons.font_download_outlined,color: theme.accentColor), onPressed: (){
-                                _showStyleMenu(context);
-                              }),
-                              IconButton(icon: Icon(Icons.menu_book,color: theme.accentColor), onPressed: (){
-                                _scaffoldKey.currentState.openEndDrawer();
-                              }),
-                            ],
-                          ),
-                        ),
-
+                        IconButton(
+                            icon: Icon(Icons.chevron_right_outlined,
+                                color: theme.accentColor),
+                            onPressed: () {
+                              _nextChapter();
+                            }),
                       ],
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    width: double.maxFinite,
-                    color: theme.canvasColor,
-                    child: Text(bookInfo==null?'获取书籍信息...':'${bookInfo.name}[${bookInfo.author}] ${bookInfo.bookUrl}'),
-                  )
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                            icon: Icon(CupertinoIcons.repeat,
+                                color: theme.accentColor),
+                            onPressed: () {
+                              _showSourceSelectDialog();
+                            }),
+                        IconButton(
+                            icon: Icon(Icons.cloud_download_outlined,
+                                color: theme.accentColor),
+                            onPressed: () {}),
+                        IconButton(
+                            key: _styleMenuKey,
+                            icon: Icon(Icons.font_download_outlined,
+                                color: theme.accentColor),
+                            onPressed: () {
+                              _showStyleMenu(context);
+                            }),
+                        IconButton(
+                            icon:
+                                Icon(Icons.menu_book, color: theme.accentColor),
+                            onPressed: () {
+                              _scaffoldKey.currentState.openEndDrawer();
+                            }),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          );
+            Container(
+              padding: EdgeInsets.all(8),
+              width: double.maxFinite,
+              color: theme.canvasColor,
+              child: Text(bookInfo == null
+                  ? '获取书籍信息...'
+                  : '${bookInfo.name}[${bookInfo.author}] $currChapterName ${bookInfo.bookUrl}'),
+            )
+          ],
+        ),
+      ),
+    );
   }
-  
+
   ///阅读样式调整菜单
-  void _showStyleMenu(BuildContext context){
+  void _showStyleMenu(BuildContext context) {
     var theme = Theme.of(context);
-    var menu = PopupMenu(context: context,contentHeight: 350,contentWidth: 260,backgroundColor: theme.cardColor,
-        child: GestureDetector(onTap: (){
-          print('menu click');
-        },behavior: HitTestBehavior.translucent,child: _buildStyleMenu(context)));
+    var menu = PopupMenu(
+        context: context,
+        contentHeight: 350,
+        contentWidth: 260,
+        backgroundColor: theme.cardColor,
+        child: GestureDetector(
+            onTap: () {
+              print('menu click');
+            },
+            behavior: HitTestBehavior.translucent,
+            child: _buildStyleMenu(context)));
     menu.show(widgetKey: _styleMenuKey);
   }
 
-  Widget _buildStyleMenu(BuildContext context){
-    return StyleMenu(onReadingStyleChanged: (){
-      _readingWidgetKey = GlobalKey();
-      setState(() {
-
-      });
-    },);
+  Widget _buildStyleMenu(BuildContext context) {
+    return StyleMenu(
+      onReadingStyleChanged: () {
+        _readingWidgetKey = GlobalKey();
+        setState(() {});
+      },
+    );
   }
 
-
-  void _showSourceSelectDialog() async{
-    var result = await showDialog(context:context,child: Dialog(child: WidgetSelectSource(bookId),));
-    if(result != null){//换源以后重新加载
+  void _showSourceSelectDialog() async {
+    var result = await showDialog(
+        context: context,
+        child: Dialog(
+          child: WidgetSelectSource(bookId),
+        ));
+    if (result != null) {
+      //换源以后重新加载
       initChapterName = null;
       _readingWidgetKey = GlobalKey();
       _hideMenuBar();
     }
   }
 
-  void _fetchBookInfo() async{
-    bookInfo = await DatabaseHelper().queryBookInfoFromBookIdCombSourceId(bookId,-1);
-    setState(() {
-
-    });
+  void _fetchBookInfo() async {
+    bookInfo =
+        await DatabaseHelper().queryBookInfoFromBookIdCombSourceId(bookId, -1);
+    setState(() {});
   }
-
 
   @override
   void dispose() {
@@ -216,27 +286,24 @@ class _PageReadingState extends State<PageReading> {
     ChapterChangedEvent.getInstance().removeListener(chapterChangedCallBack);
   }
 
-  void _switchMenuBar(){
+  void _switchMenuBar() {
     showMenuBar = !showMenuBar;
-    setState(() {
-
-    });
+    setState(() {});
   }
 
-  void _nextChapter(){
+  void _nextChapter() {
     _hideMenuBar();
     NextChapterEvent.getInstance().emit();
   }
 
-  void _previousChapter(){
+  void _previousChapter() {
     _hideMenuBar();
     PreviousChapterEvent.getInstance().emit();
   }
 
-  void _hideMenuBar(){
+  void _hideMenuBar() {
     setState(() {
       showMenuBar = false;
     });
   }
 }
-

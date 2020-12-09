@@ -59,9 +59,9 @@ class PageBreaker{
       if(currText.trim().isEmpty){
         break;
       }
-      developer.log('-----------------------------------');
-      developer.log(currText);
-      developer.log('-----------------------------------');
+      // developer.log('-----------------------------------');
+      // developer.log(currText);
+      // developer.log('-----------------------------------');
       var textPainter = TextPainter(text: TextSpan(text: currText,style: contentString.style),textDirection: TextDirection.ltr,);
       textPainter.layout(maxWidth: drawSize.width);
       var tempPage = YDPage(titleOffset,titlePainter, textPainter);

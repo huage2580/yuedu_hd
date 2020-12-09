@@ -117,7 +117,9 @@ class BookDetailState extends State<BookDetailWidget> {
                         child: SizedBox(
                             height: 50,
                             child: FlatButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':bookDetail.id});
+                                },
                                 child: Text('开始阅读'),
                                 color: theme.primaryColor,
                                 textColor: theme.canvasColor,

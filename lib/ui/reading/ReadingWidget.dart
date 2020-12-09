@@ -162,6 +162,9 @@ class _ReadingWidgetState extends State<ReadingWidget> {
 
 
   void _setupData() async{
+    if(!mounted||sizeKey.currentContext == null){
+      return;//横竖屏切换的bug
+    }
     size = Size.copy(sizeKey.currentContext.size);
     print(size);
     bookInfoBean = await _fetchBookInfo();

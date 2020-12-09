@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:yuedu_hd/ui/YDRouter.dart';
 import 'package:yuedu_hd/ui/book_source/page_source_add.dart';
@@ -28,6 +29,11 @@ class HomeState extends State<HomePage> {
 
   @override
   void initState() {
+    SystemChrome.setPreferredOrientations([ 	 //强制横屏
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight
+    ]);
+    SystemChrome.setEnabledSystemUIOverlays([]);
     super.initState();
   }
 
