@@ -138,9 +138,11 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
   dynamic updateChapter(BookSourceCombBean source) async{
     await BookTocHelper.getInstance().updateChapterList(source.bookid, source.sourceid,notUpdateDB: true).then((chapters){
       source.lastChapterName = chapters.last.name;
-      setState(() {
+      if(this.mounted){
+        setState(() {
 
-      });
+        });
+      }
     }).catchError((e){
       source.lastChapterName = '[X]目录解析异常';
       setState(() {

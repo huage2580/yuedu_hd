@@ -24,7 +24,7 @@ class ReadingWidget extends StatefulWidget{
   final String initChapterName;
 
 
-  ReadingWidget(this.bookId, this.initChapterName):super(key: ValueKey(initChapterName));
+  ReadingWidget(this.bookId, this.initChapterName,{key}):super(key: key);
 
   @override
   _ReadingWidgetState createState() => _ReadingWidgetState();
@@ -58,11 +58,15 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   var nextPageCallBack;
   var previousPageCallBack;
 
+  var errorTips;
 
   @override
   void initState() {
     _controller = PageController(initialPage: INIT_PAGE);
-    Future.delayed(Duration(milliseconds: 400),(){_setupData();});
+    Future.delayed(Duration(milliseconds: 400),(){
+      DisplayCache.getInstance().clear();
+      _setupData();
+    });
     //事件监听
     reloadCallBack = () {
       var errorPage = DisplayCache.getInstance().get(ReloadEvent.getInstance().pageIndex);
@@ -104,7 +108,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       child: Stack(
         children: [
           Center(
-            child: Text("(●'◡'●)\n加载中..."),
+            child: Text(errorTips??"(●'◡'●)\n加载中..."),
           ),
           SizedBox(
             width: double.maxFinite,
@@ -179,7 +183,21 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   ///目录加载完成
   void _onChaptersLoad() async{
     if(chaptersList.isEmpty){
-      return;
+      setState(() {
+        errorTips = "本地章节为空，正在获取网络数据...";
+      });
+      //从网络获取章节
+      chaptersList = await tocHelper.updateChapterList(widget.bookId, -1).catchError((e){
+        setState(() {
+          errorTips = "章节加载失败，请重试或换源";
+        });
+      });
+      if(chaptersList == null || chaptersList.isEmpty){
+        setState(() {
+          errorTips = "章节加载失败，请重试或换源";
+        });
+        return;
+      }
     }
     //当前阅读的章节，找到章节id
     for(var i =0;i<chaptersList.length;i++){
@@ -226,13 +244,14 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       });
     });
     //失败?
-    if(chapterContent == null){
+    if(chapterContent == null || chapterContent.isEmpty){
       return Future.value(-1);
     }
     //成功开始分页,制造显示页面
     DisplayConfig config = DisplayConfig.getDefault();
     //内容中每个段落开头的空格
-    chapterContent = chapterContent.replaceAll('\n', '\n${' ' * config.spaceParagraph}');
+    var spaceForParagraph = ' ' * config.spaceParagraph;
+    chapterContent = spaceForParagraph + chapterContent.replaceAll('\n', '\n$spaceForParagraph');
 
     //标题，正文
     final textStyle = TextStyle(

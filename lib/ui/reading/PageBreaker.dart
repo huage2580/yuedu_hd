@@ -20,7 +20,7 @@ class PageBreaker{
   List<YDPage> splitPage(){
     var results = List<YDPage>();
     //当前页面的文字
-    String currText = contentString.text;
+    String currText = contentString.text + ' ';//二分缺失的bug，干脆添个空格
     //剩余文字
     String overText = '';
 
@@ -34,7 +34,7 @@ class PageBreaker{
       var titleMargin = DisplayConfig.getDefault().titleMargin;
       var titleOffset = titlePainter==null?0.0:titlePainter.height + titleMargin;
       //计算内容
-      var maxIndex = currText.length - 1;
+      var maxIndex = currText.length;
       var minIndex = 0;
       var maybeIndex = 0;
       //二分得出最后需要截取的位置
@@ -54,15 +54,14 @@ class PageBreaker{
           minIndex = maybeIndex;
         }
       }
-
       overText = currText.substring(maybeIndex);
       currText = currText.substring(0,maybeIndex);
       if(currText.trim().isEmpty){
         break;
       }
-      // developer.log('-----------------------------------');
-      // developer.log(currText);
-      // developer.log('-----------------------------------');
+      developer.log('-----------------------------------');
+      developer.log(currText);
+      developer.log('-----------------------------------');
       var textPainter = TextPainter(text: TextSpan(text: currText,style: contentString.style),textDirection: TextDirection.ltr,);
       textPainter.layout(maxWidth: drawSize.width);
       var tempPage = YDPage(titleOffset,titlePainter, textPainter);

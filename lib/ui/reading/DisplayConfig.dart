@@ -11,7 +11,7 @@ class DisplayConfig{
   double titleSize = 24;//标题大小
   int titleColor = 0xff000000;//标题颜色
   double titleMargin = 0;//标题和正文的间距
-  int spaceParagraph = 8;//段落开头空格
+  int spaceParagraph = 4;//段落开头空格
 
   static DisplayConfig getDefault(){
     return DisplayConfig();

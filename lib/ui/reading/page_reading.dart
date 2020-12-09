@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yuedu_hd/db/BookInfoBean.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
+import 'package:yuedu_hd/ui/book_source/widget_select_source.dart';
 import 'package:yuedu_hd/ui/bookshelf/widget_chapters.dart';
 import 'package:yuedu_hd/ui/reading/ReadingWidget.dart';
 import 'package:yuedu_hd/ui/reading/event/ChapterChangedEvent.dart';
@@ -31,12 +32,14 @@ class _PageReadingState extends State<PageReading> {
   BookInfoBean bookInfo;
   int bookId = -1;
 
+  var _readingWidgetKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
     chapterChangedCallBack = (){
+      currChapterName = ChapterChangedEvent.getInstance().chapterName;
       setState(() {
-        currChapterName = ChapterChangedEvent.getInstance().chapterName;
       });
     };
     ChapterChangedEvent.getInstance().addListener(chapterChangedCallBack);
@@ -51,6 +54,9 @@ class _PageReadingState extends State<PageReading> {
     }
     if(initChapterName == null){
       initChapterName = args['initChapterName'];
+      if(initChapterName!=null){//没指定阅读章节，要从上次阅读加载
+        _readingWidgetKey = GlobalKey();
+      }
     }
     var theme = Theme.of(context);
     return Scaffold(
@@ -73,7 +79,7 @@ class _PageReadingState extends State<PageReading> {
         child: Stack(
           key: sizeKey,
           children: [
-            ReadingWidget(bookId, initChapterName),
+            ReadingWidget(bookId, initChapterName,key: _readingWidgetKey,),
             _buildMenuBar(context, theme),
           ],
         ),
@@ -82,6 +88,7 @@ class _PageReadingState extends State<PageReading> {
       endDrawer: Drawer(
         child: ChaptersWidget(bookId,(bean){
           initChapterName = bean.name;
+          _readingWidgetKey = GlobalKey();
           setState(() {
             showMenuBar = false;
             //选取章节
@@ -133,6 +140,9 @@ class _PageReadingState extends State<PageReading> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              IconButton(icon: Icon(CupertinoIcons.repeat,color: theme.accentColor), onPressed: (){
+                                _showSourceSelectDialog();
+                              }),
                               IconButton(icon: Icon(Icons.cloud_download_outlined,color: theme.accentColor), onPressed: (){}),
                               IconButton(key: _styleMenuKey,icon:Icon(Icons.font_download_outlined,color: theme.accentColor), onPressed: (){
                                 _showStyleMenu(context);
@@ -166,6 +176,15 @@ class _PageReadingState extends State<PageReading> {
         child: FlatButton(onPressed: (){print('click!');},child: Text('test'),),
     );
     menu.show(widgetKey: _styleMenuKey);
+  }
+
+  void _showSourceSelectDialog() async{
+    var result = await showDialog(context:context,child: Dialog(child: WidgetSelectSource(bookId),));
+    if(result != null){//换源以后重新加载
+      initChapterName = null;
+      _readingWidgetKey = GlobalKey();
+      _hideMenuBar();
+    }
   }
 
   void _fetchBookInfo() async{
