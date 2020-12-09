@@ -14,6 +14,10 @@ import 'package:yuedu_hd/ui/reading/event/PreviousChapterEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/PreviousPageEvent.dart';
 import 'package:yuedu_hd/ui/widget/PopupMenu.dart';
 
+import 'StyleMenuWidget.dart';
+
+
+
 class PageReading extends StatefulWidget{
 
   @override
@@ -172,11 +176,22 @@ class _PageReadingState extends State<PageReading> {
   ///阅读样式调整菜单
   void _showStyleMenu(BuildContext context){
     var theme = Theme.of(context);
-    var menu = PopupMenu(context: context,contentHeight: 300,contentWidth: 260,backgroundColor: theme.cardColor,
-        child: FlatButton(onPressed: (){print('click!');},child: Text('test'),),
-    );
+    var menu = PopupMenu(context: context,contentHeight: 350,contentWidth: 260,backgroundColor: theme.cardColor,
+        child: GestureDetector(onTap: (){
+          print('menu click');
+        },behavior: HitTestBehavior.translucent,child: _buildStyleMenu(context)));
     menu.show(widgetKey: _styleMenuKey);
   }
+
+  Widget _buildStyleMenu(BuildContext context){
+    return StyleMenu(onReadingStyleChanged: (){
+      _readingWidgetKey = GlobalKey();
+      setState(() {
+
+      });
+    },);
+  }
+
 
   void _showSourceSelectDialog() async{
     var result = await showDialog(context:context,child: Dialog(child: WidgetSelectSource(bookId),));
@@ -204,10 +219,7 @@ class _PageReadingState extends State<PageReading> {
   void _switchMenuBar(){
     showMenuBar = !showMenuBar;
     setState(() {
-      CupertinoIcons.square_split_1x2_fill;
-      CupertinoIcons.square_split_2x1_fill;
-      CupertinoIcons.square_favorites_fill;
-      CupertinoIcons.book_fill;
+
     });
   }
 
@@ -228,4 +240,3 @@ class _PageReadingState extends State<PageReading> {
   }
 }
 
-//TODO 配置菜单样式

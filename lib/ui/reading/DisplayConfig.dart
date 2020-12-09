@@ -13,8 +13,13 @@ class DisplayConfig{
   double titleMargin = 0;//标题和正文的间距
   int spaceParagraph = 4;//段落开头空格
 
+  static DisplayConfig _default;
+
   static DisplayConfig getDefault(){
-    return DisplayConfig();
+    if(_default == null){
+      _default = DisplayConfig();
+    }
+    return _default;
   }
 
 }

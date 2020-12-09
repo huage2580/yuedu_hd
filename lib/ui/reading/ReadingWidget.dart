@@ -2,6 +2,7 @@
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:yuedu_hd/db/BookInfoBean.dart';
 import 'package:yuedu_hd/db/bookChapterBean.dart';
@@ -60,11 +61,14 @@ class _ReadingWidgetState extends State<ReadingWidget> {
 
   var errorTips;
 
+  DisplayConfig config;
+
   @override
   void initState() {
     _controller = PageController(initialPage: INIT_PAGE);
+    DisplayCache.getInstance().clear();
+    config = DisplayConfig.getDefault();
     Future.delayed(Duration(milliseconds: 400),(){
-      DisplayCache.getInstance().clear();
       _setupData();
     });
     //事件监听
@@ -103,6 +107,8 @@ class _ReadingWidgetState extends State<ReadingWidget> {
 
   @override
   Widget build(BuildContext context) {
+
+
     return Container(
       key: sizeKey,
       child: Stack(
@@ -113,7 +119,9 @@ class _ReadingWidgetState extends State<ReadingWidget> {
           SizedBox(
             width: double.maxFinite,
             height: double.maxFinite,
-            child: PageView.builder(itemBuilder: (ctx,index){
+            child: PageView.builder(scrollDirection: config.isVertical==1?Axis.vertical:Axis.horizontal,
+              pageSnapping: config.isVertical != 1,
+              itemBuilder: (ctx,index){
               if(index < firstPage){
                 return _buildErrorIndex();
               }
@@ -144,7 +152,6 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   }
 
   Widget _buildErrorIndex(){
-    DisplayConfig config = DisplayConfig.getDefault();
     return Container(
       color: Color(config.backgroundColor),
       child: Center(
@@ -248,7 +255,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       return Future.value(-1);
     }
     //成功开始分页,制造显示页面
-    DisplayConfig config = DisplayConfig.getDefault();
+
     //内容中每个段落开头的空格
     var spaceForParagraph = ' ' * config.spaceParagraph;
     chapterContent = spaceForParagraph + chapterContent.replaceAll('\n', '\n$spaceForParagraph');

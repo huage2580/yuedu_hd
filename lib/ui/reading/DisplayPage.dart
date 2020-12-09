@@ -7,7 +7,7 @@ import 'package:yuedu_hd/ui/reading/event/ReloadEvent.dart';
 import 'package:yuedu_hd/ui/reading/TextPage.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 
-
+//todo 颜色，单双页
 //单双页，页眉页脚，左右中间间距
 class DisplayPage extends StatelessWidget{
   static const STATUS_LOADING = 11;
@@ -35,7 +35,7 @@ class DisplayPage extends StatelessWidget{
       child: Stack(
         children: [
           if(status == STATUS_SUCCESS)
-            _buildContent(),
+            _buildContent(context),
           if(status == STATUS_LOADING)
             Container(
               child: Center(//占位内容
@@ -64,7 +64,8 @@ class DisplayPage extends StatelessWidget{
     );
   }
 
-  Widget _buildContent(){
+  Widget _buildContent(BuildContext context){
+    var theme = Theme.of(context);
     var config = DisplayConfig.getDefault();
     return Stack(
       children: [
@@ -72,9 +73,12 @@ class DisplayPage extends StatelessWidget{
           padding: EdgeInsets.all(config.margin),
           child:TextPage(ydPage: text,),
         ),
-        Align(
-          alignment: Alignment.bottomRight,
-          child: Text('$currPage/$maxPage'),
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Align(
+            alignment: Alignment.bottomRight,
+            child: Text('$currPage/$maxPage',style: TextStyle(color: Colors.grey),),
+          ),
         )
 
       ],
