@@ -11,6 +11,7 @@ import 'package:yuedu_hd/ui/reading/event/NextChapterEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/NextPageEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/PreviousChapterEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/PreviousPageEvent.dart';
+import 'package:yuedu_hd/ui/widget/PopupMenu.dart';
 
 class PageReading extends StatefulWidget{
 
@@ -20,6 +21,7 @@ class PageReading extends StatefulWidget{
 
 class _PageReadingState extends State<PageReading> {
   final sizeKey = GlobalKey();
+  final _styleMenuKey = GlobalKey();
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
   var showMenuBar = false;
   var initChapterName;
@@ -132,7 +134,9 @@ class _PageReadingState extends State<PageReading> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(icon: Icon(Icons.cloud_download_outlined,color: theme.accentColor), onPressed: (){}),
-                              IconButton(icon: Icon(Icons.font_download_outlined,color: theme.accentColor), onPressed: (){}),
+                              IconButton(key: _styleMenuKey,icon:Icon(Icons.font_download_outlined,color: theme.accentColor), onPressed: (){
+                                _showStyleMenu(context);
+                              }),
                               IconButton(icon: Icon(Icons.menu_book,color: theme.accentColor), onPressed: (){
                                 _scaffoldKey.currentState.openEndDrawer();
                               }),
@@ -146,13 +150,22 @@ class _PageReadingState extends State<PageReading> {
                   Container(
                     padding: EdgeInsets.all(8),
                     width: double.maxFinite,
-                    color: theme.cardColor,
+                    color: theme.canvasColor,
                     child: Text(bookInfo==null?'获取书籍信息...':'${bookInfo.name}[${bookInfo.author}] ${bookInfo.bookUrl}'),
                   )
                 ],
               ),
             ),
           );
+  }
+  
+  ///阅读样式调整菜单
+  void _showStyleMenu(BuildContext context){
+    var theme = Theme.of(context);
+    var menu = PopupMenu(context: context,contentHeight: 300,contentWidth: 260,backgroundColor: theme.cardColor,
+        child: FlatButton(onPressed: (){print('click!');},child: Text('test'),),
+    );
+    menu.show(widgetKey: _styleMenuKey);
   }
 
   void _fetchBookInfo() async{
