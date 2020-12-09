@@ -81,6 +81,7 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
         Navigator.of(context).pop(bean.name);
       },
       child: Container(
+        height: 40,
         padding: EdgeInsets.all(10),
         child: Row(
           children: [
@@ -105,7 +106,7 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
         setState(() {
           if(chaptersList.isNotEmpty){
             _showLoading = false;
-            Future.delayed(Duration(milliseconds: 100),(){_scrollToRead();});
+            Future.delayed(Duration(milliseconds: 10),(){_scrollToRead();});
           }
         });
       }

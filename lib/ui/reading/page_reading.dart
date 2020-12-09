@@ -110,18 +110,21 @@ class _PageReadingState extends State<PageReading> {
         ),
       ),
       endDrawerEnableOpenDragGesture: false,
-      endDrawer: Drawer(
-        child: ChaptersWidget(
-          bookId,
-          (bean) {
-            initChapterName = bean.name;
-            _readingWidgetKey = GlobalKey();
-            setState(() {
-              showMenuBar = false;
-              //选取章节
-            });
-          },
-          readChapterName: currChapterName,
+      endDrawer: Container(
+        width: 400,
+        child: Drawer(
+          child: ChaptersWidget(
+            bookId,
+            (bean) {
+              initChapterName = bean.name;
+              _readingWidgetKey = GlobalKey();
+              setState(() {
+                showMenuBar = false;
+                //选取章节
+              });
+            },
+            readChapterName: currChapterName,
+          ),
         ),
       ),
     );
