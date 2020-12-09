@@ -1,5 +1,6 @@
 
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:flutter/widgets.dart';
 import 'package:yuedu_hd/db/BookInfoBean.dart';
@@ -11,6 +12,7 @@ import 'package:yuedu_hd/ui/reading/DisplayConfig.dart';
 import 'package:yuedu_hd/ui/reading/DisplayPage.dart';
 import 'package:yuedu_hd/ui/reading/DisplayCache.dart';
 import 'package:yuedu_hd/ui/reading/PageBreaker.dart';
+import 'package:yuedu_hd/ui/reading/event/ChapterChangedEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/ReloadEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/NextChapterEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/NextPageEvent.dart';
@@ -38,7 +40,8 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   var chaptersList = List<BookChapterBean>();
   var currChapterIndex = 0;
   var initChapterId = -1;
-  var initChapterName;
+  var initChapterName;//章节名
+  var initReadPage = 1;//阅读的章节页码，章节内分页，从1开始
   var displayPageList = LinkedHashMap<int,DisplayPage>();//页码对应显示页面
 
   var sizeKey = GlobalKey();
@@ -153,8 +156,10 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     bookInfoBean = await _fetchBookInfo();
     if(widget.initChapterName == null){
       initChapterName = bookInfoBean.lastReadChapter;
+      initReadPage = bookInfoBean.lastReadPage;
     }else{
       initChapterName = widget.initChapterName;
+      initReadPage = 1;
     }
     await _fetchChapters();
   }
@@ -191,17 +196,23 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       currChapterIndex = 0;
     }
     //获取当前章节内容
-    await _loadChapter(currChapterIndex,INIT_PAGE,false);
-    notifyPageChanged(INIT_PAGE);
+    var splitPages = await _loadChapter(currChapterIndex,INIT_PAGE,false);
+    //加载成功跳转页码
+    var offsetPage = 0;
+    if(splitPages > 0){
+      offsetPage = min(initReadPage -1, splitPages - 1);
+      _controller.jumpToPage(INIT_PAGE + offsetPage);
+    }
+    notifyPageChanged(INIT_PAGE + offsetPage);
 
   }
   ///[fromEnd]为true,[initIndex]为最后一页，需要从后往前填充内容
-  dynamic _loadChapter(int chapterIndex,int pageIndex,bool fromEnd) async{
+  Future<int> _loadChapter(int chapterIndex,int pageIndex,bool fromEnd) async{
     if(chapterIndex < 0 || chapterIndex >= chaptersList.length){
-      return;
+      return Future.value(-1);
     }
     //先占位加载中页面
-    DisplayCache.getInstance().put(pageIndex, DisplayPage(DisplayPage.STATUS_LOADING, null));
+    DisplayCache.getInstance().put(pageIndex, DisplayPage(DisplayPage.STATUS_LOADING, null,chapterIndex: chapterIndex,currPage: 1,viewPageIndex: pageIndex,fromEnd: fromEnd,));
     setState(() {
       if(chapterIndex == 0){
         firstPage = pageIndex;
@@ -209,14 +220,14 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     });
     //获取正文
     String chapterContent = await contentHelper.getChapterContent(chaptersList[chapterIndex].id).catchError((e){
-      DisplayCache.getInstance().put(pageIndex, DisplayPage(DisplayPage.STATUS_ERROR, null,chapterIndex: chapterIndex,fromEnd: fromEnd,viewPageIndex: pageIndex,));
+      DisplayCache.getInstance().put(pageIndex, DisplayPage(DisplayPage.STATUS_ERROR, null,chapterIndex: chapterIndex,currPage: 1,fromEnd: fromEnd,viewPageIndex: pageIndex,));
       setState(() {
 
       });
     });
     //失败?
     if(chapterContent == null){
-      return;
+      return Future.value(-1);
     }
     //成功开始分页,制造显示页面
     DisplayConfig config = DisplayConfig.getDefault();
@@ -257,7 +268,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       }
     });
     //通知该章节加载完成
-
+    return Future.value(pagesList.length);
 
   }
 
@@ -268,9 +279,10 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     if(displayPage == null) {
       return;
     }
+    ChapterChangedEvent.getInstance().emit(chaptersList[displayPage.chapterIndex].name);
     //更新阅读记录
-    if(displayPage.currPage == 1){
-      DatabaseHelper().updateLastReadChapter(widget.bookId, chaptersList[displayPage.chapterIndex].name);
+    if(displayPage.status == DisplayPage.STATUS_SUCCESS){
+      DatabaseHelper().updateLastReadChapter(widget.bookId, chaptersList[displayPage.chapterIndex].name,displayPage.currPage);
     }
 
     //如果是章节第一页，加载前一章

@@ -2,8 +2,11 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:yuedu_hd/db/BookInfoBean.dart';
+import 'package:yuedu_hd/db/databaseHelper.dart';
 import 'package:yuedu_hd/ui/bookshelf/widget_chapters.dart';
 import 'package:yuedu_hd/ui/reading/ReadingWidget.dart';
+import 'package:yuedu_hd/ui/reading/event/ChapterChangedEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/NextChapterEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/NextPageEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/PreviousChapterEvent.dart';
@@ -20,11 +23,30 @@ class _PageReadingState extends State<PageReading> {
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
   var showMenuBar = false;
   var initChapterName;
+  var currChapterName;
+  var chapterChangedCallBack;
+
+  BookInfoBean bookInfo;
+  int bookId = -1;
+
+  @override
+  void initState() {
+    super.initState();
+    chapterChangedCallBack = (){
+      setState(() {
+        currChapterName = ChapterChangedEvent.getInstance().chapterName;
+      });
+    };
+    ChapterChangedEvent.getInstance().addListener(chapterChangedCallBack);
+  }
 
   @override
   Widget build(BuildContext context) {
     var args= ModalRoute.of(context).settings.arguments as Map;
-    int bookId = args['bookId'];
+    if(bookId == -1){
+      bookId = args['bookId'];
+      _fetchBookInfo();
+    }
     if(initChapterName == null){
       initChapterName = args['initChapterName'];
     }
@@ -62,7 +84,7 @@ class _PageReadingState extends State<PageReading> {
             showMenuBar = false;
             //选取章节
           });
-        }),
+        },readChapterName: currChapterName,),
       ),
     );
   }
@@ -97,7 +119,7 @@ class _PageReadingState extends State<PageReading> {
                               IconButton(icon: Icon(Icons.chevron_left_outlined,color: theme.accentColor), onPressed: (){
                                 _previousChapter();
                               }),
-                              Text('第XXX章节',style: TextStyle(color: theme.accentColor,fontSize: 22),),
+                              Text(currChapterName??'加载中...',style: TextStyle(color: theme.accentColor,fontSize: 22),),
                               IconButton(icon: Icon(Icons.chevron_right_outlined,color: theme.accentColor), onPressed: (){
                                 _nextChapter();
                               }),
@@ -125,7 +147,7 @@ class _PageReadingState extends State<PageReading> {
                     padding: EdgeInsets.all(8),
                     width: double.maxFinite,
                     color: theme.cardColor,
-                    child: Text('这里是书籍信息'),
+                    child: Text(bookInfo==null?'获取书籍信息...':'${bookInfo.name}[${bookInfo.author}] ${bookInfo.bookUrl}'),
                   )
                 ],
               ),
@@ -133,10 +155,27 @@ class _PageReadingState extends State<PageReading> {
           );
   }
 
+  void _fetchBookInfo() async{
+    bookInfo = await DatabaseHelper().queryBookInfoFromBookIdCombSourceId(bookId,-1);
+    setState(() {
+
+    });
+  }
+
+
+  @override
+  void dispose() {
+    super.dispose();
+    ChapterChangedEvent.getInstance().removeListener(chapterChangedCallBack);
+  }
+
   void _switchMenuBar(){
     showMenuBar = !showMenuBar;
     setState(() {
-
+      CupertinoIcons.square_split_1x2_fill;
+      CupertinoIcons.square_split_2x1_fill;
+      CupertinoIcons.square_favorites_fill;
+      CupertinoIcons.book_fill;
     });
   }
 
@@ -156,3 +195,5 @@ class _PageReadingState extends State<PageReading> {
     });
   }
 }
+
+//TODO 配置菜单样式

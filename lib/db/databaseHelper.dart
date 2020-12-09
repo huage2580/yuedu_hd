@@ -61,7 +61,8 @@ class DatabaseHelper {
   "inbookShelf" integer,
   "groupId" INTEGER,
   "updatetime" integer,
-  "lastReadChapter" TEXT
+  "lastReadChapter" TEXT,
+  "lastReadPage" INTEGER NOT NULL DEFAULT 1
 );
 
 CREATE INDEX "book_id_index"
@@ -538,8 +539,8 @@ ON "book_chapter" (
   }
 
   ///更新阅读的章节
-  dynamic updateLastReadChapter(int bookId,String chapterName){
-    return withDB().then((db) => db.update(TABLE_BOOK, {'lastReadChapter':chapterName},where: '_id = $bookId'));
+  dynamic updateLastReadChapter(int bookId,String chapterName,int lastReadPage){
+    return withDB().then((db) => db.update(TABLE_BOOK, {'lastReadChapter':chapterName,'lastReadPage':lastReadPage},where: '_id = $bookId'));
   }
 
 }

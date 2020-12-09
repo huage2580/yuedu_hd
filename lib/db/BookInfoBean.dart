@@ -14,6 +14,7 @@ class BookInfoBean{
   String lastReadChapter;
   int groupId = -1;
   int inbookShelf = 0;
+  int lastReadPage = 1;
 
   //关联的书源
   int source_id;
@@ -68,6 +69,7 @@ class BookInfoBean{
     lastReadChapter = map['lastReadChapter'];
     groupId = map['groupId'];
     inbookShelf = map['inbookShelf'];
+    lastReadPage = map['lastReadPage'];
   }
 
 }
