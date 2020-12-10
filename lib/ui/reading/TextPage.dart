@@ -11,7 +11,7 @@ class TextPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     if(ydPage == null){
-      return Center(child: Text('null'),);
+      return Center(child: Text(''),);
     }
     return CustomPaint(painter: YDPainter(ydPage),);
   }

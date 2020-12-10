@@ -3,8 +3,8 @@
 class DisplayConfig{
   int isSinglePage = 0;
   int isVertical = 0;
-  double margin = 10;//外边距
-  double inSizeMargin = 20;//双页的话，行内边距
+  double margin = 20;//外边距
+  double inSizeMargin = 40;//双页的话，行内边距
   int backgroundColor = 0xfff5f5f5;//阅读背景色
   double textSize = 20;//正文字体大小
   int textColor = 0xff000000;//正文字体颜色

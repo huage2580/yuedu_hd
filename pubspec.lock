@@ -274,7 +274,7 @@ packages:
       path: "."
       ref: HEAD
       resolved-ref: "49dd0aa5cb7466d51dc33ec7e8ca947c00bbae80"
-      url: "https://github.com/huage2580/reader_parser.git"
+      url: "git@github.com:huage2580/reader_parser.git"
     source: git
     version: "1.0.0+1"
 sdks:

@@ -111,6 +111,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
 
     return Container(
       key: sizeKey,
+      color: Color(config.backgroundColor),
       child: Stack(
         children: [
           Center(
@@ -194,17 +195,17 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   void _onChaptersLoad() async{
     if(chaptersList.isEmpty){
       setState(() {
-        errorTips = "本地章节为空，正在获取网络数据...";
+        errorTips = "本地目录为空，正在获取网络数据...";
       });
       //从网络获取章节
       chaptersList = await tocHelper.updateChapterList(widget.bookId, -1).catchError((e){
         setState(() {
-          errorTips = "章节加载失败，请重试或换源";
+          errorTips = "目录加载失败，请重试或换源";
         });
       });
       if(chaptersList == null || chaptersList.isEmpty){
         setState(() {
-          errorTips = "章节加载失败，请重试或换源";
+          errorTips = "目录加载失败，请重试或换源";
         });
         return;
       }
@@ -250,44 +251,52 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     String chapterContent = await contentHelper.getChapterContent(chaptersList[chapterIndex].id).catchError((e){
       DisplayCache.getInstance().put(pageIndex, DisplayPage(DisplayPage.STATUS_ERROR, null,chapterIndex: chapterIndex,currPage: 1,fromEnd: fromEnd,viewPageIndex: pageIndex,));
       setState(() {
-
+        //失败?
       });
     });
     //失败?
     if(chapterContent == null || chapterContent.isEmpty){
       return Future.value(-1);
     }
-    //成功开始分页,制造显示页面
+    //-----------------------成功开始分页,制造显示页面---------------------
 
     //内容中每个段落开头的空格
     var spaceForParagraph = ' ' * config.spaceParagraph;
     chapterContent = spaceForParagraph + chapterContent.replaceAll('\n', '\n$spaceForParagraph');
 
     //标题，正文
-    final textStyle = TextStyle(
-      color: Color(config.textColor),
-      fontSize: config.textSize,
+    var pageBreaker = PageBreaker(
+        _generateContentTextSpan(chapterContent),
+        _generateTitleTextSpan(chaptersList[chapterIndex].name),
+        _generateTextPageSize()
     );
-
-    final textSpan = TextSpan(
-      text: chapterContent,
-      style: textStyle,
-    );
-    final titleStyle = TextStyle(
-      color: Color(config.titleColor),
-      fontSize: config.titleSize,
-      fontWeight: FontWeight.bold,
-    );
-    final titleSpan = TextSpan(
-      text: chaptersList[chapterIndex].name.trim(),
-      style: titleStyle,
-    );
-    var textPageSize = Size(size.width- config.margin * 2, size.height - config.margin * 2);
-    var pageBreaker = PageBreaker(textSpan, titleSpan, textPageSize);
     var pagesList = pageBreaker.splitPage();
     //分页完成填充数据
-    for(var i = 0;i< pagesList.length;i++){
-      DisplayCache.getInstance().put(pageIndex + (fromEnd?(i+1-pagesList.length):i), DisplayPage(DisplayPage.STATUS_SUCCESS, pagesList[i],chapterIndex: chapterIndex,currPage: i+1,maxPage: pagesList.length,));
+    var batch = List<int>();
+
+    if(config.isSinglePage == 1){
+      //------单页------
+      for(var i = 0;i< pagesList.length;i++){
+        var currIndex = pageIndex + (fromEnd?(i+1-pagesList.length):i);
+        batch.add(currIndex);
+        DisplayCache.getInstance().put(currIndex, DisplayPage(DisplayPage.STATUS_SUCCESS, pagesList[i],chapterIndex: chapterIndex,currPage: i+1,maxPage: pagesList.length,));
+      }
+    }else{
+      //------双页------
+      var pageCount = (pagesList.length/2).ceil();
+      for(var i=0;i<pageCount;i++){
+        var currIndex = pageIndex + (fromEnd?(i+1-pageCount):i);
+        batch.add(currIndex);
+        var realIndex = 2*i;
+        DisplayCache.getInstance().put(currIndex, DisplayPage(DisplayPage.STATUS_SUCCESS,
+          pagesList[realIndex],text2: realIndex>pagesList.length-2?null:pagesList[realIndex+1],
+          chapterIndex: chapterIndex,currPage: i+1,maxPage: pageCount,));
+      }
+    }
+
+
+    if(batch.isNotEmpty){
+      DisplayCache.getInstance().packChapter(batch);
     }
 
     setState(() {
@@ -298,7 +307,44 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     });
     //通知该章节加载完成
     return Future.value(pagesList.length);
+  }
 
+  //正文的样式
+  TextSpan _generateContentTextSpan(String chapterContent){
+    final textStyle = TextStyle(
+      color: Color(config.textColor),
+      fontSize: config.textSize,
+    );
+
+    final textSpan = TextSpan(
+      text: chapterContent,
+      style: textStyle,
+    );
+    return textSpan;
+  }
+
+  //标题的样式
+  TextSpan _generateTitleTextSpan(String title){
+    final titleStyle = TextStyle(
+      color: Color(config.titleColor),
+      fontSize: config.titleSize,
+      fontWeight: FontWeight.bold,
+    );
+    final titleSpan = TextSpan(
+      text: title.trim(),
+      style: titleStyle,
+    );
+    return titleSpan;
+  }
+
+  //计算分页的大小
+  Size _generateTextPageSize(){
+    var textPageSize = Size(size.width- config.margin * 2, size.height - config.margin * 2);//显示区域减去外边距
+    if(config.isSinglePage == 1){//单页
+      return textPageSize;
+    }else{//双页
+      return Size((textPageSize.width-config.inSizeMargin)/2,textPageSize.height);
+    }
   }
 
   //滚动到了当前页码
