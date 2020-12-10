@@ -7,6 +7,7 @@ import 'package:yuedu_hd/ui/book_source/page_source_add.dart';
 import 'package:yuedu_hd/ui/book_source/page_source_list.dart';
 import 'package:yuedu_hd/ui/bookshelf/page_add_book.dart';
 import 'package:yuedu_hd/ui/bookshelf/page_bookshelf.dart';
+import 'package:yuedu_hd/ui/download/page_download.dart';
 import 'package:yuedu_hd/ui/explore/page_explore.dart';
 import 'package:yuedu_hd/ui/settings/page_settings.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
@@ -23,6 +24,7 @@ class HomeState extends State<HomePage> {
   static const PAGE_EXPLORE = 1;
   static const PAGE_SOURCE = 2;
   static const PAGE_SETTINGS = 3;
+  static const PAGE_DOWNLOAD = 4;
 
   int currPage = 0;
   var homeContainerKey = GlobalKey<NavigatorState>();
@@ -109,6 +111,14 @@ class HomeState extends State<HomePage> {
           },
         ),
         _HomeMenuItem(
+          CupertinoIcons.arrow_down_circle,
+          "下载",
+          isSelected: currPage == PAGE_DOWNLOAD,
+          onTap: () {
+            switchPageTo(PAGE_DOWNLOAD);
+          },
+        ),
+        _HomeMenuItem(
           Icons.cloud_circle_outlined,
           "书源",
           isSelected: currPage == PAGE_SOURCE,
@@ -156,6 +166,11 @@ class HomeState extends State<HomePage> {
           homeContainerKey.currentState.pushNamedAndRemoveUntil(YDRouter.SETTINGS,ModalRoute.withName(YDRouter.SETTINGS));
         });
         break;
+      case PAGE_DOWNLOAD:
+        setState(() {
+          homeContainerKey.currentState.pushNamedAndRemoveUntil(YDRouter.DOWNLOAD,ModalRoute.withName(YDRouter.DOWNLOAD));
+        });
+        break;
 
 
     }
@@ -175,6 +190,7 @@ class HomeState extends State<HomePage> {
           YDRouter.EXPLORE:(context)=>PageExplore(),
           YDRouter.SETTINGS:(context)=>PageSettings(),
           YDRouter.BOOK_ADD:(context)=>PageAddBook(),
+          YDRouter.DOWNLOAD:(context)=>PageDownLoad(),
         },
       ),
     );

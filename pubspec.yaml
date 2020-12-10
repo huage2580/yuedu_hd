@@ -44,6 +44,8 @@ dependencies:
   draggable_scrollbar: ^0.0.4
   # gridView
   waterfall_flow: any
+  # toast
+  bot_toast: ^3.0.5
 
 dev_dependencies:
   flutter_test:

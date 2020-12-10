@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,6 +6,7 @@ import 'package:yuedu_hd/db/BookInfoBean.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
 import 'package:yuedu_hd/ui/book_source/widget_select_source.dart';
 import 'package:yuedu_hd/ui/bookshelf/widget_chapters.dart';
+import 'package:yuedu_hd/ui/download/BookDownloader.dart';
 import 'package:yuedu_hd/ui/reading/ReadingWidget.dart';
 import 'package:yuedu_hd/ui/reading/event/ChapterChangedEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/NextChapterEvent.dart';
@@ -50,7 +52,6 @@ class _PageReadingState extends State<PageReading> {
 
     chapterChangedCallBack = () {
       currChapterName = ChapterChangedEvent.getInstance().chapterName;
-      showMenuBar = false;
       setState(() {});
     };
     ChapterChangedEvent.getInstance().addListener(chapterChangedCallBack);
@@ -204,7 +205,10 @@ class _PageReadingState extends State<PageReading> {
                         IconButton(
                             icon: Icon(Icons.cloud_download_outlined,
                                 color: theme.accentColor),
-                            onPressed: () {}),
+                            onPressed: () {
+                              BookDownloader.getInstance().startDownload(bookId);
+                              BotToast.showText(text:"开始缓存");
+                            }),
                         IconButton(
                             key: _styleMenuKey,
                             icon: Icon(Icons.font_download_outlined,
@@ -241,7 +245,7 @@ class _PageReadingState extends State<PageReading> {
   ///阅读样式调整菜单
   void _showStyleMenu(BuildContext context) {
     var theme = Theme.of(context);
-    var menu = PopupMenu(
+    var styleMenu = PopupMenu(
         context: context,
         contentHeight: 350,
         contentWidth: 260,
@@ -252,7 +256,7 @@ class _PageReadingState extends State<PageReading> {
             },
             behavior: HitTestBehavior.translucent,
             child: _buildStyleMenu(context)));
-    menu.show(widgetKey: _styleMenuKey);
+    styleMenu.show(widgetKey: _styleMenuKey);
   }
 
   Widget _buildStyleMenu(BuildContext context) {

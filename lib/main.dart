@@ -5,6 +5,7 @@ import 'package:yuedu_hd/ui/YDRouter.dart';
 import 'package:yuedu_hd/ui/home_page.dart';
 import 'package:yuedu_hd/ui/reading/page_reading.dart';
 import 'package:yuedu_hd/ui/style/ycolors.dart';
+import 'package:bot_toast/bot_toast.dart';
 
 import 'ui/style/ycolors.dart';
 
@@ -24,6 +25,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      builder: BotToastInit(), //1. call BotToastInit
+      navigatorObservers: [BotToastNavigatorObserver()],
       navigatorKey: YDRouter.mainRouter,
       title: '阅读hd',
       theme: ThemeData(

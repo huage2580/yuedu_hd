@@ -6,6 +6,7 @@ class YDRouter{
 
   static const String BOOKSHELF = "bookshelf";
   static const String EXPLORE = "explore";
+  static const String DOWNLOAD = "download";
   static const String SETTINGS = "settings";
 
 
