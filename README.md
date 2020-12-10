@@ -1,6 +1,9 @@
 # yuedu_hd
 
-阅读HD
+阅读HD  
+
+## releases
+[v001 预览版,只有安卓apk](https://github.com/huage2580/yuedu_hd/releases/tag/v001)
 
 ## 免责声明
 
