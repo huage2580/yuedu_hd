@@ -373,6 +373,12 @@ ON "book_chapter" (
     return Future.value(BookInfoBean.fromMap(map[0]));
   }
 
+  ///id移除书架
+  Future<void> removeBookshelfById(int bookId) async{
+    await withDB().then((db) => db.update(TABLE_BOOK,{'inbookShelf':0},where: '_id = $bookId'));
+    return Future.value();
+  }
+
   ///查询在书架的书籍
   Future<List<BookShelfBean>> queryBookInBookShelf() async{
     return await withDB().then((db) => db.transaction((txn) async{

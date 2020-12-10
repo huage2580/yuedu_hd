@@ -159,6 +159,9 @@ class _PageBookShelfState extends State<PageBookShelf>
           _fetchBookShelf();
         });//更新阅读记录
       },
+      onLongPress: (){
+        _showDelete(context,bean);
+      },
       child: Container(
         padding: EdgeInsets.all(8),
         child: Row(
@@ -233,5 +236,23 @@ class _PageBookShelfState extends State<PageBookShelf>
     await Future.wait(futureList);
     await _fetchBookShelf();
     return Future.value(0);
+  }
+
+  void _showDelete(BuildContext context, BookShelfBean bean) {
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Row(
+        children: <Widget>[
+          Icon(Icons.delete,color: Colors.white,),
+          Text('确定删除 ${bean.bookName} ?')],
+      ),
+      action: SnackBarAction(
+        textColor: Colors.red,
+        label: '删除',
+        onPressed: () async{
+          await DatabaseHelper().removeBookshelfById(bean.bookId);
+          _fetchBookShelf();
+        },
+      ),
+    ));
   }
 }
