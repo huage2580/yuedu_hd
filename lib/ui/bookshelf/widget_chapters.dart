@@ -106,7 +106,7 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
         setState(() {
           if(chaptersList.isNotEmpty){
             _showLoading = false;
-            Future.delayed(Duration(milliseconds: 10),(){_scrollToRead();});
+            Future.delayed(Duration(milliseconds: 100),(){_scrollToRead();});
           }
         });
       }

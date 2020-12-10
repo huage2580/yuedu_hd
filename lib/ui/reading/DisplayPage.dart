@@ -37,7 +37,7 @@ class DisplayPage extends StatelessWidget{
           if(status == STATUS_LOADING)
             Container(
               child: Center(//占位内容
-                child: Text('加载中'),
+                child: Text('加载中',style: TextStyle(color: Color(config.textColor)),),
               ),
             ),
           if(status == STATUS_ERROR)
@@ -48,11 +48,12 @@ class DisplayPage extends StatelessWidget{
   }
 
   Widget _buildError(){
+    var config = DisplayConfig.getDefault();
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('加载失败/(ㄒoㄒ)/~~'),
+          Text('加载失败/(ㄒoㄒ)/~~',style: TextStyle(color: Color(config.textColor)),),
           VSpace(20),
           RaisedButton(onPressed: (){
             ReloadEvent.getInstance().reload(viewPageIndex);

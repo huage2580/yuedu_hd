@@ -19,11 +19,13 @@ class StyleMenu extends StatefulWidget{
 }
 
 class _StyleMenuState extends State<StyleMenu> {
+  var config = DisplayConfig.getDefault();
+
   @override
   Widget build(BuildContext context) {
 
+    config = DisplayConfig.getDefault();
     var theme = Theme.of(context);
-    var config = DisplayConfig.getDefault();
     //配置内容
     bool isVerticalScroll = config.isVertical == 1;
     bool isTwoPage = config.isSinglePage == 0;
@@ -57,9 +59,15 @@ class _StyleMenuState extends State<StyleMenu> {
             children: [
               Text('内容布局:',style: theme.textTheme.headline6,),
               HSpace(16),
-              Icon(CupertinoIcons.rectangle_fill,size: 40,color: !isTwoPage?theme.primaryColor:theme.canvasColor,),
+              GestureDetector(child: Icon(CupertinoIcons.rectangle_fill,size: 40,color: !isTwoPage?theme.primaryColor:theme.canvasColor,),onTap: (){
+                config.isSinglePage = 1;
+                _notifyStyleChanged();
+              },),
               HSpace(16),
-              Icon(CupertinoIcons.book_fill,size: 40,color: isTwoPage?theme.primaryColor:theme.canvasColor,),
+              GestureDetector(child: Icon(CupertinoIcons.book_fill,size: 40,color: isTwoPage?theme.primaryColor:theme.canvasColor,),onTap: (){
+                config.isSinglePage = 0;
+                _notifyStyleChanged();
+              },),
             ],
           ),
           Divider(),
@@ -68,19 +76,7 @@ class _StyleMenuState extends State<StyleMenu> {
           Container(
             height: 40,
             width: double.maxFinite,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                _buildColorItem(context, Colors.white, Colors.black,isSelected: true),
-                _buildColorItem(context, Colors.black45, Colors.white70),
-                _buildColorItem(context, Colors.blueGrey, Colors.black),
-                _buildColorItem(context, Colors.lightGreen, Colors.orange),
-                _buildColorItem(context, Colors.white, Colors.black),
-                _buildColorItem(context, Colors.white, Colors.black),
-                _buildColorItem(context, Colors.white, Colors.black),
-                _buildColorItem(context, Colors.white, Colors.black),
-              ],
-            ),
+            child: _buildColorList(context),
           ),
           Divider(),
           Row(
@@ -120,17 +116,46 @@ class _StyleMenuState extends State<StyleMenu> {
     );
   }
 
+
+  ///颜色列表
+  ListView _buildColorList(BuildContext context) {
+    return ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              _buildColorItem(context, Color(config.backgroundColor), Color(config.textColor),isSelected: true),
+              _buildColorItem(context, Color(0xffCCE8CF), Colors.black),
+              _buildColorItem(context, Color(0xff373737), Color(0xffcecece)),
+              _buildColorItem(context, Color(0xff2a2c37), Color(0xffcaccdf)),
+              _buildColorItem(context, Color(0xfff5f5f5), Color(0xff151920)),
+              _buildColorItem(context, Color(0xffFFFFFF), Color(0xff000000)),
+            ],
+          );
+  }
+
   Widget _buildColorItem(BuildContext context,Color bgColor,Color textColor,{bool isSelected = false}){
-    return  Container(
-      margin: EdgeInsets.only(right: 8),
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(),
-        borderRadius: BorderRadius.all(Radius.circular(20)),
+    return  GestureDetector(
+      onTap: () async{
+        if(isSelected){
+
+
+        }else{
+          config.backgroundColor = bgColor.value;
+          config.textColor = textColor.value;
+          config.titleColor = config.textColor;
+          _notifyStyleChanged();
+        }
+      },
+      child: Container(
+        margin: EdgeInsets.only(right: 4),
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: bgColor,
+          border: Border.all(),
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+        ),
+        child:Icon(isSelected?Icons.done:CupertinoIcons.textformat,size: 24,color: textColor,),
       ),
-      child:Icon(isSelected?Icons.done:CupertinoIcons.textformat,size: 24,color: textColor,),
     );
   }
 
@@ -141,3 +166,4 @@ class _StyleMenuState extends State<StyleMenu> {
   }
 
 }
+

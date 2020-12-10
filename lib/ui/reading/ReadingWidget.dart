@@ -115,7 +115,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       child: Stack(
         children: [
           Center(
-            child: Text(errorTips??"(●'◡'●)\n加载中..."),
+            child: Text(errorTips??"(●'◡'●)\n加载中...",style: TextStyle(color: Color(config.textColor)),),
           ),
           SizedBox(
             width: double.maxFinite,
@@ -156,7 +156,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     return Container(
       color: Color(config.backgroundColor),
       child: Center(
-        child: Text('没有了啦'),
+        child: Text('没有了啦',style: TextStyle(color: Color(config.textColor)),),
       ),
     );
   }

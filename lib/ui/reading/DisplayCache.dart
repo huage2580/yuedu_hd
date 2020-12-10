@@ -49,6 +49,7 @@ class DisplayCache{
 
   void clear(){
     _cache.clear();
+    _chapterList.clear();
   }
 
 }

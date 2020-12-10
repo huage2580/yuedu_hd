@@ -6,7 +6,7 @@ class DisplayConfig{
   double margin = 20;//外边距
   double inSizeMargin = 40;//双页的话，行内边距
   int backgroundColor = 0xfff5f5f5;//阅读背景色
-  double textSize = 20;//正文字体大小
+  double textSize = 18;//正文字体大小
   int textColor = 0xff000000;//正文字体颜色
   double titleSize = 24;//标题大小
   int titleColor = 0xff000000;//标题颜色
