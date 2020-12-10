@@ -111,7 +111,7 @@ class HomeState extends State<HomePage> {
           },
         ),
         _HomeMenuItem(
-          CupertinoIcons.arrow_down_circle,
+          Icons.arrow_circle_down_outlined,
           "下载",
           isSelected: currPage == PAGE_DOWNLOAD,
           onTap: () {

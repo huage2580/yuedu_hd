@@ -35,6 +35,7 @@ class _PageReadingState extends State<PageReading> {
   int bookId = -1;
 
   var orientation = Orientation.landscape;
+  var size = Size(-1, -1);//整个手机or窗口的大小
 
   var _readingWidgetKey = GlobalKey();
 
@@ -100,6 +101,13 @@ class _PageReadingState extends State<PageReading> {
                 //横竖屏切换重新渲染阅读页
                 _readingWidgetKey = GlobalKey();
                 orientation = or;
+              }
+              if(or == orientation){//window size changed
+                var currSize = Size.copy(MediaQuery.of(context).size);
+                if(currSize != size){
+                  size = currSize;
+                  _readingWidgetKey = GlobalKey();
+                }
               }
               return ReadingWidget(
                 bookId,

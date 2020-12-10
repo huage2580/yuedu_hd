@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:worker_manager/worker_manager.dart';
@@ -6,10 +8,18 @@ import 'package:yuedu_hd/ui/home_page.dart';
 import 'package:yuedu_hd/ui/reading/page_reading.dart';
 import 'package:yuedu_hd/ui/style/ycolors.dart';
 import 'package:bot_toast/bot_toast.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite/sqflite.dart';
 
 import 'ui/style/ycolors.dart';
 
 void main() async{
+  if (Platform.isWindows || Platform.isLinux) {
+    // Initialize FFI
+    sqfliteFfiInit();
+    // Change the default factory
+    databaseFactory = databaseFactoryFfi;
+  }
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([ 	 //强制横屏
     DeviceOrientation.landscapeLeft,
