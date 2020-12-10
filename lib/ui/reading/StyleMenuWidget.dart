@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:yuedu_hd/db/databaseHelper.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 
 import 'DisplayConfig.dart';
@@ -163,6 +164,7 @@ class _StyleMenuState extends State<StyleMenu> {
     setState(() {
       widget.onReadingStyleChanged();
     });
+    DatabaseHelper().saveConfig(config);
   }
 
 }

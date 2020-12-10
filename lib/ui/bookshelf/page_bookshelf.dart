@@ -214,6 +214,7 @@ class _PageBookShelfState extends State<PageBookShelf>
 
 
   dynamic _fetchBookShelf() async{
+    await DatabaseHelper().loadConfig();
     var temp = await DatabaseHelper().queryBookInBookShelf();
     _bookList.clear();
     _bookList.addAll(temp);

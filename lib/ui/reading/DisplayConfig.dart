@@ -17,9 +17,43 @@ class DisplayConfig{
 
   static DisplayConfig getDefault(){
     if(_default == null){
-      _default = DisplayConfig();
+      _default = DisplayConfig._();
     }
     return _default;
   }
 
+  DisplayConfig._(){
+    //pass
+  }
+
+  DisplayConfig.fromMap(Map map){
+    isSinglePage = map['isSinglePage'];
+    isVertical = map['isVertical'];
+    margin = map['margin'];
+    inSizeMargin = map['inSizeMargin'];
+    backgroundColor = map['backgroundColor'];
+    textSize = map['textSize'];
+    textColor = map['textColor'];
+    titleSize = map['titleSize'];
+    titleColor = map['titleColor'];
+    titleMargin = map['titleMargin'];
+    spaceParagraph = map['spaceParagraph'];
+    _default = this;
+  }
+
+  Map<String,dynamic> toMap(){
+    Map map = Map<String,dynamic>();
+    map['isSinglePage'] = isSinglePage;
+    map['isVertical'] = isVertical;
+    map['margin'] = margin;
+    map['inSizeMargin'] = inSizeMargin;
+    map['backgroundColor'] = backgroundColor;
+    map['textSize'] = textSize;
+    map['textColor'] = textColor;
+    map['titleSize'] = titleSize;
+    map['titleColor'] = titleColor;
+    map['titleMargin'] = titleMargin;
+    map['spaceParagraph'] = spaceParagraph;
+    return map;
+  }
 }

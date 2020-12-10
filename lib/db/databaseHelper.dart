@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:sqflite/sqflite.dart';
 import 'package:yuedu_hd/db/BookShelfBean.dart';
+import 'package:yuedu_hd/ui/reading/DisplayConfig.dart';
 
 import 'BookInfoBean.dart';
 import 'BookSourceBean.dart';
@@ -14,6 +15,8 @@ class DatabaseHelper {
   static const TABLE_BOOK = 'book';
   static const TABLE_BOOK_COMB_SOURCE = 'book_comb_source';
   static const TABLE_CHAPTER = 'book_chapter';
+  static const TABLE_CONFIG = 'display_config';
+
 
   static const _SQL_CREATE_BOOK_SOURCES = '''
   CREATE TABLE "book_sources" (
@@ -110,6 +113,23 @@ ON "book_chapter" (
 );
   ''';
 
+  static const _SQL_CREATE_CONFIG='''
+  CREATE TABLE "display_config" (
+    "_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "isSinglePage" integer NOT NULL DEFAULT 0,
+    "isVertical" integer NOT NULL DEFAULT 0,
+    "margin" REAL NOT NULL DEFAULT 40,
+    "backgroundColor" integer NOT NULL,
+    "inSizeMargin" REAL NOT NULL,
+    "textSize" REAL NOT NULL,
+    "textColor" integer NOT NULL,
+    "titleSize" REAL NOT NULL,
+    "titleColor" integer NOT NULL,
+    "titleMargin" REAL NOT NULL,
+    "spaceParagraph" integer NOT NULL DEFAULT 4
+  );
+  ''';
+
 
   //----------------------------------------------------------------------
   static DatabaseHelper _instance;
@@ -141,6 +161,9 @@ ON "book_chapter" (
       await _executeMultiSQL(db, _SQL_CREATE_BOOK);
       await _executeMultiSQL(db, _SQL_CREATE_BOOK_COMB_SOURCE);
       await _executeMultiSQL(db, _SQL_CREATE_CHAPTER);
+      //配置项
+      await _executeMultiSQL(db, _SQL_CREATE_CONFIG);
+      await db.insert(TABLE_CONFIG, DisplayConfig.getDefault().toMap());
     });
   }
 
@@ -541,6 +564,17 @@ ON "book_chapter" (
   ///更新阅读的章节
   dynamic updateLastReadChapter(int bookId,String chapterName,int lastReadPage){
     return withDB().then((db) => db.update(TABLE_BOOK, {'lastReadChapter':chapterName,'lastReadPage':lastReadPage},where: '_id = $bookId'));
+  }
+
+  ///保存配置项
+  dynamic saveConfig(DisplayConfig config) async{
+    return withDB().then((db) => db.update(TABLE_CONFIG
+        , config.toMap(),where: '_id = 1'));
+  }
+
+  ///加载配置
+  Future<DisplayConfig> loadConfig() async{
+    return withDB().then((db) => db.query(TABLE_CONFIG)).then((value) => DisplayConfig.fromMap(value[0]));
   }
 
 }
