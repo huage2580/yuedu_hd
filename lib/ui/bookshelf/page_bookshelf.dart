@@ -23,9 +23,11 @@ class _PageBookShelfState extends State<PageBookShelf>
   var _bookList = List<BookShelfBean>();
   var _tocHelper = BookTocHelper.getInstance();
 
+  var currSortType = 1;//0添加顺序，1上次阅读时间
+
   @override
   void initState() {
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 1, vsync: this);
     _fetchBookShelf();
     super.initState();
   }
@@ -49,12 +51,12 @@ class _PageBookShelfState extends State<PageBookShelf>
                       Tab(
                         text: '全部',
                       ),
-                      Tab(
-                        text: '分组一',
-                      ),
-                      Tab(
-                        text: '分组二',
-                      ),
+                      // Tab(
+                      //   text: '分组一',
+                      // ),
+                      // Tab(
+                      //   text: '分组二',
+                      // ),
                     ],
                     controller: _tabController,
                     indicatorColor: Colors.transparent,
@@ -72,24 +74,24 @@ class _PageBookShelfState extends State<PageBookShelf>
                   itemBuilder: (ctx) {
                     return [
                       PopupMenuItem(
-                        child: Text('默认排序'),
+                        child: Text('添加顺序'),
                         value: 0,
                       ),
                       PopupMenuItem(
-                        child: Text('添加顺序'),
+                        child: Text('上次阅读'),
                         value: 1,
                       ),
-                      PopupMenuItem(
-                        child: Text('最后更新'),
-                        value: 2,
-                      ),
                     ];
+                  },
+                  onSelected: (i){
+                    currSortType = i;
+                    _fetchBookShelf();
                   },
                   child: IgnorePointer(
                     child: TextButton.icon(
                         onPressed: (){},
                         icon: Icon(Icons.sort_outlined),
-                        label: Text('默认排序'),),
+                        label: Text(currSortType==0?'添加顺序':'上次阅读'),),
                   ),
                 ),
               ],
@@ -130,6 +132,9 @@ class _PageBookShelfState extends State<PageBookShelf>
   }
 
   Widget _buildList(context) {
+    if(_bookList.isEmpty){
+      return Center(child: Text('请添加书源，然后再搜索书籍'),);
+    }
     return RefreshIndicator(
       color: YColors.primary,
       onRefresh: ()async{
@@ -149,6 +154,7 @@ class _PageBookShelfState extends State<PageBookShelf>
     var theme = Theme.of(context);
     return GestureDetector(
       onTap: (){
+        DatabaseHelper().updateBookReadTime(bean.bookId);
         YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':bean.bookId})
             .then((value){
           SystemChrome.setPreferredOrientations([ 	 //强制横屏
@@ -218,7 +224,7 @@ class _PageBookShelfState extends State<PageBookShelf>
 
   dynamic _fetchBookShelf() async{
     await DatabaseHelper().loadConfig();
-    var temp = await DatabaseHelper().queryBookInBookShelf();
+    var temp = await DatabaseHelper().queryBookInBookShelf(currSortType);
     _bookList.clear();
     _bookList.addAll(temp);
     setState(() {

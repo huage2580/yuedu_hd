@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yuedu_hd/db/BookSourceBean.dart';
@@ -159,6 +160,9 @@ class _StateSourceList extends State<PageSourceList> {
                   break;
                 case 1:
                   _stateSelect(false);
+                  break;
+                case 2:
+                  BotToast.showText(text: '当前无法校验书源');
                   break;
               }
             },

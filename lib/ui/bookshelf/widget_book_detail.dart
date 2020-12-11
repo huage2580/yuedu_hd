@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yuedu_hd/db/BookInfoBean.dart';
@@ -218,8 +219,10 @@ class BookDetailState extends State<BookDetailWidget> {
                 children: [
                   Icon(CupertinoIcons.folder_circle),
                   HSpace(8),
-                  Expanded(child: Text('分组: 还没做呢${bookDetail.groupId}',style: theme.textTheme.subtitle1,maxLines: 1,overflow: TextOverflow.ellipsis,)),
-                  SizedBox(height: 26,child: FlatButton(onPressed: (){}, child: Text('设置分组'), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,color: theme.primaryColor,textColor: theme.canvasColor,)),
+                  Expanded(child: Text('分组: ${bookDetail.groupId}',style: theme.textTheme.subtitle1,maxLines: 1,overflow: TextOverflow.ellipsis,)),
+                  SizedBox(height: 26,child: FlatButton(onPressed: (){
+                    BotToast.showText(text: '不支持分组!');
+                  }, child: Text('设置分组'), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,color: theme.primaryColor,textColor: theme.canvasColor,)),
                 ],
               ),
             ),

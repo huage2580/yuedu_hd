@@ -382,8 +382,8 @@ ON "book_chapter" (
     return Future.value();
   }
 
-  ///查询在书架的书籍
-  Future<List<BookShelfBean>> queryBookInBookShelf() async{
+  ///查询在书架的书籍[sortType]/0添加顺序，1上次阅读时间
+  Future<List<BookShelfBean>> queryBookInBookShelf(int sortType) async{
     return await withDB().then((db) => db.transaction((txn) async{
       var bookList = await txn.rawQuery('''
       SELECT
@@ -401,6 +401,8 @@ ON "book_chapter" (
       WHERE
       	book.inbookShelf = 1 
       	AND book_comb_source.used = 1
+      
+      ${sortType == 1?"ORDER BY updatetime DESC":"ORDER BY book._id"}
       ''').then((value) => value.map((e) => BookShelfBean.fromMap(e)).toList());
       //章节信息补充
       for (var book in bookList) {
@@ -417,6 +419,11 @@ ON "book_chapter" (
     })
     );
 
+  }
+
+  ///更新阅读时间
+  dynamic updateBookReadTime(int bookId){
+    withDB().then((db)=>db.update(TABLE_BOOK, {'updatetime':DateTime.now().millisecondsSinceEpoch,},where: '_id = $bookId'));
   }
 
 
