@@ -13,6 +13,7 @@ import 'package:yuedu_hd/ui/reading/event/NextChapterEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/NextPageEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/PreviousChapterEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/PreviousPageEvent.dart';
+import 'package:yuedu_hd/ui/settings/MoreStyleSettingsMenu.dart';
 import 'package:yuedu_hd/ui/widget/PopupMenu.dart';
 
 import 'StyleMenuWidget.dart';
@@ -38,6 +39,7 @@ class _PageReadingState extends State<PageReading> {
   var size = Size(-1, -1);//整个手机or窗口的大小
 
   var _readingWidgetKey = GlobalKey();
+  PopupMenu styleMenu;
 
   @override
   void initState() {
@@ -208,7 +210,7 @@ class _PageReadingState extends State<PageReading> {
                             icon: Icon(CupertinoIcons.repeat,
                                 color: theme.accentColor),
                             onPressed: () {
-                              _showSourceSelectDialog();
+                              _showSourceSelectDialog(context);
                             }),
                         IconButton(
                             icon: Icon(Icons.cloud_download_outlined,
@@ -253,7 +255,7 @@ class _PageReadingState extends State<PageReading> {
   ///阅读样式调整菜单
   void _showStyleMenu(BuildContext context) {
     var theme = Theme.of(context);
-    var styleMenu = PopupMenu(
+    styleMenu = PopupMenu(
         context: context,
         contentHeight: 350,
         contentWidth: 260,
@@ -273,10 +275,30 @@ class _PageReadingState extends State<PageReading> {
         _readingWidgetKey = GlobalKey();
         setState(() {});
       },
+      onMoreClick: (){
+        styleMenu.dismiss();
+        showMenuBar = false;
+        _showMoreSettings(context);
+      },
     );
   }
 
-  void _showSourceSelectDialog() async {
+  void _showMoreSettings(BuildContext context){
+    Navigator.of(context).push(MaterialPageRoute(builder: (context){
+      return Scaffold(
+        appBar: AppBar(title: Text('阅读设置'),),
+        body: SingleChildScrollView(child: MoreStyleSettingsMenu()),
+      );
+    })).then((value){
+      showMenuBar = false;
+      _readingWidgetKey = GlobalKey();
+      setState(() {
+
+      });
+    });
+  }
+
+  void _showSourceSelectDialog(BuildContext context) async {
     var result = await showDialog(
         context: context,
         child: Dialog(

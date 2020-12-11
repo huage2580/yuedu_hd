@@ -126,7 +126,10 @@ ON "book_chapter" (
     "titleSize" REAL NOT NULL,
     "titleColor" integer NOT NULL,
     "titleMargin" REAL NOT NULL,
-    "spaceParagraph" integer NOT NULL DEFAULT 4
+    "spaceParagraph" integer NOT NULL DEFAULT 4,
+    "lineSpace" REAL NOT NULL,
+    "isTitleBold" integer NOT NULL DEFAULT 1,
+    "isTextBold" integer NOT NULL DEFAULT 0
   );
   ''';
 

@@ -13,6 +13,10 @@ class DisplayConfig{
   double titleMargin = 0;//标题和正文的间距
   int spaceParagraph = 4;//段落开头空格
 
+  double lineSpace = 1.2;//行距
+  int isTitleBold = 1;//标题加粗
+  int isTextBold = 0;//正文加粗
+
   static DisplayConfig _default;
 
   static DisplayConfig getDefault(){
@@ -38,6 +42,10 @@ class DisplayConfig{
     titleColor = map['titleColor'];
     titleMargin = map['titleMargin'];
     spaceParagraph = map['spaceParagraph'];
+    lineSpace = map['lineSpace'];
+    isTitleBold = map['isTitleBold'];
+    isTextBold = map['isTextBold'];
+
     _default = this;
   }
 
@@ -54,6 +62,10 @@ class DisplayConfig{
     map['titleColor'] = titleColor;
     map['titleMargin'] = titleMargin;
     map['spaceParagraph'] = spaceParagraph;
+    map['lineSpace'] = lineSpace;
+    map['isTitleBold'] = isTitleBold;
+    map['isTextBold'] = isTextBold;
+
     return map;
   }
 }

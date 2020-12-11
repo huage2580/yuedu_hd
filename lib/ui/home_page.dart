@@ -102,14 +102,14 @@ class HomeState extends State<HomePage> {
             switchPageTo(PAGE_BOOK);
           },
         ),
-        _HomeMenuItem(
-          Icons.explore_outlined,
-          "发现",
-          isSelected: currPage == PAGE_EXPLORE,
-          onTap: () {
-            switchPageTo(PAGE_EXPLORE);
-          },
-        ),
+        // _HomeMenuItem(
+        //   Icons.explore_outlined,
+        //   "发现",
+        //   isSelected: currPage == PAGE_EXPLORE,
+        //   onTap: () {
+        //     switchPageTo(PAGE_EXPLORE);
+        //   },
+        // ),
         _HomeMenuItem(
           Icons.arrow_circle_down_outlined,
           "下载",

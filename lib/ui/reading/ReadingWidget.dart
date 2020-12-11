@@ -314,6 +314,8 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     final textStyle = TextStyle(
       color: Color(config.textColor),
       fontSize: config.textSize,
+      fontWeight: config.isTextBold==1?FontWeight.bold:FontWeight.normal,
+      height: config.lineSpace,
     );
 
     final textSpan = TextSpan(
@@ -326,9 +328,9 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   //标题的样式
   TextSpan _generateTitleTextSpan(String title){
     final titleStyle = TextStyle(
-      color: Color(config.titleColor),
-      fontSize: config.titleSize,
-      fontWeight: FontWeight.bold,
+        color: Color(config.titleColor),
+        fontSize: config.titleSize,
+        fontWeight: config.isTitleBold==1?FontWeight.bold:FontWeight.normal
     );
     final titleSpan = TextSpan(
       text: title.trim(),
