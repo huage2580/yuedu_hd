@@ -42,12 +42,19 @@ class HomeState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     ThemeData themeData = Theme.of(context);
+    bool isIOS = Theme.of(context).platform == TargetPlatform.iOS||Theme.of(context).platform == TargetPlatform.macOS;
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       resizeToAvoidBottomInset: false,
       backgroundColor: themeData.backgroundColor,
-      body: Row(
+      body: Stack(
         children: [
+          Row(
+            children: [
+              SizedBox(width: 180,),
+              Expanded(child: _buildHomeContainer(context))
+            ],
+          ),
           Container(
             width: 180,
             decoration: BoxDecoration(
@@ -60,11 +67,10 @@ class HomeState extends State<HomePage> {
                 //   ),
                 // ],
                 borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(15),
-                    bottomRight: Radius.circular(15))),
+                    topRight: Radius.circular(isIOS?0:15),
+                    bottomRight: Radius.circular(isIOS?0:15))),
             child: _buildMenu(context),
           ),
-          Expanded(child: _buildHomeContainer(context))
         ],
       ),
     );
