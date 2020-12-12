@@ -33,14 +33,25 @@ class BookSourceHelper{
       _log.writeln('json解析异常:$e');
       return Future.value(result);
     }
-    for(var item in sourceList){
-      if(!_checkCompatible(item)){
+    if(jsonStr.startsWith('{')){//single item
+      var item = sourceList;
+      if(!_checkCompatible(sourceList)){
         _log.writeln('[x不兼容过滤]->${item['bookSourceUrl']}');
-        continue;
+        return Future.value(result);
       }
       result.add(BookSourceBean.fromJson(item));
       _log.writeln('[兼容]->【${item['bookSourceName']} 】${item['bookSourceUrl']}');
+    }else{
+      for(var item in sourceList){
+        if(!_checkCompatible(item)){
+          _log.writeln('[x不兼容过滤]->${item['bookSourceUrl']}');
+          continue;
+        }
+        result.add(BookSourceBean.fromJson(item));
+        _log.writeln('[兼容]->【${item['bookSourceName']} 】${item['bookSourceUrl']}');
+      }
     }
+
     _log.writeln('---解析结束---');
     return Future.value(result);
   }
