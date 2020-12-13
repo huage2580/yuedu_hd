@@ -23,6 +23,7 @@ class _StateSourceList extends State<PageSourceList> {
   bool showLoading = true;
   int _selectCount = 0;
   TextEditingController _searchController = TextEditingController();
+  var isLandscape = false;
 
   @override
   void initState() {
@@ -33,12 +34,13 @@ class _StateSourceList extends State<PageSourceList> {
 
   @override
   Widget build(BuildContext context) {
+    isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     ThemeData theme = Theme.of(context);
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       resizeToAvoidBottomInset: false,
       body: Container(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.all(isLandscape?20:4),
         child: Column(
           children: [
             Row(
@@ -93,8 +95,10 @@ class _StateSourceList extends State<PageSourceList> {
             children: [
               HSpace(60),
               Text('名称/分组'),
-              HSpace(140),
-              Text('网站源'),
+              if(isLandscape)
+                HSpace(140),
+              if(isLandscape)
+                Text('网站源'),
               Spacer(),
               Text('启用'),
               HSpace(20),
@@ -148,10 +152,11 @@ class _StateSourceList extends State<PageSourceList> {
           child: Text('反选'),
         ),
         HSpace(8),
-        OutlineButton(
-          onPressed: () {_deleteSelect();},
-          child: Text('删除'),
-        ),
+        if(isLandscape)
+          OutlineButton(
+            onPressed: () {_deleteSelect();},
+            child: Text('删除'),
+          ),
         PopupMenuButton(
             onSelected: (k){
               switch(k){
@@ -164,6 +169,9 @@ class _StateSourceList extends State<PageSourceList> {
                 case 2:
                   BotToast.showText(text: '当前无法校验书源');
                   break;
+                case 3:
+                  _deleteSelect();
+                  break;
               }
             },
             offset: Offset(0, -180),
@@ -172,6 +180,8 @@ class _StateSourceList extends State<PageSourceList> {
                 PopupMenuItem(child: Text('启用所选'),value: 0,),
                 PopupMenuItem(child: Text('禁用所选'),value: 1,),
                 PopupMenuItem(child: Text('校验所选'),value: 2,),
+                if(!isLandscape)
+                  PopupMenuItem(child: Text('删除所选'),value: 3,),
               ];
             }),
       ],
@@ -190,7 +200,7 @@ class _StateSourceList extends State<PageSourceList> {
   Container _buildSearch(ThemeData theme) {
     return Container(
       height: 40,
-      width: 300,
+      width: isLandscape?300:220,
       padding: EdgeInsets.only(left: 8, right: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -262,7 +272,10 @@ class _StateSourceList extends State<PageSourceList> {
               style: theme.textTheme.subtitle1,
             )),
         HSpace(20),
-        Expanded(child: Text(bean.bookSourceUrl)),
+        if(isLandscape)
+          Expanded(child: Text(bean.bookSourceUrl)),
+        if(!isLandscape)
+          Spacer(),
         Switch(
           value: bean.enabled,
           onChanged: (b) {

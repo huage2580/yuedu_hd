@@ -16,6 +16,9 @@ class _PageSourceAddState extends State<PageSourceAdd> {
   bool showLoading = false;
   String _log='';
   TextEditingController _textEditingController;
+  var isLandscape = false;
+
+
   @override
   void initState() {
     super.initState();
@@ -26,61 +29,84 @@ class _PageSourceAddState extends State<PageSourceAdd> {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       resizeToAvoidBottomInset: false,
       body: Container(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                IconButton(icon: Icon(CupertinoIcons.back,color: theme.primaryColor,),padding: EdgeInsets.all(0), onPressed: (){
-                  Navigator.of(context).pop();
-                }),
-                Expanded(child: _buildSearch(theme),),
-                HSpace(8),
-                FlatButton(onPressed: (){
-                  _fromNetWork();
-                },
-                  child: Text('导入',style: TextStyle(color: theme.accentColor),),
-                  color: theme.primaryColorDark,
-                  shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
-                ),
-                HSpace(8),
-                FlatButton(onPressed: (){
-                  _fromClipboard();
-                },
-                  child: Text('粘贴板导入',style: TextStyle(color: theme.accentColor),),
-                  color: theme.primaryColorDark,
-                  shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
-                ),
+        child: Container(
+          padding: EdgeInsets.all(isLandscape?20:4),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  IconButton(icon: Icon(CupertinoIcons.back,color: theme.primaryColor,),padding: EdgeInsets.all(0), onPressed: (){
+                    Navigator.of(context).pop();
+                  }),
+                  Expanded(child: _buildSearch(theme),),
+                  HSpace(8),
+                  if(isLandscape)
+                    _buildBtnLayout(theme),
 
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text('''
+                ],
+              ),
+              if(!isLandscape)
+                Center(child: _buildBtnLayout(theme)),
+              Expanded(
+                child: CupertinoScrollbar(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Text('''
 书源的导入：
 方式一：在上方输入网址，点击按钮开始导入。
 方式二：复制配置文件到粘贴板，点击【粘贴板导入】按钮。
 暂不支持编辑和修改，同网址书源每次导入均覆盖内容。
-              ''',style: theme.textTheme.headline6,),
-            ),
-            VSpace(10),
-            Text('调试日志:',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12),),
-            VSpace(10),
-            Expanded(
-                child: SingleChildScrollView(
-                  child: Text(_log),
-                ),
-            ),
+                          ''',style: isLandscape?theme.textTheme.headline6:theme.textTheme.subtitle2,),
+                        ),
+                        VSpace(10),
+                        Text('调试日志:',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12),),
+                        VSpace(10),
+                        Text(_log),
 
-          ],
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildBtnLayout(ThemeData theme){
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        FlatButton(onPressed: (){
+          _fromNetWork();
+        },
+          child: Text('导入',style: TextStyle(color: theme.accentColor),),
+          color: theme.primaryColorDark,
+          shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+        ),
+        HSpace(8),
+        FlatButton(onPressed: (){
+          _fromClipboard();
+        },
+          child: Text('粘贴板导入',style: TextStyle(color: theme.accentColor),),
+          color: theme.primaryColorDark,
+          shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+        ),
+      ],
     );
   }
 
