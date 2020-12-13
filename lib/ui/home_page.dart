@@ -31,10 +31,10 @@ class HomeState extends State<HomePage> {
 
   @override
   void initState() {
-    SystemChrome.setPreferredOrientations([ 	 //强制横屏
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight
-    ]);
+    // SystemChrome.setPreferredOrientations([ 	 //强制横屏
+    //   DeviceOrientation.landscapeLeft,
+    //   DeviceOrientation.landscapeRight
+    // ]);
     SystemChrome.setEnabledSystemUIOverlays([]);
     super.initState();
   }
@@ -47,32 +47,58 @@ class HomeState extends State<HomePage> {
       resizeToAvoidBottomPadding: false,
       resizeToAvoidBottomInset: false,
       backgroundColor: themeData.backgroundColor,
-      body: Stack(
-        children: [
-          Row(
-            children: [
-              SizedBox(width: 180,),
-              Expanded(child: _buildHomeContainer(context))
-            ],
+      body: OrientationBuilder(builder: (context,orientation){
+        if(orientation == Orientation.landscape){
+          return _buildLandscape(context, themeData, isIOS);
+        }else{
+          return _buildPortrait(context, themeData, isIOS);
+        }
+      },),
+    );
+  }
+
+  Stack _buildLandscape(BuildContext context, ThemeData themeData, bool isIOS) {
+    return Stack(
+      children: [
+        Row(
+          children: [
+            SizedBox(width: 180,),
+            Expanded(child: _buildHomeContainer(context))
+          ],
+        ),
+        Container(
+          width: 180,
+          decoration: BoxDecoration(
+              color: themeData.cardColor,
+              // boxShadow: <BoxShadow>[
+              //   BoxShadow(
+              //     color: themeData.shadowColor,
+              //     offset: Offset(-1, 1),
+              //     blurRadius: 8.0,
+              //   ),
+              // ],
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(isIOS?0:15),
+                  bottomRight: Radius.circular(isIOS?0:15))),
+          child: _buildMenu(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPortrait(BuildContext context,ThemeData themeData, bool isIOS){
+    return Stack(
+      children: [
+        Container(margin: EdgeInsets.only(bottom: 60),child: _buildHomeContainer(context)),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            height: 60,
+            decoration: BoxDecoration(color: themeData.cardColor,),
+            child: _buildPortraitMenu(context),
           ),
-          Container(
-            width: 180,
-            decoration: BoxDecoration(
-                color: themeData.cardColor,
-                // boxShadow: <BoxShadow>[
-                //   BoxShadow(
-                //     color: themeData.shadowColor,
-                //     offset: Offset(-1, 1),
-                //     blurRadius: 8.0,
-                //   ),
-                // ],
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(isIOS?0:15),
-                    bottomRight: Radius.circular(isIOS?0:15))),
-            child: _buildMenu(context),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -146,6 +172,54 @@ class HomeState extends State<HomePage> {
     );
   }
 
+  Widget _buildPortraitMenu(BuildContext context){
+    return Row(
+      children: [
+        Expanded(child: _HomeMenuItem(
+          Icons.book_outlined,
+          "书架",
+          isSelected: currPage == PAGE_BOOK,
+          onTap: () {
+            switchPageTo(PAGE_BOOK);
+          },
+          orientation: Orientation.portrait,
+        ),),
+        Expanded(child:  _HomeMenuItem(
+          Icons.arrow_circle_down_outlined,
+          "下载",
+          isSelected: currPage == PAGE_DOWNLOAD,
+          onTap: () {
+            switchPageTo(PAGE_DOWNLOAD);
+          },
+          orientation: Orientation.portrait,
+
+        ),
+        ),
+        Expanded(child:  _HomeMenuItem(
+          Icons.cloud_circle_outlined,
+          "书源",
+          isSelected: currPage == PAGE_SOURCE,
+          onTap: () {
+            switchPageTo(PAGE_SOURCE);
+          },
+          orientation: Orientation.portrait,
+
+        ),
+        ),
+        Expanded(child: _HomeMenuItem(
+          Icons.settings_outlined,
+          "设置",
+          isSelected: currPage == PAGE_SETTINGS,
+          onTap: () {
+            switchPageTo(PAGE_SETTINGS);
+          },
+          orientation: Orientation.portrait,
+        ),
+        ),
+      ],
+    );
+  }
+
   void switchPageTo(int target) {
     if (currPage == target) {
       return;
@@ -208,13 +282,14 @@ class _HomeMenuItem extends StatelessWidget {
   final IconData icon;
   final String text;
   final Function onTap;
+  final Orientation orientation;
 
   const _HomeMenuItem(
     this.icon,
     this.text, {
     Key key,
     this.isSelected = false,
-    this.onTap,
+    this.onTap,this.orientation = Orientation.landscape,
   }) : super(key: key);
 
   @override
@@ -223,33 +298,70 @@ class _HomeMenuItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
-        margin: EdgeInsets.only(left: 8, right: 8, top: 4),
-        decoration: isSelected
-            ? BoxDecoration(
-                color: themeData.primaryColorLight,
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-              )
-            : null,
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 32,
-              color: isSelected ? themeData.primaryColor : null,
-            ),
-            HSpace(4),
-            Expanded(
-                child: Text(
-              text,
-              style: TextStyle(
-                  fontSize: themeData.textTheme.headline5.fontSize,
-                  color: isSelected ? themeData.primaryColor : null),
-            )),
-          ],
-        ),
+      child: _menuItemWidget(themeData),
+    );
+  }
+
+  Widget _menuItemWidget(themeData){
+    if(orientation == Orientation.landscape){
+      return _buildLandScapeItem(themeData);
+    }else{
+      return _buildPortraitItem(themeData);
+    }
+  }
+
+  Container _buildLandScapeItem(ThemeData themeData) {
+    return Container(
+      padding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
+      margin: EdgeInsets.only(left: 8, right: 8, top: 4),
+      decoration: isSelected
+          ? BoxDecoration(
+              color: themeData.primaryColorLight,
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+            )
+          : null,
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 32,
+            color: isSelected ? themeData.primaryColor : null,
+          ),
+          HSpace(4),
+          Expanded(
+              child: Text(
+            text,
+            style: TextStyle(
+                fontSize: themeData.textTheme.headline5.fontSize,
+                color: isSelected ? themeData.primaryColor : null),
+          )),
+        ],
       ),
     );
   }
+
+  Container _buildPortraitItem(ThemeData themeData) {
+    return Container(
+      padding: EdgeInsets.all(4),
+      margin: EdgeInsets.zero,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 18,
+            color: isSelected ? themeData.primaryColor : null,
+          ),
+          VSpace(4),
+          Text(
+            text,
+            style: TextStyle(
+                fontSize: themeData.textTheme.subtitle2.fontSize,
+                color: isSelected ? themeData.primaryColor : null),
+          ),
+        ],
+      ),
+    );
+  }
+
 }

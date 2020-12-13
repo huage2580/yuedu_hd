@@ -21,10 +21,10 @@ void main() async{
     databaseFactory = databaseFactoryFfi;
   }
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([ 	 //强制横屏
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight
-  ]);
+  // SystemChrome.setPreferredOrientations([ 	 //强制横屏
+  //   DeviceOrientation.landscapeLeft,
+  //   DeviceOrientation.landscapeRight
+  // ]);
   SystemChrome.setEnabledSystemUIOverlays([]);
   await Executor().warmUp();
   runApp(MyApp());
