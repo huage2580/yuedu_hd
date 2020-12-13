@@ -47,17 +47,17 @@ class _DownloadInfoWidgetState extends State<DownloadInfoWidget> {
 
   @override
   Widget build(BuildContext context) {
+    var isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     if(downloader.chapters.isEmpty){
       return Container(child: Center(child: Text('没有下载任务...',style: Theme.of(context).textTheme.headline4,)));
     }
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.all(16),
+          padding: EdgeInsets.all(isLandscape?16:4),
           child: Row(
             children: [
-              Text('${downloader.bookInfoBean.name} 待缓存章节: ${downloader.chapters.length}',style: Theme.of(context).textTheme.headline5,),
-              Spacer(),
+              Expanded(child: Text('${downloader.bookInfoBean.name} 待缓存章节: ${downloader.chapters.length}',style: isLandscape?Theme.of(context).textTheme.headline5:null,)),
               IconButton(icon: Icon(Icons.stop), onPressed: (){
                 downloader.stop();
               })
