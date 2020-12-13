@@ -12,8 +12,9 @@ import 'package:yuedu_hd/ui/widget/space.dart';
 ///书籍详情
 class BookDetailWidget extends StatefulWidget {
   final int bookId;
+  final Function backClick;
 
-  BookDetailWidget(this.bookId) : super(key: ValueKey(bookId));
+  BookDetailWidget(this.bookId, {this.backClick}) : super(key: ValueKey(bookId));
 
   @override
   State<StatefulWidget> createState() {
@@ -42,96 +43,108 @@ class BookDetailState extends State<BookDetailWidget> {
     );
   }
 
-  Column _buildDetail(BuildContext context) {
+  Widget _buildDetail(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     var theme = Theme.of(context);
-    return Column(
+    return Stack(
       children: [
-        SizedBox(
-          height: 180,
-          child: Stack(
-            children: [
-              Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SizedBox(
-                    height: 80,
-                    width: double.maxFinite,
-                    child: CustomPaint(
-                      painter: _ArcPainter(context),
+        Column(
+          children: [
+            SizedBox(
+              height: 180,
+              child: Stack(
+                children: [
+                  Align(
+                      alignment: Alignment.bottomCenter,
+                      child: SizedBox(
+                        height: 80,
+                        width: double.maxFinite,
+                        child: CustomPaint(
+                          painter: _ArcPainter(context),
+                        ),
+                      )),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SizedBox(
+                        height: 120,
+                        width: 96,
+                        child: Image.network(bookDetail.coverUrl)),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+                child: Container(
+              width: double.maxFinite,
+              color: theme.cardColor,
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Text(
+                    bookDetail.name,
+                    style: theme.textTheme.headline5,
+                  ),
+                  VSpace(8),
+                  _buildTags(context),
+                  VSpace(16),
+                  Expanded(child: _buildInfo(context)),
+                  Divider(
+                    height: 0.5,
+                    thickness: 0.5,
+                  ),
+                  Container(
+                    height: 50,
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                            onTap: () {
+                              _fetchDetail(widget.bookId);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 20, right: 20),
+                              child: Icon(Icons.sync),
+                            )),
+                        VerticalDivider(width: 0.5,thickness: 1,),
+                        Expanded(
+                            child: SizedBox(
+                                height: 50,
+                                child: FlatButton(
+                                    onPressed: () async{
+                                      await DatabaseHelper().addToBookShelf(widget.bookId);
+                                      setState(() {
+                                        bookDetail.inbookShelf = 1;
+                                      });
+                                    },
+                                    child: Text(bookDetail.inbookShelf == 0?'加入书架':'已在书架'),
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap))),
+                        Expanded(
+                            child: SizedBox(
+                                height: 50,
+                                child: FlatButton(
+                                    onPressed: () {
+                                      YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':bookDetail.id});
+                                    },
+                                    child: Text('开始阅读'),
+                                    color: theme.primaryColor,
+                                    textColor: theme.canvasColor,
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap))),
+                      ],
                     ),
-                  )),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: SizedBox(
-                    height: 120,
-                    width: 96,
-                    child: Image.network(bookDetail.coverUrl)),
+                  ),
+                ],
               ),
-            ],
-          ),
+            )),
+          ],
         ),
-        Expanded(
-            child: Container(
-          width: double.maxFinite,
-          color: theme.cardColor,
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Text(
-                bookDetail.name,
-                style: theme.textTheme.headline5,
-              ),
-              VSpace(8),
-              _buildTags(context),
-              VSpace(16),
-              Expanded(child: _buildInfo(context)),
-              Divider(
-                height: 0.5,
-                thickness: 0.5,
-              ),
-              Container(
-                height: 50,
-                child: Row(
-                  children: [
-                    GestureDetector(
-                        onTap: () {
-                          _fetchDetail(widget.bookId);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 20, right: 20),
-                          child: Icon(Icons.sync),
-                        )),
-                    VerticalDivider(width: 0.5,thickness: 1,),
-                    Expanded(
-                        child: SizedBox(
-                            height: 50,
-                            child: FlatButton(
-                                onPressed: () async{
-                                  await DatabaseHelper().addToBookShelf(widget.bookId);
-                                  setState(() {
-                                    bookDetail.inbookShelf = 1;
-                                  });
-                                },
-                                child: Text(bookDetail.inbookShelf == 0?'加入书架':'已在书架'),
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap))),
-                    Expanded(
-                        child: SizedBox(
-                            height: 50,
-                            child: FlatButton(
-                                onPressed: () {
-                                  YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':bookDetail.id});
-                                },
-                                child: Text('开始阅读'),
-                                color: theme.primaryColor,
-                                textColor: theme.canvasColor,
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap))),
-                  ],
-                ),
-              ),
-            ],
+        if(!isLandscape)
+          Container(
+            padding: EdgeInsets.all(8),
+            child: IconButton(icon: Icon(CupertinoIcons.back,color: theme.primaryColor,), onPressed: (){
+              widget.backClick();
+            }),
           ),
-        )),
       ],
     );
   }

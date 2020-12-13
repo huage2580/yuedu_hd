@@ -250,7 +250,7 @@ class _PageReadingState extends State<PageReading> {
               color: theme.canvasColor,
               child: Text(bookInfo == null
                   ? '获取书籍信息...'
-                  : '${bookInfo.name}[${bookInfo.author}] $currChapterName ${bookInfo.bookUrl}',maxLines: 1,overflow: TextOverflow.ellipsis,),
+                  : '${bookInfo.name}[${bookInfo.author}] $currChapterName \n${bookInfo.bookUrl}',maxLines: 2,overflow: TextOverflow.ellipsis,),
             )
           ],
         ),

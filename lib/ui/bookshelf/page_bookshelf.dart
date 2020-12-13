@@ -1,5 +1,6 @@
 
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -238,7 +239,12 @@ class _PageBookShelfState extends State<PageBookShelf>
     await _fetchBookShelf();
     var futureList = List<Future>();
     for (var book in _bookList) {
-      futureList.add(_tocHelper.updateChapterList(book.bookId, book.sourceId));
+      futureList.add(_tocHelper.updateChapterList(book.bookId, book.sourceId)
+          .then((value) => BotToast.showText(text: '${book.bookName} 更新成功'))
+          .catchError((e){
+            BotToast.showText(text: '${book.bookName} 更新失败\n$e');
+      })
+      );
     }
     await Future.wait(futureList);
     await _fetchBookShelf();

@@ -20,6 +20,8 @@ class _PageAddBookState extends State<PageAddBook>{
   var _searchResultList = List<BookInfoBean>();
 
   var _selectBookId = -1;//5 for test,default -1
+  var isLandscape = false;
+
 
   @override
   void initState() {
@@ -31,52 +33,112 @@ class _PageAddBookState extends State<PageAddBook>{
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
+    isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       resizeToAvoidBottomPadding: false,
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                Column(
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(top: 20),
-                      child: Row(
-                        children: [
-                          IconButton(icon: Icon(CupertinoIcons.back,color: theme.primaryColor,), onPressed: (){
-                            Navigator.of(context).pop();
-                          }),
-                          Expanded(child: _buildSearch(theme)),
-                          HSpace(8),
-                        ],
-                      ),
-                    ),
-                    Visibility(visible: _canStop,child: LinearProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(theme.primaryColorLight),)),
-                    Expanded(child: _buildSearchList(context)),
-                  ],
-                ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Visibility(
-                    visible: _canStop,
-                    child: FloatingActionButton(onPressed: (){
-                      _searchHelper.cancelSearch('test');
-                      BotToast.showText(text:"请等待线程结束...");
-                    },child: Icon(Icons.stop),backgroundColor: theme.primaryColor,foregroundColor: theme.canvasColor,),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          VerticalDivider(width: 0.5,thickness: 0.5,),
-          Expanded(child: BookDetailWidget(_selectBookId)),
-        ],
-      ),
+      body: OrientationBuilder( builder: (context,orientation){
+        if(isLandscape){
+          return _buildPageLandscape(theme, context);
+        }else{
+          return _buildPagePortrait(theme, context);
+        }
+      },),
     );
   }
+
+  Row _buildPageLandscape(ThemeData theme, BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(top: 20),
+                    child: Row(
+                      children: [
+                        IconButton(icon: Icon(CupertinoIcons.back,color: theme.primaryColor,), onPressed: (){
+                          Navigator.of(context).pop();
+                        }),
+                        Expanded(child: _buildSearch(theme)),
+                        HSpace(8),
+                      ],
+                    ),
+                  ),
+                  Visibility(visible: _canStop,child: LinearProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(theme.primaryColorLight),)),
+                  Expanded(child: _buildSearchList(context)),
+                ],
+              ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Visibility(
+                  visible: _canStop,
+                  child: FloatingActionButton(onPressed: (){
+                    _searchHelper.cancelSearch('test');
+                    BotToast.showText(text:"请等待线程结束...");
+                  },child: Icon(Icons.stop),backgroundColor: theme.primaryColor,foregroundColor: theme.canvasColor,),
+                ),
+              ),
+            ],
+          ),
+        ),
+        VerticalDivider(width: 0.5,thickness: 0.5,),
+        Expanded(child: BookDetailWidget(_selectBookId)),
+      ],
+    );
+  }
+
+  Widget _buildPagePortrait(ThemeData theme, BuildContext context) {
+    return Stack(
+      children: [
+        Stack(
+          children: [
+            Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: 20),
+                  child: Row(
+                    children: [
+                      IconButton(icon: Icon(CupertinoIcons.back,color: theme.primaryColor,), onPressed: (){
+                        Navigator.of(context).pop();
+                      }),
+                      Expanded(child: _buildSearch(theme)),
+                      HSpace(8),
+                    ],
+                  ),
+                ),
+                Visibility(visible: _canStop,child: LinearProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(theme.primaryColorLight),)),
+                Expanded(child: _buildSearchList(context)),
+              ],
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Visibility(
+                visible: _canStop,
+                child: Container(
+                  margin: EdgeInsets.all(8),
+                  child: FloatingActionButton(onPressed: (){
+                    _searchHelper.cancelSearch('test');
+                    BotToast.showText(text:"请等待线程结束...");
+                  },child: Icon(Icons.stop),backgroundColor: theme.primaryColor,foregroundColor: theme.canvasColor,),
+                ),
+              ),
+            ),
+          ],
+        ),
+        Visibility(visible: _selectBookId !=-1,child: Container(color: theme.backgroundColor,child: BookDetailWidget(_selectBookId,backClick: (){
+          _selectBookId = -1;
+          setState(() {
+
+          });
+        },))),
+      ],
+    );
+  }
+
 
   Container _buildSearch(ThemeData theme) {
     return Container(

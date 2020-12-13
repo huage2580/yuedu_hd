@@ -64,6 +64,7 @@ class BookTocHelper{
         developer.log('目录解析完成 ${book.bookUrl},目录数量:${result.length}');
       }else{
         developer.log('目录解析错误:${book.bookUrl},网络错误${response.statusCode}');
+        throw Exception('网络错误${response.statusCode}');
       }
     }catch(e){
       developer.log('${book.bookUrl} 目录解析错误[使用规则${ruleBean.toString()}]:$e');
