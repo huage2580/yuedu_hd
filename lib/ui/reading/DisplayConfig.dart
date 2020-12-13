@@ -1,7 +1,7 @@
 
 //阅读的配置项目
 class DisplayConfig{
-  int isSinglePage = 0;
+  int isSinglePage = 1;
   int isVertical = 0;
   double margin = 20;//外边距
   double inSizeMargin = 40;//双页的话，行内边距
