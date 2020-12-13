@@ -34,89 +34,93 @@ class _StyleMenuState extends State<StyleMenu> {
     bool isTwoPage = config.isSinglePage == 0;
 
     //
-    return Container(
-      padding: EdgeInsets.all(10),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+    return CupertinoScrollbar(
+      child: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('滚动方向:',style: theme.textTheme.headline6,),
-              HSpace(16),
-              GestureDetector(child: Icon(CupertinoIcons.square_split_1x2,size: 40,color: isVerticalScroll?theme.primaryColor:theme.canvasColor,),onTap: (){
-                config.isVertical = 1;
-                _notifyStyleChanged();
-              },),
-              HSpace(16),
-              GestureDetector(child: Icon(CupertinoIcons.square_split_2x1,size: 40,color: !isVerticalScroll?theme.primaryColor:theme.canvasColor,),onTap: (){
-                config.isVertical = 0;
-                _notifyStyleChanged();
-              },),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text('滚动方向:',style: theme.textTheme.headline6,),
+                  HSpace(16),
+                  GestureDetector(child: Icon(CupertinoIcons.square_split_1x2,size: 40,color: isVerticalScroll?theme.primaryColor:theme.canvasColor,),onTap: (){
+                    config.isVertical = 1;
+                    _notifyStyleChanged();
+                  },),
+                  HSpace(16),
+                  GestureDetector(child: Icon(CupertinoIcons.square_split_2x1,size: 40,color: !isVerticalScroll?theme.primaryColor:theme.canvasColor,),onTap: (){
+                    config.isVertical = 0;
+                    _notifyStyleChanged();
+                  },),
+                ],
+              ),
+              Divider(),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text('内容布局:',style: theme.textTheme.headline6,),
+                  HSpace(16),
+                  GestureDetector(child: Icon(CupertinoIcons.rectangle_expand_vertical,size: 40,color: !isTwoPage?theme.primaryColor:theme.canvasColor,),onTap: (){
+                    config.isSinglePage = 1;
+                    _notifyStyleChanged();
+                  },),
+                  HSpace(16),
+                  GestureDetector(child: Icon(CupertinoIcons.book_fill,size: 40,color: isTwoPage?theme.primaryColor:theme.canvasColor,),onTap: (){
+                    config.isSinglePage = 0;
+                    _notifyStyleChanged();
+                  },),
+                ],
+              ),
+              Divider(),
+              Text('颜色:',style: theme.textTheme.headline6,),
+              VSpace(8),
+              Container(
+                height: 40,
+                width: double.maxFinite,
+                child: _buildColorList(context),
+              ),
+              Divider(),
+              Row(
+                children: [
+                  Text('正文:',style: theme.textTheme.headline6,),
+                  IconButton(icon: Icon(CupertinoIcons.minus_circle), onPressed: (){
+                    config.textSize = config.textSize - 1;
+                    _notifyStyleChanged();
+                  }),
+                  Text('${config.textSize}sp'),
+                  IconButton(icon: Icon(CupertinoIcons.add_circled), onPressed: (){
+                    config.textSize = config.textSize + 1;
+                    _notifyStyleChanged();
+                  })
+                ],
+              ),
+              Row(
+                children: [
+                  Text('标题:',style: theme.textTheme.headline6,),
+                  IconButton(icon: Icon(CupertinoIcons.minus_circle), onPressed: (){
+                    config.titleSize = config.titleSize - 1;
+                    _notifyStyleChanged();
+                  }),
+                  Text('${config.titleSize}sp'),
+                  IconButton(icon: Icon(CupertinoIcons.add_circled), onPressed: (){
+                    config.titleSize = config.titleSize + 1;
+                    _notifyStyleChanged();
+                  })
+                ],
+              ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: GestureDetector(child: Text('更多设置 >'),onTap: (){
+                  widget.onMoreClick();
+                },),
+              ),
             ],
           ),
-          Divider(),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text('内容布局:',style: theme.textTheme.headline6,),
-              HSpace(16),
-              GestureDetector(child: Icon(CupertinoIcons.rectangle_expand_vertical,size: 40,color: !isTwoPage?theme.primaryColor:theme.canvasColor,),onTap: (){
-                config.isSinglePage = 1;
-                _notifyStyleChanged();
-              },),
-              HSpace(16),
-              GestureDetector(child: Icon(CupertinoIcons.book_fill,size: 40,color: isTwoPage?theme.primaryColor:theme.canvasColor,),onTap: (){
-                config.isSinglePage = 0;
-                _notifyStyleChanged();
-              },),
-            ],
-          ),
-          Divider(),
-          Text('颜色:',style: theme.textTheme.headline6,),
-          VSpace(8),
-          Container(
-            height: 40,
-            width: double.maxFinite,
-            child: _buildColorList(context),
-          ),
-          Divider(),
-          Row(
-            children: [
-              Text('正文:',style: theme.textTheme.headline6,),
-              IconButton(icon: Icon(CupertinoIcons.minus_circle), onPressed: (){
-                config.textSize = config.textSize - 1;
-                _notifyStyleChanged();
-              }),
-              Text('${config.textSize}sp'),
-              IconButton(icon: Icon(CupertinoIcons.add_circled), onPressed: (){
-                config.textSize = config.textSize + 1;
-                _notifyStyleChanged();
-              })
-            ],
-          ),
-          Row(
-            children: [
-              Text('标题:',style: theme.textTheme.headline6,),
-              IconButton(icon: Icon(CupertinoIcons.minus_circle), onPressed: (){
-                config.titleSize = config.titleSize - 1;
-                _notifyStyleChanged();
-              }),
-              Text('${config.titleSize}sp'),
-              IconButton(icon: Icon(CupertinoIcons.add_circled), onPressed: (){
-                config.titleSize = config.titleSize + 1;
-                _notifyStyleChanged();
-              })
-            ],
-          ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: GestureDetector(child: Text('更多设置 >'),onTap: (){
-              widget.onMoreClick();
-            },),
-          ),
-        ],
+        ),
       ),
     );
   }

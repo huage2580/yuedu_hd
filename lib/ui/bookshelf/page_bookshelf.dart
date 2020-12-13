@@ -35,12 +35,13 @@ class _PageBookShelfState extends State<PageBookShelf>
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    bool isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       resizeToAvoidBottomInset: false,
       body: Container(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.all(isPortrait?8:20),
         child: Column(
           children: [
             Row(
@@ -106,7 +107,7 @@ class _PageBookShelfState extends State<PageBookShelf>
               ),
               child: Stack(
                 children: [
-                  Container(margin: EdgeInsets.all(8),child: _buildList(context)),
+                  Container(margin: EdgeInsets.all(8),child: _buildList(context,isPortrait)),
                   Container(
                     margin: EdgeInsets.all(16),
                     child: Align(
@@ -131,7 +132,7 @@ class _PageBookShelfState extends State<PageBookShelf>
     );
   }
 
-  Widget _buildList(context) {
+  Widget _buildList(context, bool isPortrait) {
     if(_bookList.isEmpty){
       return Center(child: Text('请添加书源，然后再搜索书籍'),);
     }
@@ -140,9 +141,13 @@ class _PageBookShelfState extends State<PageBookShelf>
       onRefresh: ()async{
         return await _updateToc();
       },
-      child: WaterfallFlow.builder(gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2
-      ),itemBuilder: (ctx,index)=>_buildBookItem(ctx, _bookList[index]),itemCount: _bookList.length,),
+      child: MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        child: WaterfallFlow.builder(gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
+          crossAxisCount: isPortrait?1:2
+        ),itemBuilder: (ctx,index)=>_buildBookItem(ctx, _bookList[index]),itemCount: _bookList.length,),
+      ),
       // child: GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
       //   crossAxisCount: 2,childAspectRatio: 2.4,crossAxisSpacing: 2,mainAxisSpacing: 8,
       // ), itemBuilder: (ctx,index)=>_buildBookItem(ctx, _bookList[index]),itemCount: _bookList.length,),
@@ -157,10 +162,6 @@ class _PageBookShelfState extends State<PageBookShelf>
         DatabaseHelper().updateBookReadTime(bean.bookId);
         YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':bean.bookId})
             .then((value){
-          SystemChrome.setPreferredOrientations([ 	 //强制横屏
-            DeviceOrientation.landscapeLeft,
-            DeviceOrientation.landscapeRight
-          ]);
           SystemChrome.setEnabledSystemUIOverlays([]);
           _fetchBookShelf();
         });//更新阅读记录

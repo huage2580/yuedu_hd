@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -143,6 +145,9 @@ class _PageReadingState extends State<PageReading> {
   }
 
   Visibility _buildMenuBar(BuildContext context, ThemeData theme) {
+    var menuBarWidth = size.width;
+    var notShowTitle = menuBarWidth < 600;
+
     return Visibility(
       visible: showMenuBar,
       child: Container(
@@ -166,41 +171,42 @@ class _PageReadingState extends State<PageReading> {
                           Navigator.of(context).pop();
                         }),
                   ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                            icon: Icon(Icons.chevron_left_outlined,
-                                color: theme.accentColor),
-                            onPressed: () {
-                              _previousChapter();
-                            }),
-                        OrientationBuilder(
-                         builder:(ctx,orn){
-                           return  Container(
-                           constraints: BoxConstraints(maxWidth:orientation == Orientation.landscape?400:80),
-                           child: Text(
-                           currChapterName ?? '加载中...',
-                           style: TextStyle(
-                           color: theme.accentColor, fontSize: 22),
-                           maxLines: 1,
-                           overflow: TextOverflow.ellipsis,
-                           ));
-                         },
-                        ),
-                        IconButton(
-                            icon: Icon(Icons.chevron_right_outlined,
-                                color: theme.accentColor),
-                            onPressed: () {
-                              _nextChapter();
-                            }),
-                      ],
+                  if(!notShowTitle)
+                    Align(
+                      alignment: Alignment.center,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                              icon: Icon(Icons.chevron_left_outlined,
+                                  color: theme.accentColor),
+                              onPressed: () {
+                                _previousChapter();
+                              }),
+                          OrientationBuilder(
+                           builder:(ctx,orn){
+                             return  Container(
+                             constraints: BoxConstraints(maxWidth:orientation == Orientation.landscape?400:80),
+                             child: Text(
+                             currChapterName ?? '加载中...',
+                             style: TextStyle(
+                             color: theme.accentColor, fontSize: 20),
+                             maxLines: 1,
+                             overflow: TextOverflow.ellipsis,
+                             ));
+                           },
+                          ),
+                          IconButton(
+                              icon: Icon(Icons.chevron_right_outlined,
+                                  color: theme.accentColor),
+                              onPressed: () {
+                                _nextChapter();
+                              }),
+                        ],
+                      ),
                     ),
-                  ),
                   Align(
                     alignment: Alignment.centerRight,
                     child: Row(
@@ -257,7 +263,7 @@ class _PageReadingState extends State<PageReading> {
     var theme = Theme.of(context);
     styleMenu = PopupMenu(
         context: context,
-        contentHeight: 350,
+        contentHeight: min(350, sizeKey.currentContext.size.height-100),
         contentWidth: 260,
         backgroundColor: theme.cardColor,
         child: GestureDetector(
