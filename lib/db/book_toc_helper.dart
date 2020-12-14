@@ -71,8 +71,11 @@ class BookTocHelper{
       return Future.error(e);
     }
     if(result.isNotEmpty && !notUpdateDB){
+      developer.log('目录插入开始 ${DateTime.now()}');
       await insertChapterToDB(result);
+      developer.log('目录插入结束 ${DateTime.now()}');
       result = await DatabaseHelper().queryBookChapters(bookId);
+      developer.log('目录二查结束 ${DateTime.now()}');
     }
 
     return Future.value(result);
@@ -101,6 +104,7 @@ List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean){
   var parser = HParser(data);
   var result = List<BookChapterBean>();
   var eles = parser.parseRuleElements(ruleBean.chapterList);
+  developer.log('目录解析开始 ${DateTime.now()}');
   for (var ele in eles) {
     var chapterBean = BookChapterBean();
     var eParser = HParser(ele.outerHtml);
@@ -111,6 +115,7 @@ List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean){
     }
     result.add(chapterBean);
   }
+  developer.log('目录解析结束 ${DateTime.now()}');
   if(result.isNotEmpty){
     if(result.lastIndexOf(result[0]) > 0){
       var subIndex = 0;

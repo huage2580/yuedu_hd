@@ -470,12 +470,12 @@ ON "book_chapter" (
   dynamic updateToc(List<BookChapterBean> chapterList) async{
     return await withDB().then((db) => db.transaction((txn) async{
       for (var chapter in chapterList) {
-        await txn.rawInsert('''
+        await txn.execute('''
         INSERT OR IGNORE INTO $TABLE_CHAPTER(
         name,url,bookId,sourceId
         )
-        VALUES(?,?,?,?)
-        ''',[chapter.name,chapter.url,chapter.bookId,chapter.sourceId]);
+        VALUES('${chapter.name}','${chapter.url}',${chapter.bookId},${chapter.sourceId})
+        ''');
       }
       //更新书籍最新章节
       if(chapterList.isNotEmpty){
