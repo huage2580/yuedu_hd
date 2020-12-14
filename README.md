@@ -3,7 +3,7 @@
 阅读HD  
 
 ## releases
-[预览版,只有安卓apk,和windows版本](https://github.com/huage2580/yuedu_hd/releases/tag/v1.0.1)
+[预览版,只有安卓apk,和windows版本](https://github.com/huage2580/yuedu_hd/releases/tag/v1.0.2)
 
 ## 免责声明
 
