@@ -163,7 +163,6 @@ class _PageBookShelfState extends State<PageBookShelf>
         DatabaseHelper().updateBookReadTime(bean.bookId);
         YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':bean.bookId})
             .then((value){
-          SystemChrome.setEnabledSystemUIOverlays([]);
           _fetchBookShelf();
         });//更新阅读记录
       },

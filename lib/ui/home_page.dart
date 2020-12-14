@@ -35,7 +35,7 @@ class HomeState extends State<HomePage> {
     //   DeviceOrientation.landscapeLeft,
     //   DeviceOrientation.landscapeRight
     // ]);
-    SystemChrome.setEnabledSystemUIOverlays([]);
+    // SystemChrome.setEnabledSystemUIOverlays([]);
     super.initState();
   }
 
@@ -87,18 +87,20 @@ class HomeState extends State<HomePage> {
   }
 
   Widget _buildPortrait(BuildContext context,ThemeData themeData, bool isIOS){
-    return Stack(
-      children: [
-        Container(margin: EdgeInsets.only(bottom: 60),child: _buildHomeContainer(context)),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            height: 60,
-            decoration: BoxDecoration(color: themeData.cardColor,),
-            child: _buildPortraitMenu(context),
+    return SafeArea(
+      child: Stack(
+        children: [
+          Container(margin: EdgeInsets.only(bottom: 60),child: _buildHomeContainer(context)),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: 60,
+              decoration: BoxDecoration(color: themeData.cardColor,),
+              child: _buildPortraitMenu(context),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

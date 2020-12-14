@@ -39,6 +39,7 @@ class _PageReadingState extends State<PageReading> {
 
   var orientation = Orientation.landscape;
   var size = Size(-1, -1);//整个手机or窗口的大小
+  var notchHeight = 0.0;//刘海高度
 
   var _readingWidgetKey = GlobalKey();
   PopupMenu styleMenu;
@@ -53,7 +54,7 @@ class _PageReadingState extends State<PageReading> {
       DeviceOrientation.portraitDown,
       DeviceOrientation.portraitUp
     ]);
-    SystemChrome.setEnabledSystemUIOverlays([]);
+    // SystemChrome.setEnabledSystemUIOverlays([]);
 
     chapterChangedCallBack = () {
       currChapterName = ChapterChangedEvent.getInstance().chapterName;
@@ -61,6 +62,8 @@ class _PageReadingState extends State<PageReading> {
     };
     ChapterChangedEvent.getInstance().addListener(chapterChangedCallBack);
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -76,8 +79,11 @@ class _PageReadingState extends State<PageReading> {
         _readingWidgetKey = GlobalKey();
       }
     }
+    notchHeight = MediaQuery.of(context).padding.top;
     var theme = Theme.of(context);
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomPadding: false,
       key: _scaffoldKey,
       body: GestureDetector(
         onTapUp: (d) {
@@ -117,6 +123,7 @@ class _PageReadingState extends State<PageReading> {
                 bookId,
                 initChapterName,
                 key: _readingWidgetKey,
+                notchHeight: notchHeight,
               );
             }),
             _buildMenuBar(context, theme),
@@ -144,7 +151,7 @@ class _PageReadingState extends State<PageReading> {
     );
   }
 
-  Visibility _buildMenuBar(BuildContext context, ThemeData theme) {
+  Widget _buildMenuBar(BuildContext context, ThemeData theme) {
     var menuBarWidth = size.width;
     var notShowTitle = menuBarWidth < 600;
 
@@ -156,6 +163,11 @@ class _PageReadingState extends State<PageReading> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if(orientation ==Orientation.portrait)
+              Container(
+                color: theme.primaryColor,
+                height: notchHeight,
+              ),
             Container(
               color: theme.primaryColor,
               padding: EdgeInsets.all(8),
@@ -328,6 +340,7 @@ class _PageReadingState extends State<PageReading> {
   void dispose() {
     super.dispose();
     ChapterChangedEvent.getInstance().removeListener(chapterChangedCallBack);
+    // SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
   }
 
   void _switchMenuBar() {

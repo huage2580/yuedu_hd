@@ -23,9 +23,10 @@ import 'package:yuedu_hd/ui/reading/event/PreviousPageEvent.dart';
 class ReadingWidget extends StatefulWidget{
   final int bookId;
   final String initChapterName;
+  final double notchHeight;
 
 
-  ReadingWidget(this.bookId, this.initChapterName,{key}):super(key: key);
+  ReadingWidget(this.bookId, this.initChapterName,{this.notchHeight,key}):super(key: key);
 
   @override
   _ReadingWidgetState createState() => _ReadingWidgetState();
@@ -107,35 +108,36 @@ class _ReadingWidgetState extends State<ReadingWidget> {
 
   @override
   Widget build(BuildContext context) {
-
-
     return Container(
-      key: sizeKey,
       color: Color(config.backgroundColor),
-      child: Stack(
-        children: [
-          Center(
-            child: Text(errorTips??"(●'◡'●)\n加载中...",style: TextStyle(color: Color(config.textColor)),),
-          ),
-          SizedBox(
-            width: double.maxFinite,
-            height: double.maxFinite,
-            child: PageView.builder(scrollDirection: config.isVertical==1?Axis.vertical:Axis.horizontal,
-              pageSnapping: config.isVertical != 1,
-              itemBuilder: (ctx,index){
-              if(index < firstPage){
-                return _buildErrorIndex();
-              }
-              return DisplayCache.getInstance().get(index);
-            },controller: _controller,
-              itemCount: MAX_PAGE,onPageChanged: (i){
-                Future.delayed(Duration(milliseconds: 500),(){
-                  notifyPageChanged(i);
-                });
-              },
+      padding: EdgeInsets.only(top: widget.notchHeight),
+      child: Container(
+        key: sizeKey,
+        child: Stack(
+          children: [
+            Center(
+              child: Text(errorTips??"(●'◡'●)\n加载中...",style: TextStyle(color: Color(config.textColor)),),
             ),
-          ),
-        ],
+            SizedBox(
+              width: double.maxFinite,
+              height: double.maxFinite,
+              child: PageView.builder(scrollDirection: config.isVertical==1?Axis.vertical:Axis.horizontal,
+                pageSnapping: config.isVertical != 1,
+                itemBuilder: (ctx,index){
+                if(index < firstPage){
+                  return _buildErrorIndex();
+                }
+                return DisplayCache.getInstance().get(index);
+              },controller: _controller,
+                itemCount: MAX_PAGE,onPageChanged: (i){
+                  Future.delayed(Duration(milliseconds: 500),(){
+                    notifyPageChanged(i);
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
