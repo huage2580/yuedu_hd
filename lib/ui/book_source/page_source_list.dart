@@ -179,7 +179,7 @@ class _StateSourceList extends State<PageSourceList> {
               return [
                 PopupMenuItem(child: Text('启用所选'),value: 0,),
                 PopupMenuItem(child: Text('禁用所选'),value: 1,),
-                PopupMenuItem(child: Text('校验所选'),value: 2,),
+                // PopupMenuItem(child: Text('校验所选'),value: 2,),
                 if(!isLandscape)
                   PopupMenuItem(child: Text('删除所选'),value: 3,),
               ];

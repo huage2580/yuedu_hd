@@ -68,7 +68,26 @@ class BookDetailState extends State<BookDetailWidget> {
                     child: SizedBox(
                         height: 120,
                         width: 96,
-                        child: Image.network(bookDetail.coverUrl)),
+                        child: Image.network(bookDetail.coverUrl,
+                          loadingBuilder: (BuildContext context, Widget child,
+                              ImageChunkEvent loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              height: 120,
+                              width: 100,
+                              color: Colors.grey,
+                              child: Center(child: Text('loading'),),
+                            );
+                          },
+                          errorBuilder: (BuildContext context, Object exception,
+                              StackTrace stackTrace) {
+                            return Container(
+                              height: 120,
+                              width: 100,
+                              color: Colors.grey,
+                            );
+                          },
+                        )),
                   ),
                 ],
               ),
@@ -226,19 +245,19 @@ class BookDetailState extends State<BookDetailWidget> {
                 ],
               ),
             ),
-            Container(
-              padding: EdgeInsets.all(4),
-              child: Row(
-                children: [
-                  Icon(CupertinoIcons.folder_circle),
-                  HSpace(8),
-                  Expanded(child: Text('分组: ${bookDetail.groupId}',style: theme.textTheme.subtitle1,maxLines: 1,overflow: TextOverflow.ellipsis,)),
-                  SizedBox(height: 26,child: FlatButton(onPressed: (){
-                    BotToast.showText(text: '不支持分组!');
-                  }, child: Text('设置分组'), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,color: theme.primaryColor,textColor: theme.canvasColor,)),
-                ],
-              ),
-            ),
+            // Container(
+            //   padding: EdgeInsets.all(4),
+            //   child: Row(
+            //     children: [
+            //       Icon(CupertinoIcons.folder_circle),
+            //       HSpace(8),
+            //       Expanded(child: Text('分组: ${bookDetail.groupId}',style: theme.textTheme.subtitle1,maxLines: 1,overflow: TextOverflow.ellipsis,)),
+            //       SizedBox(height: 26,child: FlatButton(onPressed: (){
+            //         BotToast.showText(text: '不支持分组!');
+            //       }, child: Text('设置分组'), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,color: theme.primaryColor,textColor: theme.canvasColor,)),
+            //     ],
+            //   ),
+            // ),
             VSpace(16),
             Text(bookDetail.intro??'简介为空'),
           ],

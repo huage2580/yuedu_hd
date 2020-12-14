@@ -23,7 +23,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
   void initState() {
     super.initState();
     _textEditingController = TextEditingController();
-    _textEditingController.text = 'https://gitee.com/vpq/codes/9ji1mged7v54brhspz3of71/raw?blob_name=sy.json';
+    _textEditingController.text = '';
   }
 
   @override
@@ -47,13 +47,16 @@ class _PageSourceAddState extends State<PageSourceAdd> {
                   }),
                   Expanded(child: _buildSearch(theme),),
                   HSpace(8),
+                  GestureDetector(onTap: (){
+                    _showHelpDialog(context);
+                  },child: Container(margin: EdgeInsets.all(4),child: Icon(Icons.help_outline),),),
                   if(isLandscape)
-                    _buildBtnLayout(theme),
+                    _buildBtnLayout(theme,context),
 
                 ],
               ),
               if(!isLandscape)
-                Center(child: _buildBtnLayout(theme)),
+                Center(child: _buildBtnLayout(theme,context)),
               Expanded(
                 child: CupertinoScrollbar(
                   child: SingleChildScrollView(
@@ -68,6 +71,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
 方式一：在上方输入网址，点击按钮开始导入。
 方式二：复制配置文件到粘贴板，点击【粘贴板导入】按钮。
 暂不支持编辑和修改，同网址书源每次导入均覆盖内容。
+规则参考:https://alanskycn.gitee.io/teachme
                           ''',style: isLandscape?theme.textTheme.headline6:theme.textTheme.subtitle2,),
                         ),
                         VSpace(10),
@@ -87,7 +91,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
     );
   }
 
-  Widget _buildBtnLayout(ThemeData theme){
+  Widget _buildBtnLayout(ThemeData theme,context){
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -131,6 +135,31 @@ class _PageSourceAddState extends State<PageSourceAdd> {
         ),
       ),
     );
+  }
+
+  void _showHelpDialog(context) async{
+     var result= await showDialog(context: context,builder: (context){
+      return AlertDialog(
+        title: Text('书源帮助'),
+        content: Text('''
+        本APP不提供内容，只提供浏览服务，按照用户自定义的规则加载特定网站的网页。
+        规则参考:https://alanskycn.gitee.io/teachme/
+        你可以从搜索引擎，酷安等社区获取别人分享的书源。
+        也可以点击确定，使用用户分享的热门书源：https://gitee.com/vpq/codes/9ji1mged7v54brhspz3of71/raw?blob_name=sy.json
+        '''),
+        actions: [
+          TextButton(onPressed: (){
+            Navigator.of(context).pop('done');
+          }, child: Text('确定')),
+        ],
+      );
+    });
+     if(result!=null){
+       _textEditingController.text = 'https://gitee.com/vpq/codes/9ji1mged7v54brhspz3of71/raw?blob_name=sy.json';
+       setState(() {
+
+       });
+     }
   }
 
 

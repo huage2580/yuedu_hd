@@ -232,7 +232,26 @@ class _PageAddBookState extends State<PageAddBook>{
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 100,width: 80,child: Image.network(infoBean.coverUrl)),
+            SizedBox(height: 100,width: 80,child: Image.network(infoBean.coverUrl,
+              loadingBuilder: (BuildContext context, Widget child,
+                  ImageChunkEvent loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Container(
+                  height: 120,
+                  width: 100,
+                  color: Colors.grey,
+                  child: Center(child: Text('loading'),),
+                );
+              },
+              errorBuilder: (BuildContext context, Object exception,
+                  StackTrace stackTrace) {
+                return Container(
+                  height: 120,
+                  width: 100,
+                  color: Colors.grey,
+                );
+              },
+            )),
             HSpace(8),
             Expanded(child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -276,6 +295,9 @@ class _PageAddBookState extends State<PageAddBook>{
 
       });
     });
+    if(_searchResultList.isEmpty){
+      BotToast.showText(text: '搜索失败，请确认添加并启用书源,检查网络和搜索关键字');
+    }
     setState(() {
       _canStop = false;
     });

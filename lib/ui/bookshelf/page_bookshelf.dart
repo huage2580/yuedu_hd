@@ -1,5 +1,3 @@
-
-
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +22,7 @@ class _PageBookShelfState extends State<PageBookShelf>
   var _bookList = List<BookShelfBean>();
   var _tocHelper = BookTocHelper.getInstance();
 
-  var currSortType = 1;//0添加顺序，1上次阅读时间
+  var currSortType = 1; //0添加顺序，1上次阅读时间
 
   @override
   void initState() {
@@ -36,13 +34,14 @@ class _PageBookShelfState extends State<PageBookShelf>
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    bool isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    bool isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
 
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       resizeToAvoidBottomInset: false,
       body: Container(
-        padding: EdgeInsets.all(isPortrait?8:20),
+        padding: EdgeInsets.all(isPortrait ? 8 : 20),
         child: Column(
           children: [
             Row(
@@ -85,15 +84,16 @@ class _PageBookShelfState extends State<PageBookShelf>
                       ),
                     ];
                   },
-                  onSelected: (i){
+                  onSelected: (i) {
                     currSortType = i;
                     _fetchBookShelf();
                   },
                   child: IgnorePointer(
                     child: TextButton.icon(
-                        onPressed: (){},
-                        icon: Icon(Icons.sort_outlined),
-                        label: Text(currSortType==0?'添加顺序':'上次阅读'),),
+                      onPressed: () {},
+                      icon: Icon(Icons.sort_outlined),
+                      label: Text(currSortType == 0 ? '添加顺序' : '上次阅读'),
+                    ),
                   ),
                 ),
               ],
@@ -108,14 +108,17 @@ class _PageBookShelfState extends State<PageBookShelf>
               ),
               child: Stack(
                 children: [
-                  Container(margin: EdgeInsets.all(8),child: _buildList(context,isPortrait)),
+                  Container(
+                      margin: EdgeInsets.all(8),
+                      child: _buildList(context, isPortrait)),
                   Container(
                     margin: EdgeInsets.all(16),
                     child: Align(
                       alignment: Alignment.bottomRight,
                       child: FloatingActionButton(
-                        onPressed: (){
-                          Navigator.of(context).pushNamed(YDRouter.BOOK_ADD)
+                        onPressed: () {
+                          Navigator.of(context)
+                              .pushNamed(YDRouter.BOOK_ADD)
                               .then((value) => _fetchBookShelf());
                         },
                         child: Icon(Icons.add),
@@ -134,20 +137,25 @@ class _PageBookShelfState extends State<PageBookShelf>
   }
 
   Widget _buildList(context, bool isPortrait) {
-    if(_bookList.isEmpty){
-      return Center(child: Text('请添加书源，然后再搜索书籍'),);
+    if (_bookList.isEmpty) {
+      return Center(
+        child: Text('请添加书源，然后再搜索书籍'),
+      );
     }
     return RefreshIndicator(
       color: YColors.primary,
-      onRefresh: ()async{
+      onRefresh: () async {
         return await _updateToc();
       },
       child: MediaQuery.removePadding(
         context: context,
         removeTop: true,
-        child: WaterfallFlow.builder(gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
-          crossAxisCount: isPortrait?1:2
-        ),itemBuilder: (ctx,index)=>_buildBookItem(ctx, _bookList[index]),itemCount: _bookList.length,),
+        child: WaterfallFlow.builder(
+          gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
+              crossAxisCount: isPortrait ? 1 : 2),
+          itemBuilder: (ctx, index) => _buildBookItem(ctx, _bookList[index]),
+          itemCount: _bookList.length,
+        ),
       ),
       // child: GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
       //   crossAxisCount: 2,childAspectRatio: 2.4,crossAxisSpacing: 2,mainAxisSpacing: 8,
@@ -155,25 +163,47 @@ class _PageBookShelfState extends State<PageBookShelf>
     );
   }
 
-
-  Widget _buildBookItem(BuildContext context,BookShelfBean bean){
+  Widget _buildBookItem(BuildContext context, BookShelfBean bean) {
     var theme = Theme.of(context);
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         DatabaseHelper().updateBookReadTime(bean.bookId);
-        YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':bean.bookId})
-            .then((value){
+        YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,
+            arguments: {'bookId': bean.bookId}).then((value) {
           _fetchBookShelf();
-        });//更新阅读记录
+        }); //更新阅读记录
       },
-      onLongPress: (){
-        _showDelete(context,bean);
+      onLongPress: () {
+        _showDelete(context, bean);
       },
       child: Container(
         padding: EdgeInsets.all(8),
         child: Row(
           children: [
-            SizedBox(height: 120,width: 100,child: Image.network(bean.coverUrl)),
+            SizedBox(
+                height: 120,
+                width: 100,
+                child: Image.network(
+                  bean.coverUrl,
+                  loadingBuilder: (BuildContext context, Widget child,
+                      ImageChunkEvent loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 120,
+                      width: 100,
+                      color: Colors.grey,
+                      child: Center(child: Text('loading'),),
+                    );
+                  },
+                  errorBuilder: (BuildContext context, Object exception,
+                      StackTrace stackTrace) {
+                    return Container(
+                      height: 120,
+                      width: 100,
+                      color: Colors.grey,
+                    );
+                  },
+                )),
             HSpace(8),
             Expanded(
               child: Column(
@@ -181,10 +211,18 @@ class _PageBookShelfState extends State<PageBookShelf>
                 children: [
                   Row(
                     children: [
-                      Expanded(child: Text(bean.bookName,style: theme.textTheme.headline6,overflow:TextOverflow.ellipsis,)),
+                      Expanded(
+                          child: Text(
+                        bean.bookName,
+                        style: theme.textTheme.headline6,
+                        overflow: TextOverflow.ellipsis,
+                      )),
                       Container(
-                        padding: EdgeInsets.only(left: 8,right: 8,top: 4,bottom: 4),
-                        decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20)),color: theme.primaryColorLight),
+                        padding: EdgeInsets.only(
+                            left: 8, right: 8, top: 4, bottom: 4),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                            color: theme.primaryColorLight),
                         child: Text('${bean.notReadChapterCount}'),
                       ),
                     ],
@@ -192,58 +230,69 @@ class _PageBookShelfState extends State<PageBookShelf>
                   VSpace(8),
                   Row(
                     children: [
-                      Icon(CupertinoIcons.person_circle,size: 18,color: theme.disabledColor),
+                      Icon(CupertinoIcons.person_circle,
+                          size: 18, color: theme.disabledColor),
                       HSpace(4),
-                      Text(bean.bookAuthor,style: theme.textTheme.headline6,),
+                      Text(
+                        bean.bookAuthor,
+                        style: theme.textTheme.headline6,
+                      ),
                     ],
                   ),
                   Row(
                     children: [
-                      Icon(CupertinoIcons.bolt_circle,size: 18,color: theme.disabledColor),
+                      Icon(CupertinoIcons.bolt_circle,
+                          size: 18, color: theme.disabledColor),
                       HSpace(4),
-                      Expanded(child: Text(bean.lastReadChapter??'未阅读',overflow: TextOverflow.ellipsis,style: theme.textTheme.headline6),),
+                      Expanded(
+                        child: Text(bean.lastReadChapter ?? '未阅读',
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.headline6),
+                      ),
                     ],
                   ),
                   Row(
                     children: [
-                      Icon(CupertinoIcons.book_circle,size: 18,color: theme.disabledColor,),
+                      Icon(
+                        CupertinoIcons.book_circle,
+                        size: 18,
+                        color: theme.disabledColor,
+                      ),
                       HSpace(4),
-                      Expanded(child: Text(bean.lastChapter??'目录为空',overflow: TextOverflow.ellipsis,style: theme.textTheme.headline6)),
+                      Expanded(
+                          child: Text(bean.lastChapter ?? '目录为空',
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.headline6)),
                     ],
                   ),
-
                 ],
               ),
             )
-
           ],
         ),
       ),
     );
   }
 
-
-  dynamic _fetchBookShelf() async{
+  dynamic _fetchBookShelf() async {
     await DatabaseHelper().loadConfig();
     var temp = await DatabaseHelper().queryBookInBookShelf(currSortType);
     _bookList.clear();
     _bookList.addAll(temp);
-    setState(() {
-
-    });
+    setState(() {});
     return Future.value(0);
   }
 
-  dynamic _updateToc() async{
+  dynamic _updateToc() async {
     await _fetchBookShelf();
     var futureList = List<Future>();
     for (var book in _bookList) {
-      futureList.add(_tocHelper.updateChapterList(book.bookId, book.sourceId)
+      futureList.add(_tocHelper
+          .updateChapterList(book.bookId, book.sourceId)
           .then((value) => BotToast.showText(text: '${book.bookName} 更新成功'))
-          .catchError((e){
-            BotToast.showText(text: '${book.bookName} 更新失败\n$e');
-      })
-      );
+          .catchError((e) {
+        BotToast.showText(text: '${book.bookName} 更新失败\n$e');
+      }));
     }
     await Future.wait(futureList);
     await _fetchBookShelf();
@@ -254,13 +303,17 @@ class _PageBookShelfState extends State<PageBookShelf>
     Scaffold.of(context).showSnackBar(SnackBar(
       content: Row(
         children: <Widget>[
-          Icon(Icons.delete,color: Colors.white,),
-          Text('确定删除 ${bean.bookName} ?')],
+          Icon(
+            Icons.delete,
+            color: Colors.white,
+          ),
+          Text('确定删除 ${bean.bookName} ?')
+        ],
       ),
       action: SnackBarAction(
         textColor: Colors.red,
         label: '删除',
-        onPressed: () async{
+        onPressed: () async {
           await DatabaseHelper().removeBookshelfById(bean.bookId);
           _fetchBookShelf();
         },
