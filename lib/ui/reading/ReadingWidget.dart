@@ -343,7 +343,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
 
   //计算分页的大小
   Size _generateTextPageSize(){
-    var textPageSize = Size(size.width- config.margin * 2, size.height - config.margin * 2);//显示区域减去外边距
+    var textPageSize = Size(size.width- config.marginLeft - config.marginRight, size.height - config.marginTop - config.marginBottom);//显示区域减去外边距
     if(config.isSinglePage == 1){//单页
       return textPageSize;
     }else{//双页

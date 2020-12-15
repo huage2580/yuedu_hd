@@ -3,8 +3,12 @@
 class DisplayConfig{
   int isSinglePage = 1;
   int isVertical = 0;
-  double margin = 20;//外边距
-  double inSizeMargin = 40;//双页的话，行内边距
+  double marginLeft = 20;//外边距
+  double marginTop = 20;//外边距
+  double marginRight = 20;//外边距
+  double marginBottom = 20;//外边距
+
+  double inSizeMargin = 40;//双页的话，页内边距
   int backgroundColor = 0xfff5f5f5;//阅读背景色
   double textSize = 18;//正文字体大小
   int textColor = 0xff000000;//正文字体颜色
@@ -33,7 +37,12 @@ class DisplayConfig{
   DisplayConfig.fromMap(Map map){
     isSinglePage = map['isSinglePage'];
     isVertical = map['isVertical'];
-    margin = map['margin'];
+
+    marginLeft = map['marginLeft'];
+    marginTop = map['marginTop'];
+    marginRight = map['marginRight'];
+    marginBottom = map['marginBottom'];
+
     inSizeMargin = map['inSizeMargin'];
     backgroundColor = map['backgroundColor'];
     textSize = map['textSize'];
@@ -53,7 +62,10 @@ class DisplayConfig{
     Map map = Map<String,dynamic>();
     map['isSinglePage'] = isSinglePage;
     map['isVertical'] = isVertical;
-    map['margin'] = margin;
+    map['marginLeft'] = marginLeft;
+    map['marginTop'] = marginTop;
+    map['marginRight'] = marginRight;
+    map['marginBottom'] = marginBottom;
     map['inSizeMargin'] = inSizeMargin;
     map['backgroundColor'] = backgroundColor;
     map['textSize'] = textSize;

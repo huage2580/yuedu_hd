@@ -142,11 +142,11 @@ class _PageSourceAddState extends State<PageSourceAdd> {
       return AlertDialog(
         title: Text('书源帮助'),
         content: Text('''
-        本APP不提供内容，只提供浏览服务，按照用户自定义的规则加载特定网站的网页。
-        规则参考:https://alanskycn.gitee.io/teachme/
-        你可以从搜索引擎，酷安等社区获取别人分享的书源。
-        也可以点击确定，使用用户分享的热门书源：https://gitee.com/vpq/codes/9ji1mged7v54brhspz3of71/raw?blob_name=sy.json
-        '''),
+本APP不提供内容，只提供浏览服务，按照用户自定义的规则加载特定网站的网页。
+使用阅读3.0书源规则（不支持js和json解析）
+参考:https://alanskycn.gitee.io/teachme/
+你可以从搜索引擎，gitee,github，酷安等社区获取别人分享的书源。
+'''),
         actions: [
           TextButton(onPressed: (){
             Navigator.of(context).pop('done');
@@ -155,7 +155,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
       );
     });
      if(result!=null){
-       _textEditingController.text = 'https://gitee.com/vpq/codes/9ji1mged7v54brhspz3of71/raw?blob_name=sy.json';
+       _textEditingController.text = '';
        setState(() {
 
        });

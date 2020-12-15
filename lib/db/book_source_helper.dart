@@ -78,6 +78,27 @@ class BookSourceHelper{
 
   ///过滤不兼容的书源
   bool _checkCompatible(LinkedHashMap item){
+    //为了更多的书源,wordCount里面的js过滤掉
+    String searchWordCountStr = item['ruleSearch']['wordCount'];
+    if(searchWordCountStr!=null){
+      var index = searchWordCountStr.indexOf(RegExp(RegexpRule.PARSER_TYPE_JS));
+      if(index > 0){
+        var result = searchWordCountStr.substring(0,index);
+        item['ruleSearch']['wordCount'] = result;
+        print('ruleSearch word compat=> $result');
+      }
+    }
+    String exploreWordCountStr = item['ruleExplore']['wordCount'];
+    if(exploreWordCountStr!=null){
+      var index = exploreWordCountStr.indexOf(RegExp(RegexpRule.PARSER_TYPE_JS));
+      if(index > 0){
+        var result = exploreWordCountStr.substring(0,index);
+        item['ruleExplore']['wordCount'] = result;
+        print('ruleExplore word compat=> $result');
+      }
+    }
+    //--------------------------------
+
     var itemStr = item.toString();
     if(RegExp(RegexpRule.PARSER_TYPE_JS).hasMatch(itemStr)){
       return false;
@@ -89,6 +110,9 @@ class BookSourceHelper{
       return false;
     }
     if(itemStr.contains('webView')){//不支持
+      return false;
+    }
+    if(item['bookSourceType'] != 0){//只兼容文字源
       return false;
     }
     return true;
