@@ -263,7 +263,7 @@ class HomeState extends State<HomePage> {
     return Container(
       child: MaterialApp(
         navigatorKey: homeContainerKey,
-        theme: Theme.of(ctx),
+        theme: Theme.of(ctx).copyWith(platform: TargetPlatform.android),//iphone刘海问题
         initialRoute: YDRouter.BOOKSHELF,
         routes: <String,WidgetBuilder>{
           YDRouter.BOOKSHELF:(context)=>PageBookShelf(),
