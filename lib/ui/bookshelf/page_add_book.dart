@@ -22,10 +22,11 @@ class _PageAddBookState extends State<PageAddBook>{
   var _selectBookId = -1;//5 for test,default -1
   var isLandscape = false;
 
+  var _canPostUpdateUI = true;
 
   @override
   void initState() {
-    // TODO: implement initState
+    //更新UI的间隔至少要两秒
     super.initState();
   }
 
@@ -292,9 +293,7 @@ class _PageAddBookState extends State<PageAddBook>{
     },updateList: (){
       //按书源数量排序
       _searchResultList.sort((a,b){return b.sourceCount.compareTo(a.sourceCount);});
-      setState(() {
-
-      });
+      _wantUpdateList();
     });
     if(_searchResultList.isEmpty){
       BotToast.showText(text: '搜索失败，请确认添加并启用书源,检查网络和搜索关键字');
@@ -302,5 +301,19 @@ class _PageAddBookState extends State<PageAddBook>{
     setState(() {
       _canStop = false;
     });
+  }
+
+  //控制UI更新的间隔，IOS频繁更新UI特别卡顿
+  void _wantUpdateList(){
+    if(!_canPostUpdateUI){
+      return;
+    }
+    _canPostUpdateUI = false;
+    Future.delayed(Duration(milliseconds: 2000),(){
+      setState(() {
+
+      });
+    }).whenComplete((){_canPostUpdateUI = true;}
+    );
   }
 }

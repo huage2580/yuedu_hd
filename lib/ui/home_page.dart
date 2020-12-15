@@ -87,16 +87,27 @@ class HomeState extends State<HomePage> {
   }
 
   Widget _buildPortrait(BuildContext context,ThemeData themeData, bool isIOS){
+    double bottomPadding = isIOS?MediaQuery.of(context).padding.bottom:0.0;
     return SafeArea(
+      bottom: false,
       child: Stack(
         children: [
-          Container(margin: EdgeInsets.only(bottom: 60),child: _buildHomeContainer(context)),
+          Container(margin: EdgeInsets.only(bottom: 60 + bottomPadding),child: _buildHomeContainer(context)),
           Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
-              height: 60,
-              decoration: BoxDecoration(color: themeData.cardColor,),
-              child: _buildPortraitMenu(context),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  height: 60,
+                  decoration: BoxDecoration(color: themeData.cardColor,),
+                  child: _buildPortraitMenu(context),
+                ),
+                Container(
+                  height: bottomPadding,
+                  color: themeData.cardColor,
+                )
+              ],
             ),
           ),
         ],

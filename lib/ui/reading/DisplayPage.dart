@@ -72,7 +72,7 @@ class DisplayPage extends StatelessWidget{
           child:_buildTextPage(config)
         ),
         Padding(
-          padding: const EdgeInsets.only(bottom: 6,right: 10),
+          padding: const EdgeInsets.only(bottom: 6,right: 14),
           child: Align(
             alignment: Alignment.bottomRight,
             child: Text('$currPage/$maxPage',style: TextStyle(color: Colors.grey),),
