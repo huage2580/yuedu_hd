@@ -68,11 +68,11 @@ class DisplayPage extends StatelessWidget{
     return Stack(
       children: [
         Container(
-          padding: EdgeInsets.all(config.margin),
+          padding: EdgeInsets.only(left: config.marginLeft,top: config.marginTop,right: config.marginRight,bottom: config.marginBottom),
           child:_buildTextPage(config)
         ),
         Padding(
-          padding: const EdgeInsets.all(4.0),
+          padding: const EdgeInsets.only(bottom: 6,right: 10),
           child: Align(
             alignment: Alignment.bottomRight,
             child: Text('$currPage/$maxPage',style: TextStyle(color: Colors.grey),),
