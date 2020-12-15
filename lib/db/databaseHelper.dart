@@ -381,7 +381,11 @@ ON "book_chapter" (
 
   ///id移除书架
   Future<void> removeBookshelfById(int bookId) async{
-    await withDB().then((db) => db.update(TABLE_BOOK,{'inbookShelf':0},where: '_id = $bookId'));
+    await withDB().then((db) => db.transaction((txn)async{
+      await txn.update(TABLE_BOOK,{'inbookShelf':0},where: '_id = $bookId');
+      await txn.delete(TABLE_BOOK_COMB_SOURCE,where: 'bookid = $bookId');
+      await txn.delete(TABLE_CHAPTER,where: 'bookId = $bookId');
+    }));
     return Future.value();
   }
 

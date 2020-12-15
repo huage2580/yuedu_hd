@@ -32,6 +32,8 @@ class _StyleMenuState extends State<StyleMenu> {
     //配置内容
     bool isVerticalScroll = config.isVertical == 1;
     bool isTwoPage = config.isSinglePage == 0;
+    bool isIOS = Theme.of(context).platform == TargetPlatform.iOS||Theme.of(context).platform == TargetPlatform.macOS;
+
 
     //
     return CupertinoScrollbar(
@@ -64,7 +66,7 @@ class _StyleMenuState extends State<StyleMenu> {
                 children: [
                   Text('内容布局:',style: theme.textTheme.headline6,),
                   HSpace(16),
-                  GestureDetector(child: Icon(CupertinoIcons.rectangle_expand_vertical,size: 40,color: !isTwoPage?theme.primaryColor:theme.canvasColor,),onTap: (){
+                  GestureDetector(child: Icon(isIOS?CupertinoIcons.rectangle_fill:CupertinoIcons.rectangle_expand_vertical,size: 40,color: !isTwoPage?theme.primaryColor:theme.canvasColor,),onTap: (){
                     config.isSinglePage = 1;
                     _notifyStyleChanged();
                   },),

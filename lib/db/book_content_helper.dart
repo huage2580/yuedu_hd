@@ -62,6 +62,9 @@ class BookContentHelper{
           String nextUrl = await Executor().execute(arg1: htmlString,arg2: contentRule.nextContentUrl,fun2: parseNextPage);
           if(nextUrl == null || nextUrl.isEmpty){
             bookUrl = null;
+          }else{
+            bookUrl = Utils.checkLink(source.bookSourceUrl, nextUrl);
+            developer.log('下一页链接 $bookUrl');
           }
         }else{
           bookUrl = null;
@@ -106,5 +109,6 @@ String parseContent(String html,BookContentRuleBean rule){
 }
 
 String parseNextPage(String html,String next){
-
+  developer.log('解析下一页的链接');
+  return HParser(html).parseRuleString(next);
 }

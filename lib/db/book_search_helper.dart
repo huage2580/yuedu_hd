@@ -14,6 +14,7 @@ import 'BookInfoBean.dart';
 import 'utils.dart';
 
 typedef void OnBookSearch(BookInfoBean data);
+typedef void UpdateList();//批量更新列表，怕太卡了
 
 
 ///搜索书籍
@@ -39,7 +40,7 @@ class BookSearchHelper{
   }
 
   ///
-  dynamic searchBookFromEnabledSource(String key,String cancelToken,{bool exactSearch = false,String author,OnBookSearch onBookSearch}) async{
+  dynamic searchBookFromEnabledSource(String key,String cancelToken,{bool exactSearch = false,String author,OnBookSearch onBookSearch,UpdateList updateList}) async{
     // await Executor().warmUp();
 
     var bookSources = await DatabaseHelper().queryAllBookSourceEnabled();
@@ -80,7 +81,7 @@ class BookSearchHelper{
       if(batchList.isEmpty){
         break;
       }
-      await _batchSearch(batchList, onBookSearch);
+      await _batchSearch(batchList, onBookSearch,updateList);
     }
     cancelSearch(cancelToken);
     developer.log('---***搜索结束***---');
@@ -93,12 +94,12 @@ class BookSearchHelper{
   }
 
   ///单次循环，n个书源
-  dynamic _batchSearch(List<BookSearchUrlBean> options,OnBookSearch onBookSearch) async{
-    var requests = options.map((e) => _request(e, onBookSearch));
+  dynamic _batchSearch(List<BookSearchUrlBean> options,OnBookSearch onBookSearch,UpdateList updateList) async{
+    var requests = options.map((e) => _request(e, onBookSearch,updateList));
     return Future.wait(requests);
   }
 
-  Future<dynamic> _request(BookSearchUrlBean options,OnBookSearch onBookSearch) async{
+  Future<dynamic> _request(BookSearchUrlBean options,OnBookSearch onBookSearch,UpdateList updateList) async{
     var contentType = options.headers['content-type'];
     Options requestOptions = Options(method: options.method,headers: options.headers,contentType:contentType ,sendTimeout: 5000,receiveTimeout: 5000);
     if(options.charset == 'gbk'){
@@ -110,6 +111,9 @@ class BookSearchHelper{
       var response = await dio.request(options.url,options: requestOptions,data: options.body);
       if(response.statusCode == 200){
         await _parseResponse(response.data,options,onBookSearch);
+        if(updateList!=null){
+          updateList();//更新列表UI
+        }
       }else{
         developer.log('搜索错误:书源错误${response.statusCode}');
       }

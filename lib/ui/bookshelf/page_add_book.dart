@@ -289,6 +289,7 @@ class _PageAddBookState extends State<PageAddBook>{
         }
       }
       temp.sourceCount += 1;
+    },updateList: (){
       //按书源数量排序
       _searchResultList.sort((a,b){return b.sourceCount.compareTo(a.sourceCount);});
       setState(() {
