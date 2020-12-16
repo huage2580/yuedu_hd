@@ -145,8 +145,7 @@ class BookSearchHelper{
         'rule_coverUrl':ruleBean.coverUrl,
       };
       //用线程池执行解析，大概需要400ms
-      var str = await Executor().execute(arg1:kv,fun1: _parse);
-      var tmp = jsonDecode(str);
+      var tmp = await Executor().execute(arg1:kv,fun1: _parse);
       List<BookInfoBean> bookInfoList = List<BookInfoBean>();
       for(var t in tmp){
         bookInfoList.add(BookInfoBean.fromMap(t));
@@ -187,7 +186,7 @@ class BookSearchHelper{
 
 
 
-String _parse(Map map){
+List<Map<String,dynamic>> _parse(Map map){
   String response = map['response'];
   BookSearchRuleBean ruleBean = BookSearchRuleBean();
   ruleBean.bookList = map['rule_bookList'];
@@ -237,6 +236,6 @@ String _parse(Map map){
   for (var value in result) {
     temp.add(value.toMap());
   }
-  return jsonEncode(temp);
+  return temp;
 }
 
