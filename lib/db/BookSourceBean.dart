@@ -37,13 +37,13 @@ class BookSourceBean{
     bookSourceName = map['bookSourceName'];
     bookSourceGroup = map['bookSourceGroup'];
     bookSourceUrl = map['bookSourceUrl'];
-    bookUrlPattern = map['bookUrlPattern'];
-    bookSourceType = map['bookSourceType'];
+    bookUrlPattern = map['bookUrlPattern']??'';
+    bookSourceType = map['bookSourceType']??0;
 
     header = map['header'];
     loginUrl = map['loginUrl'];
     bookSourceComment = map['bookSourceComment'];
-    weight = map['weight'];
+    weight = map['weight']??0;
     exploreUrl = map['exploreUrl'];
     searchUrl = map['searchUrl'];
     ruleExplore = jsonEncode(map['ruleExplore']);
@@ -58,7 +58,7 @@ class BookSourceBean{
     }else{
       enabled = tenabled;
     }
-    var tenabledExplore = map['enabledExplore'];
+    var tenabledExplore = map['enabledExplore']??0;
     if(tenabledExplore is int){
       enabledExplore = tenabledExplore == 1;
     }else{
