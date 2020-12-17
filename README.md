@@ -4,7 +4,7 @@
 感谢 飞哥的开源项目[阅读](https://github.com/gedoor/legado)  
 
 ## releases
-[安卓apk,和windows版本](https://github.com/huage2580/yuedu_hd/releases/tag/v1.0.2)  
+[安卓apk,和windows版本](https://github.com/huage2580/yuedu_hd/releases)  
 [IOS](https://apps.apple.com/cn/app/%E9%98%85%E8%AF%BBHD/id1544754759) 也可以appstore 搜索'阅读HD'  
 
 
