@@ -1,9 +1,19 @@
-# yuedu_hd
+# 阅读HD 
 
-阅读HD  
+## 声明
+感谢 飞哥的开源项目[阅读](https://github.com/gedoor/legado)  
 
 ## releases
-[预览版,只有安卓apk,和windows版本](https://github.com/huage2580/yuedu_hd/releases/tag/v1.0.2)
+[安卓apk,和windows版本](https://github.com/huage2580/yuedu_hd/releases/tag/v1.0.2)  
+[IOS](https://apps.apple.com/cn/app/%E9%98%85%E8%AF%BBHD/id1544754759) 也可以appstore 搜索'阅读HD'  
+
+
+## 截图  
+![1](https://github.com/huage2580/yuedu_hd/blob/master/screenshot/1242x2688bb%201.png)
+![1](https://github.com/huage2580/yuedu_hd/blob/master/screenshot/1242x2688bb.png)
+![1](https://github.com/huage2580/yuedu_hd/blob/master/screenshot/1242x2688bb2.png)
+![2](https://github.com/huage2580/yuedu_hd/blob/master/screenshot/2732x2048bb%201.png)
+![2](https://github.com/huage2580/yuedu_hd/blob/master/screenshot/2732x2048bb.png)
 
 ## 免责声明
 
