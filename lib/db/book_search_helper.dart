@@ -1,6 +1,8 @@
 
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 
 import 'package:worker_manager/worker_manager.dart';
@@ -34,9 +36,17 @@ class BookSearchHelper{
   }
 
   var tokenList = ['none'];
-
+  Dio dio;
   BookSearchHelper._init(){
     //
+    dio = Dio();
+    (dio.httpClientAdapter as DefaultHttpClientAdapter)
+        .onHttpClientCreate = (client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) {
+        return true;
+      };
+    };
   }
 
   ///
@@ -106,10 +116,11 @@ class BookSearchHelper{
       requestOptions.responseDecoder = Utils.gbkDecoder;
     }
     try{
-      var dio = Dio();
+
       dio.options.connectTimeout = 5000;
       var response = await dio.request(options.url,options: requestOptions,data: options.body);
       if(response.statusCode == 200){
+        //todo 尝试不解析只请求，看ios会不会卡
         await _parseResponse(response.data,options,onBookSearch);
         if(updateList!=null){
           updateList();//更新列表UI
@@ -126,7 +137,8 @@ class BookSearchHelper{
 
   dynamic _parseResponse(String response,BookSearchUrlBean options, OnBookSearch onBookSearch) async{
     int sourceId = options.sourceId;
-    developer.log('解析搜索返回内容：$sourceId|${DateTime.now()}');
+    var tempTime = DateTime.now();
+    developer.log('解析搜索返回内容：$sourceId|$tempTime');
     BookSourceBean source = await DatabaseHelper().queryBookSourceById(sourceId);
     var ruleBean = source.mapSearchRuleBean();
     try{
@@ -144,13 +156,15 @@ class BookSearchHelper{
         'rule_tocUrl':ruleBean.tocUrl,
         'rule_coverUrl':ruleBean.coverUrl,
       };
+      developer.log('解析搜索返回内容开始：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
       //用线程池执行解析，大概需要400ms
       var tmp = await Executor().execute(arg1:kv,fun1: _parse);
+      developer.log('解析搜索返回内容结束：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
       List<BookInfoBean> bookInfoList = List<BookInfoBean>();
       for(var t in tmp){
         bookInfoList.add(BookInfoBean.fromMap(t));
       }
-      developer.log('解析搜索返回内容完成：$sourceId|${DateTime.now()}');
+      developer.log('解析搜索返回内容完成：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
       for (var bookInfo in bookInfoList) {
         //链接修正
         bookInfo.bookUrl = Utils.checkLink(source.bookSourceUrl, bookInfo.bookUrl);

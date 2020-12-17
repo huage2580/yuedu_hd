@@ -26,7 +26,7 @@ void main() async{
   //   DeviceOrientation.landscapeRight
   // ]);
   // SystemChrome.setEnabledSystemUIOverlays([]);
-  await Executor().warmUp();
+  await Executor().warmUp(log: true);
   runApp(MyApp());
 }
 

@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yuedu_hd/db/BookInfoBean.dart';
 import 'package:yuedu_hd/db/book_search_helper.dart';
 import 'package:yuedu_hd/ui/bookshelf/widget_book_detail.dart';
+import 'package:yuedu_hd/ui/widget/image_async.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 
 class PageAddBook extends StatefulWidget{
@@ -30,6 +33,13 @@ class _PageAddBookState extends State<PageAddBook>{
     super.initState();
   }
 
+
+  @override
+  void dispose() {
+    super.dispose();
+    //终止搜索
+    _searchHelper.cancelSearch('test');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -208,7 +218,7 @@ class _PageAddBookState extends State<PageAddBook>{
         child: CupertinoScrollbar(
           child: ListView.separated(itemBuilder: (ctx,index){
             return _buildItem(ctx,_searchResultList[index]);
-          }, separatorBuilder: (c,i)=>Divider(height: 0.5,thickness: 0.5,), itemCount: _searchResultList.length),
+          }, separatorBuilder: (c,i)=>Divider(height: 0.5,thickness: 0.5,), itemCount: min(30, _searchResultList.length)),
         ),
       ),
     );
@@ -220,6 +230,8 @@ class _PageAddBookState extends State<PageAddBook>{
     return GestureDetector(
       onTap: (){
         _selectBookId = infoBean.id;
+        //终止搜索
+        _searchHelper.cancelSearch('test');
         setState(() {
 
         });
@@ -233,25 +245,25 @@ class _PageAddBookState extends State<PageAddBook>{
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 100,width: 80,child: Image.network(infoBean.coverUrl,
-              loadingBuilder: (BuildContext context, Widget child,
-                  ImageChunkEvent loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Container(
-                  height: 120,
-                  width: 100,
-                  color: Colors.grey,
-                  child: Center(child: Text('loading'),),
-                );
-              },
-              errorBuilder: (BuildContext context, Object exception,
-                  StackTrace stackTrace) {
-                return Container(
-                  height: 120,
-                  width: 100,
-                  color: Colors.grey,
-                );
-              },
+            SizedBox(height: 100,width: 80,child: FadeInImageWithoutAuth.network(infoBean.coverUrl,
+              // loadingBuilder: (BuildContext context, Widget child,
+              //     ImageChunkEvent loadingProgress) {
+              //   if (loadingProgress == null) return child;
+              //   return Container(
+              //     height: 120,
+              //     width: 100,
+              //     color: Colors.grey,
+              //     child: Center(child: Text('loading'),),
+              //   );
+              // },
+              // errorBuilder: (BuildContext context, Object exception,
+              //     StackTrace stackTrace) {
+              //   return Container(
+              //     height: 120,
+              //     width: 100,
+              //     color: Colors.grey,
+              //   );
+              // },
             )),
             HSpace(8),
             Expanded(child: Column(
@@ -292,7 +304,6 @@ class _PageAddBookState extends State<PageAddBook>{
       temp.sourceCount += 1;
     },updateList: (){
       //按书源数量排序
-      _searchResultList.sort((a,b){return b.sourceCount.compareTo(a.sourceCount);});
       _wantUpdateList();
     });
     if(_searchResultList.isEmpty){
@@ -309,6 +320,7 @@ class _PageAddBookState extends State<PageAddBook>{
       return;
     }
     _canPostUpdateUI = false;
+    _searchResultList.sort((a,b){return b.sourceCount.compareTo(a.sourceCount);});
     Future.delayed(Duration(milliseconds: 2000),(){
       setState(() {
 
