@@ -45,27 +45,43 @@ class BookTocHelper{
     }
     //3.请求网络
     try{
-      developer.log('目录请求 ${book.bookUrl}');
-      var dio = Dio();
-      dio.options.connectTimeout = 10000;
-      var response = await dio.get(book.bookUrl,options: requestOptions);
-      if(response.statusCode == 200){
-        developer.log('目录解析 ${book.bookUrl}');
-        var chapters = await Executor().execute(arg1: response.data as String,arg2: ruleBean,fun2: _parseResponse);
-        if(chapters.isEmpty){
-          throw Exception('目录为空');
+      var bookUrl = book.bookUrl;
+
+      while(bookUrl!=null){
+        developer.log('目录请求 ${book.bookUrl}');
+        var dio = Dio();
+        dio.options.connectTimeout = 10000;
+        var response = await dio.get(book.bookUrl,options: requestOptions);
+        if(response.statusCode == 200){
+          developer.log('目录解析 ${book.bookUrl}');
+          var chapters = await Executor().execute(arg1: response.data as String,arg2: ruleBean,fun2: _parseResponse);
+          if(chapters.isEmpty){
+            throw Exception('目录为空');
+          }
+          if(ruleBean.nextTocUrl!=null && ruleBean.nextTocUrl.trim().isNotEmpty){
+            var nextUrl = await Executor().execute(arg1: response.data as String,arg2: ruleBean,fun2: _parseNextUrl);
+            if(nextUrl!=null || nextUrl.trim().isNotEmpty){
+              bookUrl = Utils.checkLink(sourceBean.bookSourceUrl, nextUrl).trim();
+            }else{
+              bookUrl = null;
+            }
+          }else{
+            bookUrl = null;
+          }
+
+          for (var chapter in chapters) {
+            chapter.url = Utils.checkLink(sourceBean.bookSourceUrl, chapter.url);
+            chapter.bookId = book.id;
+            chapter.sourceId = book.source_id;
+          }
+          result.addAll(chapters);
+        }else{
+          developer.log('目录解析错误:${book.bookUrl},网络错误${response.statusCode}');
+          throw Exception('网络错误${response.statusCode}');
         }
-        for (var chapter in chapters) {
-          chapter.url = Utils.checkLink(sourceBean.bookSourceUrl, chapter.url);
-          chapter.bookId = book.id;
-          chapter.sourceId = book.source_id;
-        }
-        result.addAll(chapters);
-        developer.log('目录解析完成 ${book.bookUrl},目录数量:${result.length}');
-      }else{
-        developer.log('目录解析错误:${book.bookUrl},网络错误${response.statusCode}');
-        throw Exception('网络错误${response.statusCode}');
       }
+      developer.log('目录解析完成 ${book.bookUrl},目录数量:${result.length}');
+
     }catch(e){
       developer.log('${book.bookUrl} 目录解析错误[使用规则${ruleBean.toString()}]:$e');
       return Future.error(e);
@@ -134,4 +150,9 @@ List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean){
   // }
   developer.log('解析的总目录${result.length}');
   return result;
+}
+
+String _parseNextUrl(String data, BookTocRuleBean ruleBean){
+  var parser = HParser(data);
+  return parser.parseRuleString(ruleBean.nextTocUrl);
 }

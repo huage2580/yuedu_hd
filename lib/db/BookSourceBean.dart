@@ -188,10 +188,11 @@ class BookTocRuleBean{
   String chapterList;
   String chapterName;
   String chapterUrl;
+  String nextTocUrl;
 
   @override
   String toString() {
-    return 'BookTocRuleBean{chapterList: $chapterList, chapterName: $chapterName, chapterUrl: $chapterUrl}';
+    return 'BookTocRuleBean{chapterList: $chapterList, chapterName: $chapterName, chapterUrl: $chapterUrl,nextTocUrl:$nextTocUrl}';
   }
 }
 
