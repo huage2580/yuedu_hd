@@ -1,7 +1,11 @@
 # 阅读HD 
 
 ## 声明
-感谢 飞哥的开源项目[阅读](https://github.com/gedoor/legado)  
+感谢 飞哥的开源项目[阅读](https://github.com/gedoor/legado)
+任何使用本项目二次开发的，均需开源且在关于页面和仓库readme注明
+https://github.com/gedoor/legado
+https://github.com/huage2580/yuedu_hd
+
 
 ## releases
 [安卓apk,和windows版本](https://github.com/huage2580/yuedu_hd/releases)  
@@ -9,11 +13,16 @@
 
 
 ## 截图  
-![1](https://github.com/huage2580/yuedu_hd/blob/master/screenshot/1242x2688bb%201.png)
-![1](https://github.com/huage2580/yuedu_hd/blob/master/screenshot/1242x2688bb.png)
-![1](https://github.com/huage2580/yuedu_hd/blob/master/screenshot/1242x2688bb2.png)
-![2](https://github.com/huage2580/yuedu_hd/blob/master/screenshot/2732x2048bb%201.png)
-![2](https://github.com/huage2580/yuedu_hd/blob/master/screenshot/2732x2048bb.png)
+![1](https://github.com/huage2580/yuedu_hd/raw/master/screenshot/1242x2688bb%201.png)
+![1](https://github.com/huage2580/yuedu_hd/raw/master/screenshot/1242x2688bb.png)
+![1](https://github.com/huage2580/yuedu_hd/raw/master/screenshot/1242x2688bb2.png)
+![2](https://github.com/huage2580/yuedu_hd/raw/master/screenshot/2732x2048bb%201.png)
+![2](https://github.com/huage2580/yuedu_hd/raw/master/screenshot/2732x2048bb.png)
+
+## 支持下作者
+![1](https://github.com/huage2580/yuedu_hd/raw/master/screenshot/IMG_0781(20201217-231645).JPG)
+![1](https://github.com/huage2580/yuedu_hd/raw/master/screenshot/IMG_0782(20201217-231834).JPG)
+
 
 ## 免责声明
 
