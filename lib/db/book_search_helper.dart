@@ -114,6 +114,7 @@ class BookSearchHelper{
     Options requestOptions = Options(method: options.method,headers: options.headers,contentType:contentType ,sendTimeout: 5000,receiveTimeout: 5000);
     if(options.charset == 'gbk'){
       requestOptions.responseDecoder = Utils.gbkDecoder;
+      options.body = UrlGBKEncode().encode(options.body);
     }
     try{
 

@@ -60,7 +60,7 @@ class BookContentHelper{
         //解析下一页
         if(contentRule.nextContentUrl!=null && contentRule.nextContentUrl.isNotEmpty){
           String nextUrl = await Executor().execute(arg1: htmlString,arg2: contentRule.nextContentUrl,fun2: parseNextPage);
-          if(nextUrl == null || nextUrl.isEmpty){
+          if(nextUrl == null || nextUrl.trim().isEmpty){
             bookUrl = null;
           }else{
             bookUrl = Utils.checkLink(source.bookSourceUrl, nextUrl);
