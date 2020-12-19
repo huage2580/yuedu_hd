@@ -229,7 +229,8 @@ List<Map<String,dynamic>> _parse(Map map){
       bookInfo.intro = bookParser.parseRuleString(ruleBean.intro);
       bookInfo.lastChapter = bookParser.parseRuleString(ruleBean.lastChapter);
       bookInfo.wordCount = bookParser.parseRuleString(ruleBean.wordCount);
-      bookInfo.bookUrl = bookParser.parseRuleString(ruleBean.bookUrl);
+      var url = bookParser.parseRuleStrings(ruleBean.bookUrl);
+      bookInfo.bookUrl = url.isNotEmpty?url[0]:null;
       if(bookInfo.bookUrl == null){
         bookInfo.bookUrl = bookParser.parseRuleString(ruleBean.tocUrl);
       }

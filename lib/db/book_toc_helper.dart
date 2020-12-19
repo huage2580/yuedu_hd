@@ -38,22 +38,39 @@ class BookTocHelper{
     BookInfoBean book = await DatabaseHelper().queryBookInfoFromBookIdCombSourceId(bookId, sourceId);
     BookSourceBean sourceBean = book.sourceBean;
     BookTocRuleBean ruleBean = book.sourceBean.mapTocRuleBean();
+    BookInfoRuleBean infoRuleBean;
+    if(book.sourceBean.ruleBookInfo!=null && book.sourceBean.ruleBookInfo.isNotEmpty){
+      infoRuleBean = book.sourceBean.mapInfoRuleBean();
+    }
     var charset = sourceBean.mapSearchUrlBean().charset;
     Options requestOptions = Options(contentType:ContentType.html.toString() ,sendTimeout: 10000,receiveTimeout: 5000);
     if(charset == 'gbk'){
       requestOptions.responseDecoder = Utils.gbkDecoder;
     }
     //3.请求网络
-    try{
-      var bookUrl = book.bookUrl;
+    var bookUrl = book.bookUrl;
 
-      while(bookUrl!=null){
-        developer.log('目录请求 ${book.bookUrl}');
-        var dio = Dio();
-        dio.options.connectTimeout = 10000;
+    try{
+      var dio = Dio();
+      dio.options.connectTimeout = 10000;
+      //解析真正的目录页
+      if(infoRuleBean!=null && infoRuleBean.tocUrl!=null && infoRuleBean.tocUrl.isNotEmpty){
         var response = await dio.get(book.bookUrl,options: requestOptions);
         if(response.statusCode == 200){
-          developer.log('目录解析 ${book.bookUrl}');
+          var tocUrl = await Executor().execute(arg1: response.data as String,arg2: infoRuleBean,fun2: _parseTocUrl);
+          bookUrl = Utils.checkLink(sourceBean.bookSourceUrl, tocUrl);
+          developer.log('解析真正的目录请求 $bookUrl');
+        }
+        else{
+          developer.log('解析真正的目录请求失败 $bookUrl');
+        }
+      }
+
+      while(bookUrl!=null){
+        developer.log('目录请求 $bookUrl');
+        var response = await dio.get(bookUrl,options: requestOptions);
+        if(response.statusCode == 200){
+          developer.log('目录解析 $bookUrl');
           var chapters = await Executor().execute(arg1: response.data as String,arg2: ruleBean,fun2: _parseResponse);
           if(chapters.isEmpty){
             throw Exception('目录为空');
@@ -76,14 +93,14 @@ class BookTocHelper{
           }
           result.addAll(chapters);
         }else{
-          developer.log('目录解析错误:${book.bookUrl},网络错误${response.statusCode}');
+          developer.log('目录解析错误:$bookUrl,网络错误${response.statusCode}');
           throw Exception('网络错误${response.statusCode}');
         }
       }
-      developer.log('目录解析完成 ${book.bookUrl},目录数量:${result.length}');
+      developer.log('目录解析完成,目录数量:${result.length}');
 
     }catch(e){
-      developer.log('${book.bookUrl} 目录解析错误[使用规则${ruleBean.toString()}]:$e');
+      developer.log('$bookUrl 目录解析错误[使用规则${ruleBean.toString()}]:$e');
       return Future.error(e);
     }
     if(result.isNotEmpty && !notUpdateDB){
@@ -124,7 +141,7 @@ List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean){
   for (var ele in eles) {
     var chapterBean = BookChapterBean();
     var eParser = HParser(ele.outerHtml);
-    chapterBean.name = eParser.parseRuleString(ruleBean.chapterName);
+    chapterBean.name = eParser.parseRuleString(ruleBean.chapterName).replaceAll('\n', '');//去掉换行符
     chapterBean.url = eParser.parseRuleString(ruleBean.chapterUrl);
     if(chapterBean.name == null || chapterBean.name.isEmpty){
       continue;
@@ -155,4 +172,10 @@ List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean){
 String _parseNextUrl(String data, BookTocRuleBean ruleBean){
   var parser = HParser(data);
   return parser.parseRuleString(ruleBean.nextTocUrl);
+}
+
+String _parseTocUrl(String data, BookInfoRuleBean ruleBean){
+  var parser = HParser(data);
+  var result = parser.parseRuleStrings(ruleBean.tocUrl);
+  return result.isNotEmpty?result[0]:null;
 }

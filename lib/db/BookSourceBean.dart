@@ -142,6 +142,16 @@ class BookSourceBean{
     bean.replaceRegex = map['replaceRegex'];
     return bean;
   }
+
+  BookInfoRuleBean mapInfoRuleBean(){
+    BookInfoRuleBean bean = BookInfoRuleBean();
+    var map = jsonDecode(jsonDecode(ruleBookInfo));
+    bean.coverUrl = map['coverUrl'];
+    bean.tocUrl = map['tocUrl'];
+    bean.intro = map['intro'];
+    return bean;
+  }
+
 }
 
 class BookSearchUrlBean{
@@ -205,5 +215,16 @@ class BookContentRuleBean{
   @override
   String toString() {
     return 'BookContentRuleBean{content: $content, nextContentUrl: $nextContentUrl, replaceRegex: $replaceRegex}';
+  }
+}
+
+class BookInfoRuleBean{
+  String intro;
+  String coverUrl;
+  String tocUrl;
+
+  @override
+  String toString() {
+    return 'BookInfoRuleBean{intro: $intro, coverUrl: $coverUrl, tocUrl: $tocUrl}';
   }
 }

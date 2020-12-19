@@ -23,7 +23,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
   void initState() {
     super.initState();
     _textEditingController = TextEditingController();
-    _textEditingController.text = '';
+    _textEditingController.text = 'https://gitee.com/gekunfei/web/raw/master/myBookshelf/xc1772006';
   }
 
   @override
