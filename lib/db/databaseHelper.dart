@@ -418,7 +418,7 @@ ON "book_chapter" (
         ''');
         book.chaptersCount = count[0]['chaptersCount'];
         var notReadCount = await txn.rawQuery('''
-        SELECT COUNT(*) AS notReadChapterCount FROM "book_chapter" WHERE book_chapter.bookId = ${book.bookId} AND book_chapter.sourceId = ${book.sourceId} AND _id > (SELECT _id FROM book_chapter WHERE book_chapter.name LIKE '%${book.lastReadChapter.trim()??''}%' LIMIT 1)
+        SELECT COUNT(*) AS notReadChapterCount FROM "book_chapter" WHERE book_chapter.bookId = ${book.bookId} AND book_chapter.sourceId = ${book.sourceId} AND _id > (SELECT _id FROM book_chapter WHERE book_chapter.name LIKE '%${book.lastReadChapter??''}%' LIMIT 1)
         ''');
         book.notReadChapterCount = notReadCount[0]['notReadChapterCount'];
       }
@@ -586,7 +586,7 @@ ON "book_chapter" (
 
   ///更新阅读的章节
   dynamic updateLastReadChapter(int bookId,String chapterName,int lastReadPage){
-    return withDB().then((db) => db.update(TABLE_BOOK, {'lastReadChapter':chapterName,'lastReadPage':lastReadPage},where: '_id = $bookId'));
+    return withDB().then((db) => db.update(TABLE_BOOK, {'lastReadChapter':(chapterName??'').trim(),'lastReadPage':lastReadPage},where: '_id = $bookId'));
   }
 
   ///保存配置项
