@@ -311,13 +311,13 @@ packages:
       name: worker_manager
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.1.9"
+    version: "3.2.1"
   yuedu_parser:
     dependency: "direct main"
     description:
       path: "."
       ref: HEAD
-      resolved-ref: b785c28b0751aa0aa926279a029318be2bc2d30a
+      resolved-ref: bf11d5d0e848625271a33ecf3709f4b81c1487a2
       url: "git@github.com:huage2580/reader_parser.git"
     source: git
     version: "1.0.0+1"

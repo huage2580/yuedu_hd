@@ -110,14 +110,18 @@ class _StateSourceList extends State<PageSourceList> {
           height: 1,
         ),
         Expanded(
-          child: CupertinoScrollbar(
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemBuilder: (ctx, index) {
-                return _buildSourceItem(ctx, bookSourceList[index]);
-              },
-              separatorBuilder: (c, i) => Divider(),
-              itemCount: bookSourceList.length,
+          child: MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: CupertinoScrollbar(
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemBuilder: (ctx, index) {
+                  return _buildSourceItem(ctx, bookSourceList[index]);
+                },
+                separatorBuilder: (c, i) => Divider(),
+                itemCount: bookSourceList.length,
+              ),
             ),
           ),
         ),

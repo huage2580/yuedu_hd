@@ -83,7 +83,7 @@ class BookContentHelper{
   Future<String> _request(Options requestOptions,String bookUrl) async{
     try{
       developer.log('正文请求 $bookUrl');
-      var dio = Dio();
+      var dio = Utils.createDioClient();
       dio.options.connectTimeout = 10000;
       var response = await dio.get(bookUrl,options: requestOptions);
       if(response.statusCode == 200) {

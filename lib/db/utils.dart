@@ -1,3 +1,4 @@
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:gbk_codec/gbk_codec.dart';
 
@@ -12,8 +13,15 @@ class Utils{
     if(input == null || input.isEmpty){
       return "";
     }
+    input = input.trim();
     if(input.startsWith('http')){
       return input;
+    }
+    else if(input.startsWith('//') && host.startsWith('http')){
+      return 'http:' + input;
+    }
+    else if(input.startsWith('//') && host.startsWith('https')){
+      return 'https:' + input;
     }
     else if(input.startsWith('//')){
       return 'http:' + input;
@@ -26,6 +34,17 @@ class Utils{
       return (host + sep + input).trim();
     }
   }
+
+  static Dio createDioClient(){
+    var dio = Dio();
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client){
+      client.badCertificateCallback=(cert, host, port){
+        return true;
+      };
+    };
+    return dio;
+  }
+
 
 }
 

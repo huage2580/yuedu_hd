@@ -43,7 +43,7 @@ class BookTocHelper{
       infoRuleBean = book.sourceBean.mapInfoRuleBean();
     }
     var charset = sourceBean.mapSearchUrlBean().charset;
-    Options requestOptions = Options(contentType:ContentType.html.toString() ,sendTimeout: 10000,receiveTimeout: 5000);
+    Options requestOptions = Options(contentType:ContentType.html.toString() ,sendTimeout: 10000,receiveTimeout: 10000);
     if(charset == 'gbk'){
       requestOptions.responseDecoder = Utils.gbkDecoder;
     }
@@ -51,7 +51,7 @@ class BookTocHelper{
     var bookUrl = book.bookUrl;
 
     try{
-      var dio = Dio();
+      var dio = Utils.createDioClient();
       dio.options.connectTimeout = 10000;
       //解析真正的目录页
       if(infoRuleBean!=null && infoRuleBean.tocUrl!=null && infoRuleBean.tocUrl.isNotEmpty){

@@ -39,14 +39,7 @@ class BookSearchHelper{
   Dio dio;
   BookSearchHelper._init(){
     //
-    dio = Dio();
-    (dio.httpClientAdapter as DefaultHttpClientAdapter)
-        .onHttpClientCreate = (client) {
-      client.badCertificateCallback =
-          (X509Certificate cert, String host, int port) {
-        return true;
-      };
-    };
+    dio = Utils.createDioClient();
   }
 
   ///

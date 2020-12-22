@@ -353,7 +353,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
 
   //滚动到了当前页码
   void notifyPageChanged(int index){
-    print(index);
+    print('page_index->$index');
     var displayPage = DisplayCache.getInstance().get(index);
     if(displayPage == null) {
       return;
@@ -367,22 +367,23 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     //如果是章节第一页，加载前一章
     if(displayPage!=null && displayPage.currPage == 1){//第一页,加载上一章节
       var tempPage = DisplayCache.getInstance().get(index-1);
-      if(tempPage!=null){
-        //有缓存不加载
-        return;
+      if(tempPage==null){
+        //没有缓存加载
+        print('加载上一章节');
+        _loadChapter(displayPage.chapterIndex-1, index-1, true);
       }
-      print('加载上一章节');
-      _loadChapter(displayPage.chapterIndex-1, index-1, true);
+
     }
+    print('page->${displayPage.currPage}/${displayPage.maxPage}');
     //如果是章节最后一页，加载后一章
     if(displayPage!=null && displayPage.currPage == displayPage.maxPage){//最后一页,加载下一章节
       var tempPage = DisplayCache.getInstance().get(index+1);
-      if(tempPage!=null){
-        //有缓存不加载
-        return;
+      if(tempPage==null){
+        //没有缓存加载
+        print('加载下一章节');
+        _loadChapter(displayPage.chapterIndex+1, index+1, false);
       }
-      print('加载下一章节');
-      _loadChapter(displayPage.chapterIndex+1, index+1, false);
+
     }
 
   }

@@ -177,7 +177,7 @@ class _PageAddBookState extends State<PageAddBook>{
               autofocus: false,
               maxLines: 1,
               decoration: InputDecoration(
-                hintText: '根据标题 搜索书源',
+                hintText: '输入书名或作者 搜索书籍',
                 prefixIconConstraints:
                 BoxConstraints(minWidth: 24, maxHeight: 24),
                 prefixIcon: Icon(
