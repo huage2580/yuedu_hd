@@ -64,6 +64,9 @@ class BookSearchHelper{
     var eparser = HEvalParser({'page':1,'key':key});
     var searchOptionList = sourcesNotEmpty.map((e){
       var bean = e.mapSearchUrlBean();
+      if(bean == null){
+        return null;
+      }
       bean.url = eparser.parse(bean.url);
       bean.body = eparser.parse(bean.body);
 
@@ -81,7 +84,9 @@ class BookSearchHelper{
       var batchList = List<BookSearchUrlBean>();
       while(searchOptionList.isNotEmpty && c < 10){// 10个书源一批
         var b = searchOptionList.removeAt(0);
-        batchList.add(b);
+        if(b!=null){
+          batchList.add(b);
+        }
         c += 1;
       }
       if(batchList.isEmpty){

@@ -144,7 +144,14 @@ class BookSourceBean{
     bean.headers = {};
 
     if(temp.length == 2){
-      var map = jsonDecode(temp[1]);
+      var map;
+
+      try{
+        map = jsonDecode(temp[1]);
+      }catch(e){
+        print(e);
+        return null;
+      }
       bean.method = map['method']==null?'GET':map['method'];
       try{
         bean.headers = map['headers']==null?{}:jsonDecode(map['headers']);
