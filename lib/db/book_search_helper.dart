@@ -120,7 +120,7 @@ class BookSearchHelper{
     try{
 
       dio.options.connectTimeout = 5000;
-      var response = await dio.request(options.url,options: requestOptions,data: options.body);
+      var response = await dio.request(options.url,options: requestOptions,data: options.body).timeout(Duration(seconds: 8));
       if(response.statusCode == 200){
         await _parseResponse(response.data,options,onBookSearch);
         if(updateList!=null){

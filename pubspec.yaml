@@ -49,6 +49,8 @@ dependencies:
   bot_toast: ^3.0.5
   # 颜色选择
   flutter_colorpicker: ^0.3.4
+  #gbk
+  fast_gbk: ^0.1.2+1
 
 dev_dependencies:
   flutter_test:

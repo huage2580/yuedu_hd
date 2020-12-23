@@ -1,12 +1,12 @@
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
-import 'package:gbk_codec/gbk_codec.dart';
+import 'package:fast_gbk/fast_gbk.dart';
 
 class Utils{
   Utils._();
 
   static String gbkDecoder(List<int> responseBytes, RequestOptions options, ResponseBody responseBody) {
-    return gbk_bytes.decode(responseBytes);
+    return gbk.decode(responseBytes);
   }
 
   static String checkLink(String host,String input){
@@ -36,7 +36,7 @@ class Utils{
   }
 
   static Dio createDioClient(){
-    var dio = Dio();
+    var dio = Dio(BaseOptions(connectTimeout: 8000,receiveTimeout: 5000,sendTimeout: 5000,responseType: ResponseType.plain,followRedirects: true));
     (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client){
       client.badCertificateCallback=(cert, host, port){
         return true;

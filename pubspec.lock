@@ -113,6 +113,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.2.0-nullsafety.3"
+  fast_gbk:
+    dependency: "direct main"
+    description:
+      name: fast_gbk
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.2+1"
   ffi:
     dependency: transitive
     description:

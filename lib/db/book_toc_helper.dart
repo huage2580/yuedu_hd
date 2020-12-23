@@ -1,5 +1,6 @@
 
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -32,7 +33,7 @@ class BookTocHelper{
     //
   }
 
-  Future<List<BookChapterBean>> updateChapterList(int bookId,int sourceId,{bool notUpdateDB = false}) async{
+  Future<List<BookChapterBean>> updateChapterList(int bookId,int sourceId,{bool notUpdateDB = false,onlyLast = false}) async{
     //warmup
     List<BookChapterBean> result = List<BookChapterBean>();
     //1.拿到书源
@@ -96,7 +97,12 @@ class BookTocHelper{
             chapter.bookId = book.id;
             chapter.sourceId = book.source_id;
           }
-          result.addAll(chapters);
+          if(onlyLast){
+            result.add(chapters.last);
+          }else{
+            result.addAll(chapters);
+          }
+          chapters.clear();
         }else if(response.statusCode == 404){//可能是分页的问题,没有后续了
           bookUrl = null;
         }

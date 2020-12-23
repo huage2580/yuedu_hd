@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yuedu_hd/db/BookSourceCombBean.dart';
+import 'package:yuedu_hd/db/CountLock.dart';
 import 'package:yuedu_hd/db/book_search_helper.dart';
 import 'package:yuedu_hd/db/book_toc_helper.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
@@ -21,6 +22,8 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
   var sourceList = List<BookSourceCombBean>();
 
   var _searching = false;
+  var _canPostUpdateUI = true;
+  var _countLock = CountLock(3);
 
   @override
   void initState() {
@@ -109,6 +112,7 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
       //先更新列表，然后获取目录
     });
     for (var source in sourceList) {
+      await _countLock.request();
       updateChapter(source);
     }
   }
@@ -136,18 +140,31 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
   }
 
   dynamic updateChapter(BookSourceCombBean source) async{
-    await BookTocHelper.getInstance().updateChapterList(source.bookid, source.sourceid,notUpdateDB: true).then((chapters){
+    await BookTocHelper.getInstance().updateChapterList(source.bookid, source.sourceid,notUpdateDB: true,onlyLast: true).then((chapters){
       source.lastChapterName = chapters.last.name;
-      if(this.mounted){
-        setState(() {
-
-        });
-      }
+      _countLock.release();
+      _wantUpdateList();
     }).catchError((e){
+      _countLock.release();
       source.lastChapterName = '[X]目录解析异常';
+      _wantUpdateList();
+    });
+  }
+
+  //控制UI更新的间隔，IOS频繁更新UI特别卡顿
+  void _wantUpdateList(){
+    if(!this.mounted){
+      return;
+    }
+    if(!_canPostUpdateUI){
+      return;
+    }
+    _canPostUpdateUI = false;
+    Future.delayed(Duration(milliseconds: 2000),(){
       setState(() {
 
       });
-    });
+    }).whenComplete((){_canPostUpdateUI = true;}
+    );
   }
 }
