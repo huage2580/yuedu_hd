@@ -481,21 +481,23 @@ ON "book_chapter" (
 
   ///更新章节目录
   dynamic updateToc(List<BookChapterBean> chapterList) async{
-    return await withDB().then((db) => db.transaction((txn) async{
+    return await withDB().then((db){
+      var batch = db.batch();
       for (var chapter in chapterList) {
-        await txn.execute('''
+        batch.execute('''
         INSERT OR IGNORE INTO $TABLE_CHAPTER(
         name,url,bookId,sourceId
         )
         VALUES('${chapter.name}','${chapter.url}',${chapter.bookId},${chapter.sourceId})
         ''');
       }
+      batch.commit();
       //更新书籍最新章节
       if(chapterList.isNotEmpty){
         var c = chapterList.last;
-        await txn.update(TABLE_BOOK, {'lastChapter':c.name},where: '_id = ${c.bookId}');
+         db.update(TABLE_BOOK, {'lastChapter':c.name},where: '_id = ${c.bookId}');
       }
-    }));
+    });
   }
 
   ///查询书籍关联可用的所有书源
