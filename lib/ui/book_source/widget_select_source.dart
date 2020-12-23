@@ -91,7 +91,7 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${bean.sourceBean.bookSourceName}'),
+                  Text('${bean.sourceBean.bookSourceName}',maxLines: 2,overflow: TextOverflow.ellipsis,),
                   Text('${bean.lastChapterName?? '正在获取目录~'}')
                 ],
               ),
@@ -140,6 +140,7 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
   }
 
   dynamic updateChapter(BookSourceCombBean source) async{
+    if(!this.mounted){return;}
     await BookTocHelper.getInstance().updateChapterList(source.bookid, source.sourceid,notUpdateDB: true,onlyLast: true).then((chapters){
       source.lastChapterName = chapters.last.name;
       _countLock.release();

@@ -22,8 +22,9 @@ class DisplayPage extends StatelessWidget{
   final int maxPage;
   final int viewPageIndex;//指代在pagerView里面的序号
   final bool fromEnd;
+  final String errorMsg;
 
-  DisplayPage(this.status, this.text,{this.text2, this.chapterIndex, this.currPage, this.maxPage, this.viewPageIndex, this.fromEnd}):super(key: ValueKey(text));
+  DisplayPage(this.status, this.text,{this.text2, this.chapterIndex, this.currPage, this.maxPage, this.viewPageIndex, this.fromEnd,this.errorMsg}):super(key: ValueKey(text));
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +54,7 @@ class DisplayPage extends StatelessWidget{
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('加载失败/(ㄒoㄒ)/~~',style: TextStyle(color: Color(config.textColor)),),
+          Text('加载失败/(ㄒoㄒ)/~~\n$errorMsg',style: TextStyle(color: Color(config.textColor)),maxLines: 6,overflow: TextOverflow.ellipsis,),
           VSpace(20),
           RaisedButton(onPressed: (){
             ReloadEvent.getInstance().reload(viewPageIndex);
