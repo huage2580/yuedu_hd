@@ -297,9 +297,10 @@ ON "book_chapter" (
         '0',
             (previousValue, element) =>
         previousValue += (',' + element.toString()));
-
-    return await withDB()
-        .then((db) => db.delete(TABLE_SOURCE, where: '_id in ($args)'));
+    return await withDB().then((db) => db.transaction((txn) async{
+      await txn.delete(TABLE_SOURCE, where: '_id in ($args)');
+      await txn.delete(TABLE_BOOK_COMB_SOURCE,where: 'sourceid in ($args)');
+    }));
   }
   /// 启用or禁用
   dynamic updateBookSourceStateById(int id,bool enabled) async{
@@ -382,7 +383,7 @@ ON "book_chapter" (
   ///id移除书架
   Future<void> removeBookshelfById(int bookId) async{
     await withDB().then((db) => db.transaction((txn)async{
-      await txn.update(TABLE_BOOK,{'inbookShelf':0},where: '_id = $bookId');
+      await txn.delete(TABLE_BOOK,where: '_id = $bookId');
       await txn.delete(TABLE_BOOK_COMB_SOURCE,where: 'bookid = $bookId');
       await txn.delete(TABLE_CHAPTER,where: 'bookId = $bookId');
     }));
@@ -435,7 +436,7 @@ ON "book_chapter" (
 
 
   ///书籍信息，完整关联
-  ///[sourceId] <=0 表示使用当前指定的书源,没有的话默认一个
+  ///[sourceId] >= 0 表示使用当前指定的书源,没有的话默认一个
   dynamic queryBookInfoFromBookIdCombSourceId(int bookId,int sourceId) async{
     var db = await withDB();
     return await db.transaction((txn) async{
@@ -466,8 +467,13 @@ ON "book_chapter" (
       }
 
       var sourceList = await txn.query(TABLE_SOURCE,where: '_id = $usedSourceId').then((list) => list.map((e) => BookSourceBean.fromJson(e)).toList());
-      bookInfo.source_id = usedSourceId;
-      bookInfo.sourceBean = sourceList[0];
+      if(sourceList.isNotEmpty){
+        bookInfo.source_id = usedSourceId;
+        bookInfo.sourceBean = sourceList[0];
+      }else{//被删除了书源
+
+      }
+
       return Future.value(bookInfo);
     });
   }

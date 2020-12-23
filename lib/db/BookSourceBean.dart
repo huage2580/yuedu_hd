@@ -33,6 +33,11 @@ class BookSourceBean{
   } //json
 
   BookSourceBean.fromJson(Map<String,dynamic> map){
+    //todo 导入兼容2.0的书源,重新做一次映射
+
+
+
+    //---------------------------------------
     id = map['_id'];
     bookSourceName = map['bookSourceName'];
     bookSourceGroup = map['bookSourceGroup'];

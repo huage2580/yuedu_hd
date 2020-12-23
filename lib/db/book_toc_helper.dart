@@ -8,8 +8,10 @@ import 'package:yuedu_hd/db/BookInfoBean.dart';
 import 'package:yuedu_hd/db/BookSourceBean.dart';
 import 'package:yuedu_hd/db/bookChapterBean.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
+import 'package:yuedu_parser/h_parser/dsoup/soup_object_cache.dart';
 import 'dart:developer' as developer;
 import 'package:yuedu_parser/h_parser/h_parser.dart';
+import 'package:yuedu_parser/h_parser/jscore/JSRuntime.dart';
 
 
 import 'utils.dart';
@@ -57,7 +59,7 @@ class BookTocHelper{
       if(infoRuleBean!=null && infoRuleBean.tocUrl!=null && infoRuleBean.tocUrl.isNotEmpty){
         var response = await dio.get(book.bookUrl,options: requestOptions);
         if(response.statusCode == 200){
-          var tocUrl = await Executor().execute(arg1: response.data as String,arg2: infoRuleBean,fun2: _parseTocUrl);
+          var tocUrl = await Executor().execute(arg1: response.data as String,arg2: infoRuleBean,arg3: bookUrl,fun3: _parseTocUrl);
           bookUrl = Utils.checkLink(sourceBean.bookSourceUrl, tocUrl);
           developer.log('解析真正的目录请求 $bookUrl');
         }
@@ -71,12 +73,12 @@ class BookTocHelper{
         var response = await dio.get(bookUrl,options: requestOptions);
         if(response.statusCode == 200){
           developer.log('目录解析 $bookUrl');
-          var chapters = await Executor().execute(arg1: response.data as String,arg2: ruleBean,fun2: _parseResponse);
+          var chapters = await Executor().execute(arg1: response.data as String,arg2: ruleBean,arg3: bookUrl,fun3: _parseResponse);
           if(chapters.isEmpty){
             throw Exception('目录为空');
           }
           if(ruleBean.nextTocUrl!=null && ruleBean.nextTocUrl.trim().isNotEmpty){
-            var nextUrl = await Executor().execute(arg1: response.data as String,arg2: ruleBean,fun2: _parseNextUrl);
+            var nextUrl = await Executor().execute(arg1: response.data as String,arg2: ruleBean,arg3: bookUrl,fun3: _parseNextUrl);
             if(nextUrl!=null || nextUrl.trim().isNotEmpty){
               bookUrl = Utils.checkLink(sourceBean.bookSourceUrl, nextUrl).trim();
             }else{
@@ -92,7 +94,10 @@ class BookTocHelper{
             chapter.sourceId = book.source_id;
           }
           result.addAll(chapters);
-        }else{
+        }else if(response.statusCode == 404){//可能是分页的问题,没有后续了
+          bookUrl = null;
+        }
+        else{
           developer.log('目录解析错误:$bookUrl,网络错误${response.statusCode}');
           throw Exception('网络错误${response.statusCode}');
         }
@@ -133,21 +138,34 @@ class BookTocHelper{
 
 }
 
-List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean){
+List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean,String url){
   var parser = HParser(data);
+  var cache =  SoupObjectCache();
+  JSRuntime jsCore = JSRuntime.init(cache);
+  var args = {'baseUrl':url};
+  parser.objectCache = cache;
+  parser.injectArgs = args;
+  //复用jsCore
+  parser.jsRuntime = jsCore;
+
   var result = List<BookChapterBean>();
   var eles = parser.parseRuleElements(ruleBean.chapterList);
   developer.log('目录解析开始 ${DateTime.now()}');
   for (var ele in eles) {
     var chapterBean = BookChapterBean();
     var eParser = HParser(ele.outerHtml);
+    eParser.objectCache = cache;
+    eParser.injectArgs = args;
+    eParser.jsRuntime = jsCore;
     chapterBean.name = eParser.parseRuleString(ruleBean.chapterName).replaceAll('\n', '');//去掉换行符
     chapterBean.url = eParser.parseRuleString(ruleBean.chapterUrl);
     if(chapterBean.name == null || chapterBean.name.isEmpty){
       continue;
     }
     result.add(chapterBean);
+    cache.destroy();
   }
+  jsCore.destroy();
   developer.log('目录解析结束 ${DateTime.now()}');
   if(result.isNotEmpty){
     if(result.lastIndexOf(result[0]) > 0){
@@ -165,17 +183,27 @@ List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean){
   // for(var t in result){
   //   developer.log(t.toString());
   // }
+  cache.destroy();
   developer.log('解析的总目录${result.length}');
   return result;
 }
 
-String _parseNextUrl(String data, BookTocRuleBean ruleBean){
+String _parseNextUrl(String data, BookTocRuleBean ruleBean,String url){
   var parser = HParser(data);
-  return parser.parseRuleString(ruleBean.nextTocUrl);
+  var cache =  SoupObjectCache();
+  parser.objectCache = cache;
+  parser.injectArgs = {'baseUrl':url};
+  var result = parser.parseRuleString(ruleBean.nextTocUrl);
+  cache.destroy();
+  return result;
 }
 
-String _parseTocUrl(String data, BookInfoRuleBean ruleBean){
+String _parseTocUrl(String data, BookInfoRuleBean ruleBean,String url){
   var parser = HParser(data);
+  var cache =  SoupObjectCache();
+  parser.objectCache = cache;
+  parser.injectArgs = {'baseUrl':url};
   var result = parser.parseRuleStrings(ruleBean.tocUrl);
+  cache.destroy();
   return result.isNotEmpty?result[0]:null;
 }

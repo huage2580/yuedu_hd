@@ -42,6 +42,7 @@ class Utils{
         return true;
       };
     };
+    dio.options.responseType = ResponseType.plain;
     return dio;
   }
 

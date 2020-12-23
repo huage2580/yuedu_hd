@@ -8,8 +8,10 @@ import 'package:dio/dio.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'package:yuedu_hd/db/BookSourceBean.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
+import 'package:yuedu_parser/h_parser/dsoup/soup_object_cache.dart';
 import 'package:yuedu_parser/h_parser/h_eval_parser.dart';
 import 'package:yuedu_parser/h_parser/h_parser.dart';
+import 'package:yuedu_parser/h_parser/jscore/JSRuntime.dart';
 import 'dart:developer' as developer;
 
 import 'BookInfoBean.dart';
@@ -64,6 +66,7 @@ class BookSearchHelper{
       var bean = e.mapSearchUrlBean();
       bean.url = eparser.parse(bean.url);
       bean.body = eparser.parse(bean.body);
+
       //精确搜索
       bean.exactSearch = exactSearch;
       if(bean.exactSearch){
@@ -139,6 +142,7 @@ class BookSearchHelper{
       //填充需要传输的数据
       var kv = {
         'response':response,
+        'baseUrl':options.url,
         'rule_bookList':ruleBean.bookList,
         'rule_name':ruleBean.name,
         'rule_author':ruleBean.author,
@@ -196,6 +200,7 @@ class BookSearchHelper{
 
 List<Map<String,dynamic>> _parse(Map map){
   String response = map['response'];
+  String baseUrl = map['baseUrl'];
   BookSearchRuleBean ruleBean = BookSearchRuleBean();
   ruleBean.bookList = map['rule_bookList'];
   ruleBean.name = map['rule_name'];
@@ -210,15 +215,30 @@ List<Map<String,dynamic>> _parse(Map map){
 
 
   List<BookInfoBean> result = List<BookInfoBean>();
+
+  var objectCache = SoupObjectCache();
+  var argsMap = {'baseUrl':baseUrl};
+  JSRuntime jsCore = JSRuntime.init(objectCache);
   try{
-    var bookList = HParser(response).parseRuleElements(ruleBean.bookList);
+    var hparser = HParser(response);
+    hparser.objectCache = objectCache;
+    argsMap['html_string'] = response;
+    hparser.injectArgs = argsMap;
+    hparser.jsRuntime = jsCore;
+    var bookList = hparser.parseRuleElements(ruleBean.bookList);
     for (var bookElement in bookList) {
       var bookInfo = BookInfoBean();
+
       var bookParser = HParser(bookElement.outerHtml);
+      argsMap['html_string'] = bookElement.outerHtml;
+      bookParser.objectCache = objectCache;
+      bookParser.injectArgs = argsMap;
+      bookParser.jsRuntime = jsCore;
+
       bookInfo.name = bookParser.parseRuleString(ruleBean.name);
       bookInfo.author = bookParser.parseRuleString(ruleBean.author);
-      var kinds = bookParser.parseRuleStrings(ruleBean.kind);
-      bookInfo.kind = kinds==null?'':kinds.join('|');
+      var kinds = bookParser.parseRuleString(ruleBean.kind);
+      bookInfo.kind = kinds==null?'':kinds.replaceAll('\n','|');
       bookInfo.intro = bookParser.parseRuleString(ruleBean.intro);
       bookInfo.lastChapter = bookParser.parseRuleString(ruleBean.lastChapter);
       bookInfo.wordCount = bookParser.parseRuleString(ruleBean.wordCount);
@@ -237,10 +257,13 @@ List<Map<String,dynamic>> _parse(Map map){
         continue;
       }
       result.add(bookInfo);
+      objectCache.destroy();
     }
   }catch(e){
     developer.log('搜索解析错误:$e');
   }
+  jsCore.destroy();
+  objectCache.destroy();
   var temp = List<Map<String,dynamic>>();
   for (var value in result) {
     temp.add(value.toMap());

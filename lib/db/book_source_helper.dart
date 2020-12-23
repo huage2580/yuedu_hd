@@ -28,6 +28,8 @@ class BookSourceHelper{
     var result = List<BookSourceBean>();
     var sourceList;
     try{
+      jsonStr = jsonStr.replaceAll(r",{webView:“true”}'", '');
+      jsonStr = jsonStr.replaceAll(r',{\"webView\":true}', '');
       sourceList = jsonDecode(jsonStr);
     }catch(e){
       _log.writeln('json解析异常:$e');
@@ -78,38 +80,15 @@ class BookSourceHelper{
 
   ///过滤不兼容的书源
   bool _checkCompatible(LinkedHashMap item){
-    //为了更多的书源,wordCount里面的js过滤掉
-    String searchWordCountStr = item['ruleSearch']['wordCount'];
-    if(searchWordCountStr!=null){
-      var index = searchWordCountStr.indexOf(RegExp(RegexpRule.PARSER_TYPE_JS));
-      if(index > 0){
-        var result = searchWordCountStr.substring(0,index);
-        item['ruleSearch']['wordCount'] = result;
-        print('ruleSearch word compat=> $result');
-      }
-    }
-    String exploreWordCountStr = item['ruleExplore']['wordCount'];
-    if(exploreWordCountStr!=null){
-      var index = exploreWordCountStr.indexOf(RegExp(RegexpRule.PARSER_TYPE_JS));
-      if(index > 0){
-        var result = exploreWordCountStr.substring(0,index);
-        item['ruleExplore']['wordCount'] = result;
-        print('ruleExplore word compat=> $result');
-      }
-    }
-    //--------------------------------
 
     var itemStr = item.toString();
-    if(RegExp(RegexpRule.PARSER_TYPE_JS).hasMatch(itemStr)){
+    if(itemStr.contains('@get:')){
       return false;
     }
-    if(RegExp(RegexpRule.EXPRESSION_JS_TOKEN).hasMatch(itemStr)){
+    if(itemStr.contains('java.ajax')){
       return false;
     }
-    if(RegExp(RegexpRule.PARSER_TYPE_JSON).hasMatch(itemStr)){
-      return false;
-    }
-    if(itemStr.contains('webView')){//不支持
+    if(itemStr.contains('Jsoup.connect')){
       return false;
     }
     if(item['bookSourceType'] != 0){//只兼容文字源
