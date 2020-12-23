@@ -143,9 +143,10 @@ class _PageSourceAddState extends State<PageSourceAdd> {
         title: Text('书源帮助'),
         content: Text('''
 本APP不提供内容，只提供浏览服务，按照用户自定义的规则加载特定网站的网页。
-使用阅读3.0书源规则（不支持js和json解析）
+使用[阅读]书源规则
 参考:https://alanskycn.gitee.io/teachme/
 你可以从搜索引擎，gitee,github，酷安等社区获取别人分享的书源。
+推荐关注公众号[开源阅读]获取书源。
 '''),
         actions: [
           TextButton(onPressed: (){
@@ -171,7 +172,12 @@ class _PageSourceAddState extends State<PageSourceAdd> {
     });
     try{
       var jsonStr = await Clipboard.getData(Clipboard.kTextPlain);
-      await _parserData(jsonStr.text);
+      if(jsonStr.text.startsWith('http')){
+        _textEditingController.text = jsonStr.text;
+        await _fromNetWork();
+      }else{
+        await _parserData(jsonStr.text);
+      }
     }catch(e){
       _log += '剪切板解析异常->\n$e\n';
     }finally{

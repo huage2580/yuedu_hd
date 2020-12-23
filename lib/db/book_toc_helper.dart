@@ -61,6 +61,9 @@ class BookTocHelper{
         if(response.statusCode == 200){
           var tocUrl = await Executor().execute(arg1: response.data as String,arg2: infoRuleBean,arg3: bookUrl,fun3: _parseTocUrl);
           bookUrl = Utils.checkLink(sourceBean.bookSourceUrl, tocUrl);
+          if(bookUrl.isEmpty){
+            bookUrl = book.bookUrl;
+          }
           developer.log('解析真正的目录请求 $bookUrl');
         }
         else{

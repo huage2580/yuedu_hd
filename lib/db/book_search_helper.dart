@@ -117,7 +117,6 @@ class BookSearchHelper{
       dio.options.connectTimeout = 5000;
       var response = await dio.request(options.url,options: requestOptions,data: options.body);
       if(response.statusCode == 200){
-        //todo 尝试不解析只请求，看ios会不会卡
         await _parseResponse(response.data,options,onBookSearch);
         if(updateList!=null){
           updateList();//更新列表UI
@@ -247,7 +246,8 @@ List<Map<String,dynamic>> _parse(Map map){
       if(bookInfo.bookUrl == null){
         bookInfo.bookUrl = bookParser.parseRuleString(ruleBean.tocUrl);
       }
-      bookInfo.coverUrl = bookParser.parseRuleString(ruleBean.coverUrl);
+      var coverUrl = bookParser.parseRuleStrings(ruleBean.coverUrl);
+      bookInfo.coverUrl = coverUrl.isNotEmpty?coverUrl[0]:null;
       if(bookInfo.name == null || bookInfo.author == null){
         continue;
       }

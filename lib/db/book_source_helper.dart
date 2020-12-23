@@ -91,7 +91,7 @@ class BookSourceHelper{
     if(itemStr.contains('Jsoup.connect')){
       return false;
     }
-    if(item['bookSourceType'] != 0){//只兼容文字源
+    if(item['bookSourceType'] !=null && item['bookSourceType'] != 0){//只兼容文字源
       return false;
     }
     return true;

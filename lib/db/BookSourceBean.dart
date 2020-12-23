@@ -33,7 +33,58 @@ class BookSourceBean{
   } //json
 
   BookSourceBean.fromJson(Map<String,dynamic> map){
-    //todo 导入兼容2.0的书源,重新做一次映射
+    //导入兼容2.0的书源,重新做一次映射
+    if(map['ruleSearchUrl']!=null){//2.0的书源，转换兼容
+      map['enabled'] = true;
+      map['enabledExplore'] = true;
+      map['bookSourceType'] = 0;
+      map['bookUrlPattern'] = map['ruleBookUrlPattern'];
+      map['header'] = '';
+      map['loginUrl'] = '';
+      map['bookSourceComment'] = '';
+      String searchUrl = map['ruleSearchUrl'];
+      //POST方式的转换
+      searchUrl = searchUrl.replaceAll('searchKey', '{{key}}');
+      var temp = searchUrl.split('@');
+      var xurl = temp[0];
+      if(temp.length >1){//POST方式
+        xurl +=',{ "method": "POST","body": "${temp[1]}"}';
+      }
+      map['searchUrl'] = xurl;
+      map['ruleExplore'] = {
+
+      };
+      map['ruleSearch'] = {
+        'name':map['ruleSearchName'],
+        'author':map['ruleSearchAuthor'],
+        'bookList':map['ruleSearchList'],
+        'bookUrl':map['ruleSearchNoteUrl'],
+        'coverUrl':map['ruleSearchCoverUrl'],
+        'intro':map['ruleIntroduce'],
+        'kind':map['ruleSearchKind'],
+        'lastChapter':map['ruleSearchLastChapter'],
+        'wordCount':'',
+      };
+      map['ruleBookInfo'] = {
+        'coverUrl' : map['ruleCoverUrl'],
+        'tocUrl' : map['ruleChapterUrl'],
+        'intro' : map['ruleIntroduce'],
+      };
+      map['ruleToc'] = {
+        'chapterList':map['ruleChapterList'],
+        'chapterName':map['ruleChapterName'],
+        'chapterUrl':map['ruleContentUrl'],
+        'nextTocUrl':map['ruleChapterUrlNext'],
+
+      };
+      map['ruleContent'] = {
+        'content':map['ruleBookContent'],
+        'nextContentUrl':map['ruleContentUrlNext'],
+        'replaceRegex':'',
+      };
+
+    }
+
 
 
 
@@ -136,6 +187,7 @@ class BookSourceBean{
     bean.chapterList = map['chapterList'];
     bean.chapterName = map['chapterName'];
     bean.chapterUrl = map['chapterUrl'];
+    bean.nextTocUrl = map['nextTocUrl'];
     return bean;
   }
 
