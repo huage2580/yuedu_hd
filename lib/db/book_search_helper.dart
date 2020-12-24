@@ -90,6 +90,7 @@ class BookSearchHelper{
       }
     }
     cancelSearch(cancelToken);
+    await _countLocker.waitDone();
     developer.log('---***搜索结束***---');
     return Future.value(0);
   }
@@ -159,12 +160,15 @@ class BookSearchHelper{
       developer.log('解析搜索返回内容完成：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
       for (var bookInfo in bookInfoList) {
         //链接修正
-        bookInfo.bookUrl = Utils.checkLink(source.bookSourceUrl, bookInfo.bookUrl);
-        bookInfo.coverUrl = Utils.checkLink(source.bookSourceUrl, bookInfo.coverUrl);
+        bookInfo.bookUrl = Utils.checkLink(options.url, bookInfo.bookUrl);
+        bookInfo.coverUrl = Utils.checkLink(options.url, bookInfo.coverUrl);
         //-------关联到书源-------------
         bookInfo.source_id = source.id;
         bookInfo.sourceBean = source;
         if(bookInfo.name == null || bookInfo.author == null){
+          continue;
+        }
+        if(bookInfo.bookUrl == null || bookInfo.bookUrl.isEmpty){
           continue;
         }
         bookInfo.name = bookInfo.name.trim();

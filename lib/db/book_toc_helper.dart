@@ -82,8 +82,8 @@ class BookTocHelper{
         var response = await dio.get(book.bookUrl,options: requestOptions);
         if(response.statusCode == 200){
           var tocUrl = await Executor().execute(arg1: response.data as String,arg2: infoRuleBean,arg3: bookUrl,fun3: _parseTocUrl);
-          bookUrl = Utils.checkLink(sourceBean.bookSourceUrl, tocUrl);
-          developer.log('解析真正的目录请求 $bookUrl [${infoRuleBean.tocUrl}]');
+          developer.log('解析真正的目录请求[$bookUrl] 结果[$tocUrl] 规则[${infoRuleBean.tocUrl}]');
+          bookUrl = Utils.checkLink(bookUrl, tocUrl);
           if(bookUrl.isEmpty){
             bookUrl = book.bookUrl;
           }
@@ -120,7 +120,7 @@ class BookTocHelper{
               //可能是数组，采用逗号分割
               var urls = nextUrl.split(',');
               urls.forEach((element) {
-                var next = Utils.checkLink(sourceBean.bookSourceUrl, element).trim();
+                var next = Utils.checkLink(curUrl, element).trim();
                 if(!allTocUrlList.contains(next)){
                   tocUrlList.add(next);
                   allTocUrlList.add(next);
@@ -130,7 +130,7 @@ class BookTocHelper{
             }
           }
           for (var chapter in chapters) {
-            chapter.url = Utils.checkLink(sourceBean.bookSourceUrl, chapter.url);
+            chapter.url = Utils.checkLink(curUrl, chapter.url);
             chapter.bookId = book.id;
             chapter.sourceId = book.source_id;
           }

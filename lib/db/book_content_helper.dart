@@ -69,12 +69,15 @@ class BookContentHelper{
           if(nextUrl == null || nextUrl.trim().isEmpty){
             bookUrl = null;
           }else{
-            bookUrl = Utils.checkLink(source.bookSourceUrl, nextUrl);
+            bookUrl = Utils.checkLink(bookUrl, nextUrl);
             developer.log('下一页链接 $bookUrl');
           }
         }else{
           bookUrl = null;
         }
+      }
+      if(content==null || content.isEmpty){
+        throw Exception('正文请求成功 解析失败');
       }
       await DatabaseHelper().updateChapterContent(chapterId, content);
       return Future.value(content);

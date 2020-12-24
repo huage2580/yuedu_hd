@@ -10,6 +10,7 @@ class CountLock{
 
   Future _lock;
   Completer _completer;
+  Completer _allDoneCompleter;
 
   /// Whether this interceptor has been locked.
   bool get locked => _lock != null;
@@ -33,13 +34,26 @@ class CountLock{
       _completer.complete();
       _lock = null;
     }
+    if(counter == 0){
+      _allDoneCompleter.complete();
+      _allDoneCompleter = null;
+    }
+  }
+  Future waitDone() async{
+    if(_allDoneCompleter!=null){
+      return _allDoneCompleter.future;
+    }
+    return Future.value(counter);
   }
 
   Future request() async{
     counter++;
+    if(_allDoneCompleter==null){
+      _allDoneCompleter = Completer();
+    }
     // print('locker:$counter');
     if(counter > max){
-      // print('lock!');
+     // print('lock!');
       return _lockMe();
     }else{
       return Future.value(counter);
@@ -49,7 +63,7 @@ class CountLock{
   void release(){
     counter --;
     if(counter <= max){
-      // print('unlock!');
+      //print('unlock!');
       _unlockMe();
     }
   }
@@ -58,6 +72,8 @@ class CountLock{
   void clear([String msg = 'cancelled']) {
     if (locked) {
       _completer.completeError(msg);
+      _allDoneCompleter.completeError(msg);
+      _allDoneCompleter = null;
       _lock = null;
     }
   }

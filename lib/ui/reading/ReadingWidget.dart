@@ -268,10 +268,8 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     }
     //-----------------------成功开始分页,制造显示页面---------------------
 
-    //内容中每个段落开头的空格
-    var spaceForParagraph = ' ' * config.spaceParagraph;
-    chapterContent = spaceForParagraph + chapterContent.replaceAll('\n', '\n$spaceForParagraph');
-
+    //净化内容
+    chapterContent = _formatContent(chapterContent);
     //标题，正文
     var pageBreaker = PageBreaker(
         _generateContentTextSpan(chapterContent),
@@ -416,8 +414,21 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       notifyPageChanged(INIT_PAGE);
     }
   }
+  //内容净化
+  String _formatContent(String chapterContent){
+    var result = chapterContent;
+    // print(result);
+    //净化连续换行为一个换行
+    result = result.replaceAll(RegExp(r'[ \n]*\n+[ ]?'), '\n');
+    //太长的空格替换成两个
+    result = result.replaceAll(RegExp(r'[ ]{4,}'), '  ');
+    //内容中每个段落开头的空格
+    var spaceForParagraph = ' ' * config.spaceParagraph;
+    result = spaceForParagraph + result.replaceAll('\n', '\n$spaceForParagraph');
 
 
+    return result;
+  }
 
 
 

@@ -14,6 +14,12 @@ class Utils{
       return "";
     }
     input = input.trim();
+    var realHost = host;
+    var urlRegexp = RegExp(r'(http[s]?:\/\/[^\/\?]*)');
+    var match = urlRegexp.firstMatch(host);
+    if(match!=null){
+      realHost = match.group(1);
+    }
     if(input.startsWith('http')){
       return input;
     }
@@ -26,9 +32,12 @@ class Utils{
     else if(input.startsWith('//')){
       return 'http:' + input;
     }
+    else if(input.startsWith('/')){
+      return realHost + input;
+    }
     else{
       String sep = '/';
-      if(host.endsWith(sep) || input.startsWith(sep)){
+      if(host.endsWith(sep)){
         sep = '';
       }
       return (host + sep + input).trim();
