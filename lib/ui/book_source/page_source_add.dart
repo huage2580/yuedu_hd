@@ -1,6 +1,7 @@
 
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:yuedu_hd/db/book_source_helper.dart';
@@ -24,8 +25,9 @@ class _PageSourceAddState extends State<PageSourceAdd> {
     super.initState();
     _textEditingController = TextEditingController();
     // _textEditingController.text = 'https://gitee.com/gekunfei/web/raw/master/myBookshelf/xc1772006';
-    _textEditingController.text = 'https://gitee.com/vpq/codes/hp702r1y56ekisd4xzjc875/raw?blob_name=sy.json';
-
+    if(!kReleaseMode){
+      _textEditingController.text = 'https://gitee.com/vpq/codes/hp702r1y56ekisd4xzjc875/raw?blob_name=sy.json';
+    }
   }
 
   @override
@@ -145,7 +147,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
         title: Text('书源帮助'),
         content: Text('''
 本APP不提供内容，只提供浏览服务，按照用户自定义的规则加载特定网站的网页。
-使用[阅读]书源规则
+使用[阅读3.0]书源规则,不完全兼容[阅读2.0]规则
 参考:https://alanskycn.gitee.io/teachme/
 你可以从搜索引擎，gitee,github，酷安等社区获取别人分享的书源。
 推荐关注公众号[开源阅读]获取书源。
