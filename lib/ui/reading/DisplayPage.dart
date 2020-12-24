@@ -54,7 +54,7 @@ class DisplayPage extends StatelessWidget{
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('加载失败/(ㄒoㄒ)/~~\n$errorMsg',style: TextStyle(color: Color(config.textColor)),maxLines: 6,overflow: TextOverflow.ellipsis,),
+          Text('加载失败/(ㄒoㄒ)/~~\n$errorMsg',style: TextStyle(color: Color(config.textColor)),maxLines: 6,overflow: TextOverflow.ellipsis,textAlign: TextAlign.center,),
           VSpace(20),
           RaisedButton(onPressed: (){
             ReloadEvent.getInstance().reload(viewPageIndex);

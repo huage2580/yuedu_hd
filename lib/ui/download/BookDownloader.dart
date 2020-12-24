@@ -28,7 +28,7 @@ class BookDownloader{
   DownLoadCallBack downLoadCallBack = (){};
 
   /// 先查询章节列表，过滤有缓存的
-  void startDownload(int bookId,{int from,int limit}) async{
+  void startDownload(int bookId,{int from,int limit,bool needToast = true}) async{
     if(chapters.isNotEmpty){
       BotToast.showText(text:"已经有缓存任务...");
       return;
@@ -52,6 +52,7 @@ class BookDownloader{
         downLoadCallBack();
       });
     }
+    BotToast.showText(text:"缓存任务结束~");
 
     bookInfoBean = null;
     downLoadCallBack();

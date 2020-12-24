@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 
 import 'package:worker_manager/worker_manager.dart';
 import 'package:yuedu_hd/db/BookSourceBean.dart';
+import 'package:yuedu_hd/db/CountLock.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
 import 'package:yuedu_parser/h_parser/dsoup/soup_object_cache.dart';
 import 'package:yuedu_parser/h_parser/h_eval_parser.dart';
@@ -39,6 +40,8 @@ class BookSearchHelper{
 
   var tokenList = ['none'];
   Dio dio;
+  var _countLocker = CountLock(8);
+
   BookSearchHelper._init(){
     //
     dio = Utils.createDioClient();
@@ -80,19 +83,11 @@ class BookSearchHelper{
     }).toList();
     while(tokenList.contains(cancelToken) && searchOptionList.isNotEmpty){
       developer.log('开启一轮搜索:本次剩余书源->${searchOptionList.length}');
-      var c = 0;
-      var batchList = List<BookSearchUrlBean>();
-      while(searchOptionList.isNotEmpty && c < 10){// 10个书源一批
-        var b = searchOptionList.removeAt(0);
-        if(b!=null){
-          batchList.add(b);
-        }
-        c += 1;
+      var b = searchOptionList.removeAt(0);
+      if(b!=null){
+        await _countLocker.request();
+        _request(b, onBookSearch,updateList).whenComplete(() => _countLocker.release());
       }
-      if(batchList.isEmpty){
-        break;
-      }
-      await _batchSearch(batchList, onBookSearch,updateList);
     }
     cancelSearch(cancelToken);
     developer.log('---***搜索结束***---');
@@ -104,11 +99,6 @@ class BookSearchHelper{
     developer.log('搜索企图终止->$token');
   }
 
-  ///单次循环，n个书源
-  dynamic _batchSearch(List<BookSearchUrlBean> options,OnBookSearch onBookSearch,UpdateList updateList) async{
-    var requests = options.map((e) => _request(e, onBookSearch,updateList));
-    return Future.wait(requests);
-  }
 
   Future<dynamic> _request(BookSearchUrlBean options,OnBookSearch onBookSearch,UpdateList updateList) async{
     var contentType = options.headers['content-type'];

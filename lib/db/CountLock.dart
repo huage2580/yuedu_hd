@@ -37,9 +37,9 @@ class CountLock{
 
   Future request() async{
     counter++;
-    print('locker:$counter');
+    // print('locker:$counter');
     if(counter > max){
-      print('lock!');
+      // print('lock!');
       return _lockMe();
     }else{
       return Future.value(counter);
@@ -49,7 +49,7 @@ class CountLock{
   void release(){
     counter --;
     if(counter <= max){
-      print('unlock!');
+      // print('unlock!');
       _unlockMe();
     }
   }

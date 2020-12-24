@@ -56,8 +56,8 @@ class BookContentHelper{
           throw Exception('正文分页超过十页');
         }
         String htmlString = await _request(requestOptions, bookUrl);
-        if(htmlString == null){
-          throw Exception('正文请求失败m');
+        if(htmlString == null || htmlString.isEmpty){
+          throw Exception('正文请求失败 null');
         }
         //解析内容
         String c = await Executor().execute(arg1: bookUrl,arg2: htmlString,arg3: contentRule,fun3: parseContent);
@@ -95,9 +95,11 @@ class BookContentHelper{
         return Future.value(response.data);
       }else{
         developer.log('正文请求失败[${response.statusCode}] $bookUrl');
+        return Future.error(Exception('正文请求失败[${response.statusCode}] $bookUrl'));
       }
     }catch(e){
       developer.log('正文请求错误[$bookUrl]:$e');
+      return Future.error(Exception('正文请求错误[$bookUrl]:$e'));
     }
     return Future.value(null);
   }

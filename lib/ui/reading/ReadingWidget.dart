@@ -264,10 +264,6 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     });
     //失败?
     if(chapterContent == null || chapterContent.isEmpty){
-      DisplayCache.getInstance().put(pageIndex, DisplayPage(DisplayPage.STATUS_ERROR, null,errorMsg: '获取的正文为空，换源吧QAQ',chapterIndex: chapterIndex,currPage: 1,fromEnd: fromEnd,viewPageIndex: pageIndex,));
-      setState(() {
-        //失败?
-      });
       return Future.value(-1);
     }
     //-----------------------成功开始分页,制造显示页面---------------------
