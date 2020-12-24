@@ -49,7 +49,12 @@ class BookContentHelper{
     }
     var content = "";
     try{
+      var counter = 0;
       while(bookUrl!=null){
+        counter ++;
+        if(counter > 10){
+          throw Exception('正文分页超过十页');
+        }
         String htmlString = await _request(requestOptions, bookUrl);
         if(htmlString == null){
           throw Exception('正文请求失败m');
@@ -85,7 +90,6 @@ class BookContentHelper{
     try{
       developer.log('正文请求 $bookUrl');
       var dio = Utils.createDioClient();
-      dio.options.connectTimeout = 10000;
       var response = await dio.get(bookUrl,options: requestOptions);
       if(response.statusCode == 200) {
         return Future.value(response.data);

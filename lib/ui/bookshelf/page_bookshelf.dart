@@ -235,7 +235,7 @@ class _PageBookShelfState extends State<PageBookShelf>
                       HSpace(4),
                       Text(
                         bean.bookAuthor,
-                        style: theme.textTheme.headline6,
+                        style: theme.textTheme.subtitle1,
                       ),
                     ],
                   ),
@@ -247,7 +247,7 @@ class _PageBookShelfState extends State<PageBookShelf>
                       Expanded(
                         child: Text(bean.lastReadChapter ?? '未阅读',
                             overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.headline6),
+                            style: theme.textTheme.subtitle1),
                       ),
                     ],
                   ),
@@ -262,7 +262,7 @@ class _PageBookShelfState extends State<PageBookShelf>
                       Expanded(
                           child: Text(bean.lastChapter ?? '目录为空',
                               overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.headline6)),
+                              style: theme.textTheme.subtitle1)),
                     ],
                   ),
                 ],

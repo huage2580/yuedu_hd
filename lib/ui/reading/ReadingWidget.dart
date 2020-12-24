@@ -64,6 +64,8 @@ class _ReadingWidgetState extends State<ReadingWidget> {
 
   DisplayConfig config;
 
+  String _tocCancelToken;
+
   @override
   void initState() {
     _controller = PageController(initialPage: INIT_PAGE);
@@ -146,6 +148,8 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   @override
   void dispose() {
     super.dispose();
+
+    tocHelper.cancel(_tocCancelToken);
     DisplayCache.getInstance().clear();
     ReloadEvent.getInstance().removeListener(reloadCallBack);
     NextChapterEvent.getInstance().removeListener(nextChapterCallBack);
@@ -200,7 +204,9 @@ class _ReadingWidgetState extends State<ReadingWidget> {
         errorTips = "本地目录为空，正在获取网络数据...";
       });
       //从网络获取章节
-      chaptersList = await tocHelper.updateChapterList(widget.bookId, -1).catchError((e){
+      chaptersList = await tocHelper.updateChapterList(widget.bookId, -1,onCancelToken: (token){
+        _tocCancelToken = token;
+      }).catchError((e){
         setState(() {
           errorTips = "目录加载失败，请重试或换源";
         });
@@ -362,7 +368,8 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     if(displayPage == null) {
       return;
     }
-    ChapterChangedEvent.getInstance().emit(chaptersList[displayPage.chapterIndex].name);
+    var tempChapter = chaptersList[displayPage.chapterIndex];
+    ChapterChangedEvent.getInstance().emit(tempChapter.name,tempChapter.id);
     //更新阅读记录
     if(displayPage.status == DisplayPage.STATUS_SUCCESS){
       DatabaseHelper().updateLastReadChapter(widget.bookId, chaptersList[displayPage.chapterIndex].name,displayPage.currPage);
@@ -413,6 +420,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       notifyPageChanged(INIT_PAGE);
     }
   }
+
 
 
 

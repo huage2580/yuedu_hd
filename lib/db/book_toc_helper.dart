@@ -19,6 +19,7 @@ import 'utils.dart';
 
 
 typedef void OnChaptersLoad(List<BookChapterBean> chapters);
+typedef void OnCancelToken(String cancelToken);
 
 ///目录更新!
 class BookTocHelper{
@@ -29,11 +30,26 @@ class BookTocHelper{
     }
     return _instance;
   }
+
+  var cancelToken = List<String>();
   BookTocHelper._init(){
     //
   }
 
-  Future<List<BookChapterBean>> updateChapterList(int bookId,int sourceId,{bool notUpdateDB = false,onlyLast = false}) async{
+  void cancel(String token){
+    if(token !=null && token.isNotEmpty){
+      cancelToken.add(token);
+    }
+  }
+
+
+  Future<List<BookChapterBean>> updateChapterList(int bookId,int sourceId,{bool notUpdateDB = false,onlyLast = false,OnCancelToken onCancelToken}) async{
+
+    var myCancelToken  = '${DateTime.now()}';
+    if(onCancelToken ==null){
+      onCancelToken = (s){};
+    }
+    onCancelToken(myCancelToken);
     //warmup
     List<BookChapterBean> result = List<BookChapterBean>();
     //1.拿到书源
@@ -58,6 +74,11 @@ class BookTocHelper{
       dio.options.connectTimeout = 10000;
       //解析真正的目录页
       if(infoRuleBean!=null && infoRuleBean.tocUrl!=null && infoRuleBean.tocUrl.isNotEmpty){
+        if(cancelToken.contains(myCancelToken)){
+          cancelToken.remove(myCancelToken);
+          throw Exception('用户取消');
+        }
+
         var response = await dio.get(book.bookUrl,options: requestOptions);
         if(response.statusCode == 200){
           var tocUrl = await Executor().execute(arg1: response.data as String,arg2: infoRuleBean,arg3: bookUrl,fun3: _parseTocUrl);
@@ -71,40 +92,62 @@ class BookTocHelper{
           developer.log('解析真正的目录请求失败 $bookUrl');
         }
       }
+      //剩余的目录分页
+      var tocUrlList = List<String>();
+      tocUrlList.add(bookUrl);
+      //所有的目录分页，为了去重
+      var allTocUrlList = List<String>();
+      allTocUrlList.add(bookUrl);
 
-      while(bookUrl!=null){
-        developer.log('目录请求 $bookUrl');
-        var response = await dio.get(bookUrl,options: requestOptions);
+      while(tocUrlList.isNotEmpty){
+        var curUrl = tocUrlList.removeAt(0);
+        developer.log('目录请求 $curUrl');
+        if(cancelToken.contains(myCancelToken)){
+          cancelToken.remove(myCancelToken);
+          throw Exception('用户取消');
+        }
+        var response = await dio.get(curUrl,options: requestOptions);
+        if(cancelToken.contains(myCancelToken)){
+          cancelToken.remove(myCancelToken);
+          throw Exception('用户取消');
+        }
         if(response.statusCode == 200){
-          developer.log('目录解析 $bookUrl');
-          var chapters = await Executor().execute(arg1: response.data as String,arg2: ruleBean,arg3: bookUrl,fun3: _parseResponse);
-          if(chapters.isEmpty){
-            throw Exception('目录为空');
-          }
+          developer.log('目录解析 $curUrl');
+          var chapters = await Executor().execute(arg1: response.data as String,arg2: ruleBean,arg3: curUrl,fun3: _parseResponse);
           if(ruleBean.nextTocUrl!=null && ruleBean.nextTocUrl.trim().isNotEmpty){
-            var nextUrl = await Executor().execute(arg1: response.data as String,arg2: ruleBean,arg3: bookUrl,fun3: _parseNextUrl);
+            var nextUrl = await Executor().execute(arg1: response.data as String,arg2: ruleBean,arg3: curUrl,fun3: _parseNextUrl);
             if(nextUrl!=null || nextUrl.trim().isNotEmpty){
-              bookUrl = Utils.checkLink(sourceBean.bookSourceUrl, nextUrl).trim();
-            }else{
-              bookUrl = null;
-            }
-          }else{
-            bookUrl = null;
-          }
+              //可能是数组，采用逗号分割
+              var urls = nextUrl.split(',');
+              urls.forEach((element) {
+                var next = Utils.checkLink(sourceBean.bookSourceUrl, element).trim();
+                if(!allTocUrlList.contains(next)){
+                  tocUrlList.add(next);
+                  allTocUrlList.add(next);
+                }
+              });
 
+            }
+          }
           for (var chapter in chapters) {
             chapter.url = Utils.checkLink(sourceBean.bookSourceUrl, chapter.url);
             chapter.bookId = book.id;
             chapter.sourceId = book.source_id;
+          }
+          if(chapters.isEmpty){
+            break;
           }
           if(onlyLast){
             result.add(chapters.last);
           }else{
             result.addAll(chapters);
           }
+          if(result.isEmpty){
+            throw Exception('目录为空');
+          }
           chapters.clear();
         }else if(response.statusCode == 404){//可能是分页的问题,没有后续了
-          bookUrl = null;
+          //pass
         }
         else{
           developer.log('目录解析错误:$bookUrl,网络错误${response.statusCode}');
@@ -114,6 +157,9 @@ class BookTocHelper{
       developer.log('目录解析完成,目录数量:${result.length}');
 
     }catch(e){
+      if(cancelToken.contains(myCancelToken)){
+        cancelToken.remove(myCancelToken);
+      }
       developer.log('$bookUrl 目录解析错误[使用规则${ruleBean.toString()}]:$e');
       return Future.error(e);
     }
@@ -124,7 +170,9 @@ class BookTocHelper{
       result = await DatabaseHelper().queryBookChapters(bookId);
       developer.log('目录二查结束 ${DateTime.now()}');
     }
-
+    if(cancelToken.contains(myCancelToken)){
+      cancelToken.remove(myCancelToken);
+    }
     return Future.value(result);
   }
 
@@ -137,8 +185,8 @@ class BookTocHelper{
   }
 
   ///仅从数据库读取数据
-  dynamic getChapterListOnlyDB(int bookId) async{
-    return await DatabaseHelper().queryBookChapters(bookId);
+  dynamic getChapterListOnlyDB(int bookId,{int from=-1,int limit=99999}) async{
+    return await DatabaseHelper().queryBookChapters(bookId,from: from,limit: limit);
   }
 
   dynamic insertChapterToDB(List<BookChapterBean> list) async{
@@ -162,7 +210,7 @@ List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean,Strin
   developer.log('目录解析开始 ${DateTime.now()}');
   for (var ele in eles) {
     var chapterBean = BookChapterBean();
-    var eParser = HParser(ele.outerHtml);
+    var eParser = HParser.forNode(ele);
     eParser.objectCache = cache;
     eParser.injectArgs = args;
     eParser.jsRuntime = jsCore;

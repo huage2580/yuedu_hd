@@ -32,6 +32,7 @@ class _PageReadingState extends State<PageReading> {
   var showMenuBar = false;
   var initChapterName;
   var currChapterName;
+  var currChapterId;
   var chapterChangedCallBack;
 
   BookInfoBean bookInfo;
@@ -58,6 +59,7 @@ class _PageReadingState extends State<PageReading> {
 
     chapterChangedCallBack = () {
       currChapterName = ChapterChangedEvent.getInstance().chapterName;
+      currChapterId = ChapterChangedEvent.getInstance().chapterId;
       setState(() {});
     };
     ChapterChangedEvent.getInstance().addListener(chapterChangedCallBack);
@@ -230,13 +232,48 @@ class _PageReadingState extends State<PageReading> {
                             onPressed: () {
                               _showSourceSelectDialog(context);
                             }),
-                        IconButton(
-                            icon: Icon(Icons.cloud_download_outlined,
-                                color: theme.accentColor),
-                            onPressed: () {
-                              BookDownloader.getInstance().startDownload(bookId);
-                              BotToast.showText(text:"开始缓存");
-                            }),
+                        PopupMenuButton(
+                          tooltip: '缓存',
+                          onSelected: (i){
+                            switch(i){
+                              case 0:
+                                BookDownloader.getInstance().startDownload(bookId);
+                                break;
+                              case 1:
+                                BookDownloader.getInstance().startDownload(bookId,from: currChapterId);
+                                break;
+                              case 2:
+                                BookDownloader.getInstance().startDownload(bookId,from: currChapterId,limit: 10);
+                                break;
+                            }
+                            BotToast.showText(text:"开始缓存");
+                          },
+                          itemBuilder: (ctx) {
+                            return [
+                              PopupMenuItem(
+                                child: Text('缓存全部'),
+                                value: 0,
+                              ),
+                              PopupMenuItem(
+                                child: Text('当前开始缓存'),
+                                value: 1,
+                              ),
+                              PopupMenuItem(
+                                child: Text('缓存后十章'),
+                                value: 2,
+                              ),
+                            ];
+                          },
+                          child: IgnorePointer(
+                            child: IconButton(
+                                icon: Icon(Icons.cloud_download_outlined,
+                                    color: theme.accentColor),
+                                onPressed: () {
+                                  // BookDownloader.getInstance().startDownload(bookId);
+                                  // BotToast.showText(text:"开始缓存");
+                                }),
+                          ),
+                        ),
                         IconButton(
                             key: _styleMenuKey,
                             icon: Icon(Icons.font_download_outlined,

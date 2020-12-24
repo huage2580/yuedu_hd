@@ -20,10 +20,11 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
   var dbHelper = DatabaseHelper();
 
   var sourceList = List<BookSourceCombBean>();
+  var _cancelTokenList = List<String>();
 
   var _searching = false;
   var _canPostUpdateUI = true;
-  var _countLock = CountLock(3);
+  var _countLock = CountLock(4);
 
   @override
   void initState() {
@@ -35,6 +36,9 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
   @override
   void dispose() {
     BookSearchHelper.getInstance().cancelSearch('source');
+    _cancelTokenList.forEach((element) {
+      BookTocHelper.getInstance().cancel(element);
+    });
     super.dispose();
   }
 
@@ -141,7 +145,9 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
 
   dynamic updateChapter(BookSourceCombBean source) async{
     if(!this.mounted){return;}
-    await BookTocHelper.getInstance().updateChapterList(source.bookid, source.sourceid,notUpdateDB: true,onlyLast: true).then((chapters){
+    await BookTocHelper.getInstance().updateChapterList(source.bookid, source.sourceid,notUpdateDB: true,onlyLast: true,onCancelToken: (token){
+      _cancelTokenList.add(token);
+    }).then((chapters){
       source.lastChapterName = chapters.last.name;
       _countLock.release();
       _wantUpdateList();
@@ -161,7 +167,7 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
       return;
     }
     _canPostUpdateUI = false;
-    Future.delayed(Duration(milliseconds: 2000),(){
+    Future.delayed(Duration(milliseconds: 500),(){
       setState(() {
 
       });

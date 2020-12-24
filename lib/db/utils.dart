@@ -36,7 +36,7 @@ class Utils{
   }
 
   static Dio createDioClient(){
-    var dio = Dio(BaseOptions(connectTimeout: 8000,receiveTimeout: 5000,sendTimeout: 5000,responseType: ResponseType.plain,followRedirects: true));
+    var dio = Dio(BaseOptions(connectTimeout: 15000,receiveTimeout: 5000,sendTimeout: 5000,responseType: ResponseType.plain,followRedirects: true));
     (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client){
       client.badCertificateCallback=(cert, host, port){
         return true;

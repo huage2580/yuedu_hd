@@ -233,7 +233,7 @@ List<Map<String,dynamic>> _parse(Map map){
     for (var bookElement in bookList) {
       var bookInfo = BookInfoBean();
 
-      var bookParser = HParser(bookElement.outerHtml);
+      var bookParser = HParser.forNode(bookElement);
       argsMap['html_string'] = bookElement.outerHtml;
       bookParser.objectCache = objectCache;
       bookParser.injectArgs = argsMap;

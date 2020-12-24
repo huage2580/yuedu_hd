@@ -26,6 +26,8 @@ class BookDetailState extends State<BookDetailWidget> {
   BookInfoBean bookDetail;
   String firstChapter='获取目录中...';
 
+  String _cancelToken = '';
+
   @override
   void initState() {
     super.initState();
@@ -270,12 +272,15 @@ class BookDetailState extends State<BookDetailWidget> {
     if (bookId <= 0) {
       return;
     }
+    BookTocHelper.getInstance().cancel(_cancelToken);
     bookDetail = await DatabaseHelper().queryBookInfoFromBookIdCombSourceId(bookId,-1);
     setState(() {
       firstChapter = '获取中...';
     });
     var chapterList = await BookTocHelper.getInstance()
-        .updateChapterList(bookId, -1, notUpdateDB: false).catchError((e) => null);
+        .updateChapterList(bookId, -1, notUpdateDB: false,onCancelToken: (token){
+          _cancelToken = token;
+    }).catchError((e) => null);
     // for (var value in chapterList) {
     //   print(value.toString());
     // }
@@ -288,6 +293,12 @@ class BookDetailState extends State<BookDetailWidget> {
     setState(() {
 
     });
+  }
+
+  @override
+  void dispose() {
+    BookTocHelper.getInstance().cancel(_cancelToken);
+    super.dispose();
   }
 
   void _showSelectSource(context) async{

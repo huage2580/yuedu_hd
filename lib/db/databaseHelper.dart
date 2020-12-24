@@ -538,7 +538,7 @@ ON "book_chapter" (
   }
 
   ///查询所有章节目录
-  Future<List<BookChapterBean>> queryBookChapters(int bookId) async{
+  Future<List<BookChapterBean>> queryBookChapters(int bookId,{int from=-1,int limit=99999}) async{
     return await withDB().then((db) => db.transaction((txn) async{
       var usedSource = await txn.query(TABLE_BOOK_COMB_SOURCE,where: 'bookid = $bookId and used = 1');
       var usedSourceId = usedSource[0]['sourceid'];
@@ -548,7 +548,7 @@ ON "book_chapter" (
         'url',
         'hasRead',
         'LENGTH(content) as length',
-      ],where: 'bookId = $bookId and sourceId = $usedSourceId');
+      ],where: 'bookId = $bookId and sourceId = $usedSourceId and _id > $from',limit: limit);
       var beanList = query.map((e) => BookChapterBean.fromJson(e)).toList();
       return Future.value(beanList);
     }));

@@ -14,9 +14,11 @@ class ChapterChangedEvent extends ChangeNotifier{
   }
 
   String chapterName;
+  int chapterId;
 
-  void emit(String name){
+  void emit(String name,int cid){
     chapterName = name;
+    chapterId = cid;
     notifyListeners();
   }
 }
