@@ -19,6 +19,15 @@ https://github.com/huage2580/yuedu_hd
 ![2](https://github.com/huage2580/yuedu_hd/raw/master/screenshot/2732x2048bb%201.png)
 ![2](https://github.com/huage2580/yuedu_hd/raw/master/screenshot/2732x2048bb.png)
 
+## windows编译问题
+release 模式可能无法编译  quickjs.c文件，添加上面两行pragma
+```
+#pragma function (ceil)
+#pragma function (floor)
+
+static const JSCFunctionListEntry js_math_funcs[] = {
+```
+
 ## 支持下作者
 ![1](https://github.com/huage2580/yuedu_hd/raw/master/screenshot/IMG_0781(20201217-231645).JPG)
 ![1](https://github.com/huage2580/yuedu_hd/raw/master/screenshot/IMG_0782(20201217-231834).JPG)
