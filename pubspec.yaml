@@ -32,6 +32,7 @@ dependencies:
   yuedu_parser:
     git:
       url: git@github.com:huage2580/reader_parser.git
+      ref: merge_qjs
 
   provider: ^4.3.2+2
   #数据库
