@@ -419,7 +419,7 @@ ON "book_chapter" (
         ''');
         book.chaptersCount = count[0]['chaptersCount'];
         var notReadCount = await txn.rawQuery('''
-        SELECT COUNT(*) AS notReadChapterCount FROM "book_chapter" WHERE book_chapter.bookId = ${book.bookId} AND book_chapter.sourceId = ${book.sourceId} AND _id > (SELECT _id FROM book_chapter WHERE book_chapter.name LIKE '%${book.lastReadChapter??''}%' LIMIT 1)
+        SELECT COUNT(*) AS notReadChapterCount FROM "book_chapter" WHERE book_chapter.bookId = ${book.bookId} AND book_chapter.sourceId = ${book.sourceId} AND _id > (SELECT _id FROM book_chapter WHERE book_chapter.name LIKE '%${book.lastReadChapter??''}%' AND book_chapter.sourceId = ${book.sourceId} LIMIT 1)
         ''');
         book.notReadChapterCount = notReadCount[0]['notReadChapterCount'];
       }
