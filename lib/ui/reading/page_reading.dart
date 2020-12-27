@@ -356,7 +356,7 @@ class _PageReadingState extends State<PageReading> {
   void _showSourceSelectDialog(BuildContext context) async {
     var result = await showDialog(
         context: context,
-        child: Dialog(
+        builder: (ctx)=>Dialog(
           child: WidgetSelectSource(bookId),
         ));
     if (result != null) {

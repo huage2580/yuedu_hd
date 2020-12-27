@@ -302,14 +302,14 @@ class BookDetailState extends State<BookDetailWidget> {
   }
 
   void _showSelectSource(context) async{
-    var result = await showDialog(context:context,child: Dialog(child: WidgetSelectSource(widget.bookId),));
+    var result = await showDialog(context:context,builder: (ctx)=>Dialog(child: WidgetSelectSource(widget.bookId)));
     if(result != null){
       _fetchDetail(widget.bookId);
     }
   }
 
   void _showChapters(BuildContext context)async{
-    var result = await showDialog(context:context,child: Dialog(child: ChaptersWidget(widget.bookId,(bean){
+    var result = await showDialog(context:context,builder: (ctx)=>Dialog(child: ChaptersWidget(widget.bookId,(bean){
 
     }),));
     if(result!=null){

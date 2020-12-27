@@ -49,12 +49,12 @@ class _StyleMenuState extends State<StyleMenu> {
                 children: [
                   Text('滚动方向:',style: theme.textTheme.headline6,),
                   HSpace(16),
-                  GestureDetector(child: Icon(CupertinoIcons.square_split_1x2,size: 40,color: isVerticalScroll?theme.primaryColor:theme.canvasColor,),onTap: (){
+                  GestureDetector(child: Icon(CupertinoIcons.square_split_1x2_fill,size: 40,color: isVerticalScroll?theme.primaryColor:theme.canvasColor,),onTap: (){
                     config.isVertical = 1;
                     _notifyStyleChanged();
                   },),
                   HSpace(16),
-                  GestureDetector(child: Icon(CupertinoIcons.square_split_2x1,size: 40,color: !isVerticalScroll?theme.primaryColor:theme.canvasColor,),onTap: (){
+                  GestureDetector(child: Icon(CupertinoIcons.square_split_2x1_fill,size: 40,color: !isVerticalScroll?theme.primaryColor:theme.canvasColor,),onTap: (){
                     config.isVertical = 0;
                     _notifyStyleChanged();
                   },),
@@ -66,7 +66,7 @@ class _StyleMenuState extends State<StyleMenu> {
                 children: [
                   Text('内容布局:',style: theme.textTheme.headline6,),
                   HSpace(16),
-                  GestureDetector(child: Icon(isIOS?CupertinoIcons.rectangle_fill:CupertinoIcons.rectangle_expand_vertical,size: 40,color: !isTwoPage?theme.primaryColor:theme.canvasColor,),onTap: (){
+                  GestureDetector(child: Icon(CupertinoIcons.rectangle_fill,size: 40,color: !isTwoPage?theme.primaryColor:theme.canvasColor,),onTap: (){
                     config.isSinglePage = 1;
                     _notifyStyleChanged();
                   },),

@@ -121,7 +121,7 @@ class BookTocHelper{
               var urls = nextUrl.split(',');
               urls.forEach((element) {
                 var next = Utils.checkLink(curUrl, element).trim();
-                if(!allTocUrlList.contains(next)){
+                if(next!=null && next.isNotEmpty && !allTocUrlList.contains(next)){
                   tocUrlList.add(next);
                   allTocUrlList.add(next);
                 }
@@ -215,7 +215,8 @@ List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean,Strin
     eParser.injectArgs = args;
     eParser.jsRuntime = jsCore;
     chapterBean.name = eParser.parseRuleString(ruleBean.chapterName).replaceAll('\n', '');//去掉换行符
-    chapterBean.url = eParser.parseRuleString(ruleBean.chapterUrl);
+    var urls = eParser.parseRuleStrings(ruleBean.chapterUrl);
+    chapterBean.url = urls.isNotEmpty?urls[0]:null;
     if(chapterBean.name == null || chapterBean.name.isEmpty){
       continue;
     }
@@ -250,9 +251,9 @@ String _parseNextUrl(String data, BookTocRuleBean ruleBean,String url){
   var cache =  SoupObjectCache();
   parser.objectCache = cache;
   parser.injectArgs = {'baseUrl':url};
-  var result = parser.parseRuleString(ruleBean.nextTocUrl);
+  var result = parser.parseRuleStrings(ruleBean.nextTocUrl);
   cache.destroy();
-  return result;
+  return result.isNotEmpty?result[0]:null;
 }
 
 String _parseTocUrl(String data, BookInfoRuleBean ruleBean,String url){

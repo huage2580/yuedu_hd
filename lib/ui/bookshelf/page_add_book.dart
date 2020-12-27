@@ -321,7 +321,7 @@ class _PageAddBookState extends State<PageAddBook>{
     }
     _canPostUpdateUI = false;
     _searchResultList.sort((a,b){return b.sourceCount.compareTo(a.sourceCount);});
-    Future.delayed(Duration(milliseconds: 1000),(){
+    Future.delayed(Duration(milliseconds: 500),(){
       setState(() {
 
       });
