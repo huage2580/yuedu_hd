@@ -5,7 +5,7 @@ class BookSourceBean{
 
   late int id;
   late String bookSourceName;
-  late String bookSourceGroup;
+  String? bookSourceGroup;
   late String bookSourceUrl;
   late String bookUrlPattern;
   late int bookSourceType;

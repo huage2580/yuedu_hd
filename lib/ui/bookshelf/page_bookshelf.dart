@@ -19,7 +19,7 @@ class _PageBookShelfState extends State<PageBookShelf>
     with SingleTickerProviderStateMixin {
   var _tabController;
 
-  var _bookList = List<BookShelfBean>();
+  List<BookShelfBean> _bookList =[];
   var _tocHelper = BookTocHelper.getInstance();
 
   var currSortType = 1; //0添加顺序，1上次阅读时间
@@ -66,7 +66,7 @@ class _PageBookShelfState extends State<PageBookShelf>
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                     unselectedLabelStyle:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                    labelColor: theme.textTheme.headline6.color,
+                    labelColor: theme.textTheme.headline6!.color,
                   ),
                 ),
                 PopupMenuButton(
@@ -84,7 +84,7 @@ class _PageBookShelfState extends State<PageBookShelf>
                     ];
                   },
                   onSelected: (i) {
-                    currSortType = i;
+                    currSortType = i as int;
                     _fetchBookShelf();
                   },
                   child: IgnorePointer(
@@ -167,7 +167,7 @@ class _PageBookShelfState extends State<PageBookShelf>
     return GestureDetector(
       onTap: () {
         DatabaseHelper().updateBookReadTime(bean.bookId);
-        YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,
+        YDRouter.mainRouter.currentState?.pushNamed(YDRouter.READING_PAGE,
             arguments: {'bookId': bean.bookId}).then((value) {
           _fetchBookShelf();
         }); //更新阅读记录
@@ -185,7 +185,7 @@ class _PageBookShelfState extends State<PageBookShelf>
                 child: Image.network(
                   bean.coverUrl,
                   loadingBuilder: (BuildContext context, Widget child,
-                      ImageChunkEvent loadingProgress) {
+                      ImageChunkEvent? loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Container(
                       height: 120,
@@ -195,7 +195,7 @@ class _PageBookShelfState extends State<PageBookShelf>
                     );
                   },
                   errorBuilder: (BuildContext context, Object exception,
-                      StackTrace stackTrace) {
+                      StackTrace? stackTrace) {
                     return Container(
                       height: 120,
                       width: 100,
@@ -284,7 +284,7 @@ class _PageBookShelfState extends State<PageBookShelf>
 
   dynamic _updateToc() async {
     await _fetchBookShelf();
-    var futureList = List<Future>();
+    List<Future> futureList = [];
     for (var book in _bookList) {
       futureList.add(_tocHelper
           .updateChapterList(book.bookId, book.sourceId)

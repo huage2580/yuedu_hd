@@ -15,14 +15,14 @@ class DisplayPage extends StatelessWidget{
 
 
   final int status;
-  final YDPage text;
-  final YDPage text2;
-  final int chapterIndex;
-  final int currPage;
-  final int maxPage;
-  final int viewPageIndex;//指代在pagerView里面的序号
-  final bool fromEnd;
-  final String errorMsg;
+  final YDPage? text;
+  final YDPage? text2;
+  final int? chapterIndex;
+  final int? currPage;
+  final int? maxPage;
+  final int? viewPageIndex;//指代在pagerView里面的序号
+  final bool? fromEnd;
+  final String? errorMsg;
 
   DisplayPage(this.status, this.text,{this.text2, this.chapterIndex, this.currPage, this.maxPage, this.viewPageIndex, this.fromEnd,this.errorMsg}):super(key: ValueKey(text));
 
@@ -57,7 +57,7 @@ class DisplayPage extends StatelessWidget{
           Text('加载失败/(ㄒoㄒ)/~~\n$errorMsg',style: TextStyle(color: Color(config.textColor)),maxLines: 6,overflow: TextOverflow.ellipsis,textAlign: TextAlign.center,),
           VSpace(20),
           RaisedButton(onPressed: (){
-            ReloadEvent.getInstance().reload(viewPageIndex);
+            ReloadEvent.getInstance().reload(viewPageIndex!);
           },child: Text('重新加载'),)
         ],
       ),

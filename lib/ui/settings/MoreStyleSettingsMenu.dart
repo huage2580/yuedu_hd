@@ -125,7 +125,7 @@ class ColorCircleWidget extends StatelessWidget {
   final Color color;
 
   const ColorCircleWidget(this.color,{
-    Key key
+    Key? key
   }) : super(key: key);
 
   @override

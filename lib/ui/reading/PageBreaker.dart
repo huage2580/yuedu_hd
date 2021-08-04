@@ -18,14 +18,14 @@ class PageBreaker{
   PageBreaker(this.contentString, this.titleString, this.drawSize);
 
   List<YDPage> splitPage(){
-    var results = List<YDPage>();
+    List<YDPage> results = [];
     //当前页面的文字
-    String currText = contentString.text + ' ';//二分缺失的bug，干脆添个空格
+    String currText = contentString.text! + ' ';//二分缺失的bug，干脆添个空格
     //剩余文字
     String overText = '';
 
     while(currText.length > 0){
-      TextPainter titlePainter;
+      TextPainter? titlePainter;
       //计算标题
       if(results.isEmpty){
         titlePainter = TextPainter(text: titleString,textDirection: TextDirection.ltr,textAlign: TextAlign.center);
@@ -64,7 +64,7 @@ class PageBreaker{
       // developer.log('-----------------------------------');
       var textPainter = TextPainter(text: TextSpan(text: currText,style: contentString.style),textDirection: TextDirection.ltr,);
       textPainter.layout(maxWidth: drawSize.width);
-      var tempPage = YDPage(titleOffset,titlePainter, textPainter);
+      var tempPage = YDPage(titleOffset,titlePainter!, textPainter);
       results.add(tempPage);
 
       currText = overText;

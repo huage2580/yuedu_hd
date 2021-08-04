@@ -6,7 +6,7 @@ import 'package:yuedu_hd/ui/reading/DisplayPage.dart';
 
 ///缓存清除的时候，按章节来清除,每次清除都要保证清空了一个章节
 class DisplayCache{
-  static DisplayCache _instance;
+  static DisplayCache? _instance;
   static const MAX_CACHE_CHAPTER = 20;//最多缓存20章内容
   DisplayCache._init(){
     //
@@ -15,16 +15,16 @@ class DisplayCache{
     if(_instance == null){
       _instance = DisplayCache._init();
     }
-    return _instance;
+    return _instance!;
   }
 
   //-----------------限制容量的缓存-----------
   var _cache = LinkedHashMap<int,DisplayPage>();
-  var _chapterList = List<List<int>>();
+  List<List<int>> _chapterList = [];
 
 
   /// maybe null
-  DisplayPage get(int index){
+  DisplayPage? get(int index){
     return _cache[index];
   }
 

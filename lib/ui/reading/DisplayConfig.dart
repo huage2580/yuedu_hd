@@ -21,13 +21,13 @@ class DisplayConfig{
   int isTitleBold = 1;//标题加粗
   int isTextBold = 0;//正文加粗
 
-  static DisplayConfig _default;
+  static DisplayConfig? _default;
 
   static DisplayConfig getDefault(){
     if(_default == null){
       _default = DisplayConfig._();
     }
-    return _default;
+    return _default!;
   }
 
   DisplayConfig._(){
@@ -59,7 +59,7 @@ class DisplayConfig{
   }
 
   Map<String,dynamic> toMap(){
-    Map map = Map<String,dynamic>();
+    var map = Map<String,dynamic>();
     map['isSinglePage'] = isSinglePage;
     map['isVertical'] = isVertical;
     map['marginLeft'] = marginLeft;

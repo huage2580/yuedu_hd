@@ -5,7 +5,7 @@ import 'package:yuedu_hd/ui/reading/PageBreaker.dart';
 
 /// 显示文字的页面，单页，已分页
 class TextPage extends StatelessWidget{
-  final YDPage ydPage;
+  final YDPage? ydPage;
 
   TextPage({this.ydPage}) : super(key: ValueKey(ydPage));
   @override
@@ -13,7 +13,7 @@ class TextPage extends StatelessWidget{
     if(ydPage == null){
       return Center(child: Text(''),);
     }
-    return CustomPaint(painter: YDPainter(ydPage),);
+    return CustomPaint(painter: YDPainter(ydPage!),);
   }
 }
 class YDPainter extends CustomPainter{

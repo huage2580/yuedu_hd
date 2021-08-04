@@ -11,9 +11,9 @@ class NumberPicker extends StatefulWidget{
   final num initialValue;
   final int decimal;//小数点后位数
 
-  const NumberPicker({Key key, this.minValue, this.maxValue, this.initialValue, this.decimal}) : super(key: key);
-  NumberPicker.decimal({Key key, this.minValue, this.maxValue, this.initialValue,this.decimal = 1});
-  NumberPicker.integer({Key key, this.minValue, this.maxValue, this.initialValue,this.decimal = 0});
+  const NumberPicker({Key? key, required this.minValue, required this.maxValue, required this.initialValue, required this.decimal}) : super(key: key);
+  NumberPicker.decimal({Key? key, required this.minValue, required this.maxValue, required this.initialValue,this.decimal = 1});
+  NumberPicker.integer({Key? key, required this.minValue, required this.maxValue, required this.initialValue,this.decimal = 0});
 
   @override
   _NumberPickerState createState() => _NumberPickerState();

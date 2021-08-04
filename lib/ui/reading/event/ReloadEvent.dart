@@ -3,13 +3,13 @@ import 'package:flutter/widgets.dart';
 
 class ReloadEvent extends ChangeNotifier{
 
-  static ReloadEvent _instance;
+  static ReloadEvent? _instance;
 
   static ReloadEvent getInstance(){
     if(_instance == null){
       _instance = ReloadEvent._();
     }
-    return _instance;
+    return _instance!;
   }
 
   ReloadEvent._(){

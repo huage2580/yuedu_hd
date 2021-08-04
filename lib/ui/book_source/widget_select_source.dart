@@ -19,8 +19,8 @@ class WidgetSelectSource extends StatefulWidget{
 class _WidgetSelectSourceState extends State<WidgetSelectSource> {
   var dbHelper = DatabaseHelper();
 
-  var sourceList = List<BookSourceCombBean>();
-  var _cancelTokenList = List<String>();
+  List<BookSourceCombBean> sourceList = [];
+  List<String> _cancelTokenList = [];
 
   var _searching = false;
   var _canPostUpdateUI = true;
@@ -126,14 +126,14 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
       _searching = true;
     });
     var book = await DatabaseHelper().queryBookById(widget.bookId);
-    await BookSearchHelper.getInstance().searchBookFromEnabledSource(book.name, 'source',author: book.author,exactSearch: true,onBookSearch: (b){
+    await BookSearchHelper.getInstance().searchBookFromEnabledSource(book.name!, 'source',author: book.author,exactSearch: true,onBookSearch: (b){
       var index =sourceList.indexWhere((element) => element.sourceid == b.source_id);
       if(index == -1){
         //添加书源
         var t = BookSourceCombBean();
         t.sourceid = b.source_id;
         t.bookid = b.id;
-        t.sourceBean = b.sourceBean;
+        t.sourceBean = b.sourceBean!;
         sourceList.add(t);
         updateChapter(t);
       }
@@ -148,7 +148,7 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
     await BookTocHelper.getInstance().updateChapterList(source.bookid, source.sourceid,notUpdateDB: true,onlyLast: true,onCancelToken: (token){
       _cancelTokenList.add(token);
     }).then((chapters){
-      source.lastChapterName = chapters.last.name;
+      source.lastChapterName = chapters.last.name!;
       _countLock.release();
       _wantUpdateList();
     }).catchError((e){

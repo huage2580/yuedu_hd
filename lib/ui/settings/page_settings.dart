@@ -183,7 +183,7 @@ When using the reading HD network service to conduct online transactions, you wi
   }
 
   void pushTextPage(String title,String text){
-    YDRouter.mainRouter.currentState.push(MaterialPageRoute(builder: (context){
+    YDRouter.mainRouter.currentState?.push(MaterialPageRoute(builder: (context){
       return Scaffold(
         appBar: AppBar(title: Text(title),),
         body: CupertinoScrollbar(

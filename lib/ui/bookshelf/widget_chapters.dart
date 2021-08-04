@@ -9,7 +9,7 @@ typedef ItemCallback = void Function(BookChapterBean chapterBean);
 ///先从数据库读取，再从网络获取
 class ChaptersWidget extends StatefulWidget {
   final int bookId;
-  final String readChapterName;
+  final String? readChapterName;
   final ItemCallback onTap;
 
   ChaptersWidget(this.bookId, this.onTap,{this.readChapterName}) : super(key: ValueKey('$bookId|$readChapterName'));
@@ -19,7 +19,7 @@ class ChaptersWidget extends StatefulWidget {
 }
 
 class _ChaptersWidgetState extends State<ChaptersWidget> {
-  var chaptersList = List<BookChapterBean>();
+  List<BookChapterBean> chaptersList = [];
   var tocHelper = BookTocHelper.getInstance();
   var _showLoading = true;
   var _scrollController = ScrollController();
@@ -123,7 +123,7 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
         break;
       }
     }//for
-    _scrollController.jumpTo(index * _itemKey.currentContext.size.height);
+    _scrollController.jumpTo(index * _itemKey.currentContext!.size!.height);
     setState(() {
 
     });

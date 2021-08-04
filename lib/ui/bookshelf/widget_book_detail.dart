@@ -12,7 +12,7 @@ import 'package:yuedu_hd/ui/widget/space.dart';
 ///书籍详情
 class BookDetailWidget extends StatefulWidget {
   final int bookId;
-  final Function backClick;
+  final Function? backClick;
 
   BookDetailWidget(this.bookId, {this.backClick}) : super(key: ValueKey(bookId));
 
@@ -23,7 +23,7 @@ class BookDetailWidget extends StatefulWidget {
 }
 
 class BookDetailState extends State<BookDetailWidget> {
-  BookInfoBean bookDetail;
+  BookInfoBean? bookDetail;
   String firstChapter='获取目录中...';
 
   String _cancelToken = '';
@@ -70,9 +70,9 @@ class BookDetailState extends State<BookDetailWidget> {
                     child: SizedBox(
                         height: 120,
                         width: 96,
-                        child: Image.network(bookDetail.coverUrl,
+                        child: Image.network(bookDetail!.coverUrl!,
                           loadingBuilder: (BuildContext context, Widget child,
-                              ImageChunkEvent loadingProgress) {
+                              ImageChunkEvent? loadingProgress) {
                             if (loadingProgress == null) return child;
                             return Container(
                               height: 120,
@@ -82,7 +82,7 @@ class BookDetailState extends State<BookDetailWidget> {
                             );
                           },
                           errorBuilder: (BuildContext context, Object exception,
-                              StackTrace stackTrace) {
+                              StackTrace? stackTrace) {
                             return Container(
                               height: 120,
                               width: 100,
@@ -102,7 +102,7 @@ class BookDetailState extends State<BookDetailWidget> {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Text(
-                    bookDetail.name,
+                    bookDetail!.name!,
                     style: theme.textTheme.headline5,
                   ),
                   VSpace(8),
@@ -133,10 +133,10 @@ class BookDetailState extends State<BookDetailWidget> {
                                     onPressed: () async{
                                       await DatabaseHelper().addToBookShelf(widget.bookId);
                                       setState(() {
-                                        bookDetail.inbookShelf = 1;
+                                        bookDetail!.inbookShelf = 1;
                                       });
                                     },
-                                    child: Text(bookDetail.inbookShelf == 0?'加入书架':'已在书架'),
+                                    child: Text(bookDetail!.inbookShelf == 0?'加入书架':'已在书架'),
                                     materialTapTargetSize:
                                         MaterialTapTargetSize.shrinkWrap))),
                         Expanded(
@@ -144,7 +144,7 @@ class BookDetailState extends State<BookDetailWidget> {
                                 height: 50,
                                 child: FlatButton(
                                     onPressed: () {
-                                      YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':bookDetail.id});
+                                      YDRouter.mainRouter.currentState?.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':bookDetail!.id});
                                     },
                                     child: Text('开始阅读'),
                                     color: theme.primaryColor,
@@ -163,7 +163,7 @@ class BookDetailState extends State<BookDetailWidget> {
           Container(
             padding: EdgeInsets.all(8),
             child: IconButton(icon: Icon(CupertinoIcons.back,color: theme.primaryColor,), onPressed: (){
-              widget.backClick();
+              widget.backClick!();
             }),
           ),
       ],
@@ -172,7 +172,7 @@ class BookDetailState extends State<BookDetailWidget> {
 
   Widget _buildTags(BuildContext context) {
     var theme = Theme.of(context);
-    var tags = bookDetail.kind.split('|');
+    var tags = bookDetail!.kind!.split('|');
     return Wrap(
       spacing: 8,
       children: [
@@ -206,7 +206,7 @@ class BookDetailState extends State<BookDetailWidget> {
                 children: [
                   Icon(CupertinoIcons.person_circle,),
                   HSpace(8),
-                  Text('作者: ${bookDetail.author}',style: theme.textTheme.headline6,maxLines: 1,overflow: TextOverflow.ellipsis,),
+                  Text('作者: ${bookDetail!.author}',style: theme.textTheme.headline6,maxLines: 1,overflow: TextOverflow.ellipsis,),
                 ],
               ),
             ),
@@ -216,7 +216,7 @@ class BookDetailState extends State<BookDetailWidget> {
                 children: [
                   Icon(Icons.explore_outlined),
                   HSpace(8),
-                  Expanded(child: Text('来源: ${bookDetail.sourceBean.bookSourceName}',style: theme.textTheme.headline6,maxLines: 1,overflow: TextOverflow.ellipsis,)),
+                  Expanded(child: Text('来源: ${bookDetail!.sourceBean!.bookSourceName}',style: theme.textTheme.headline6,maxLines: 1,overflow: TextOverflow.ellipsis,)),
                   SizedBox(height: 26,width: 60,child: FlatButton(onPressed: (){
                     _showSelectSource(context);
                   }, child: Text('换源'), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,color: theme.primaryColor,textColor: theme.canvasColor,)),
@@ -229,7 +229,7 @@ class BookDetailState extends State<BookDetailWidget> {
                 children: [
                   Icon(CupertinoIcons.bolt_circle),
                   HSpace(8),
-                  Expanded(child: Text('最新章节: ${bookDetail.lastChapter}',style: theme.textTheme.subtitle1,maxLines: 1,overflow: TextOverflow.ellipsis,)),
+                  Expanded(child: Text('最新章节: ${bookDetail!.lastChapter}',style: theme.textTheme.subtitle1,maxLines: 1,overflow: TextOverflow.ellipsis,)),
                 ],
               ),
             ),
@@ -261,7 +261,7 @@ class BookDetailState extends State<BookDetailWidget> {
             //   ),
             // ),
             VSpace(16),
-            Text(bookDetail.intro??'简介为空'),
+            Text(bookDetail?.intro??'简介为空'),
           ],
         ),
       ),
@@ -287,8 +287,8 @@ class BookDetailState extends State<BookDetailWidget> {
     if(chapterList==null || chapterList.isEmpty){
       firstChapter = '目录空,请重试或换源';
     }else{
-      firstChapter = chapterList[0].name;
-      bookDetail.lastChapter = chapterList.last.name;
+      firstChapter = chapterList[0].name!;
+      bookDetail!.lastChapter = chapterList.last.name;
     }
     setState(() {
 
@@ -313,7 +313,7 @@ class BookDetailState extends State<BookDetailWidget> {
 
     }),));
     if(result!=null){
-      YDRouter.mainRouter.currentState.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':widget.bookId,'initChapterName':result});
+      YDRouter.mainRouter.currentState?.pushNamed(YDRouter.READING_PAGE,arguments: {'bookId':widget.bookId,'initChapterName':result});
     }
   }
 
@@ -321,7 +321,7 @@ class BookDetailState extends State<BookDetailWidget> {
 
 
 class _ArcPainter extends CustomPainter {
-  Paint _mPaint;
+  late Paint _mPaint;
 
   @override
   void paint(Canvas canvas, Size size) {

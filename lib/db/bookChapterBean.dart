@@ -9,7 +9,7 @@ class BookChapterBean{
   int bookId=0;
   int sourceId=0;
 
-  int length=0;
+  int? length;
 
   @override
   String toString() {

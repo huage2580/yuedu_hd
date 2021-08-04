@@ -21,7 +21,7 @@ class NetworkImageWithoutAuth extends ImageProvider<NetworkImageWithoutAuth> {
   final double scale;
 
   /// The HTTP headers that will be used with [HttpClient.get] to fetch image from network.
-  final Map<String, String> headers;
+  final Map<String, String>? headers;
 
   @override
   Future<NetworkImageWithoutAuth> obtainKey(ImageConfiguration configuration) {
@@ -54,7 +54,7 @@ class NetworkImageWithoutAuth extends ImageProvider<NetworkImageWithoutAuth> {
     if (bytes.lengthInBytes == 0)
       throw Exception('NetworkImage is an empty file');
 
-    return PaintingBinding.instance.instantiateImageCodec(bytes);
+    return PaintingBinding.instance!.instantiateImageCodec(bytes);
   }
 
   @override

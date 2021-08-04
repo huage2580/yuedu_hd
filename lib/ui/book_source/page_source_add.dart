@@ -16,7 +16,7 @@ class PageSourceAdd extends StatefulWidget{
 class _PageSourceAddState extends State<PageSourceAdd> {
   bool showLoading = false;
   String _log='';
-  TextEditingController _textEditingController;
+  late TextEditingController _textEditingController;
   var isLandscape = false;
 
 
@@ -175,11 +175,11 @@ class _PageSourceAddState extends State<PageSourceAdd> {
     });
     try{
       var jsonStr = await Clipboard.getData(Clipboard.kTextPlain);
-      if(jsonStr.text.startsWith('http')){
-        _textEditingController.text = jsonStr.text;
+      if(jsonStr!.text!.startsWith('http')){
+        _textEditingController.text = jsonStr.text!;
         await _fromNetWork();
       }else{
-        await _parserData(jsonStr.text);
+        await _parserData(jsonStr.text!);
       }
     }catch(e){
       _log += '剪切板解析异常->\n$e\n';

@@ -240,27 +240,27 @@ class HomeState extends State<HomePage> {
     switch(target){
       case PAGE_BOOK:
         setState(() {
-          homeContainerKey.currentState.pushNamedAndRemoveUntil(YDRouter.BOOKSHELF,ModalRoute.withName(YDRouter.BOOKSHELF));
+          homeContainerKey.currentState?.pushNamedAndRemoveUntil(YDRouter.BOOKSHELF,ModalRoute.withName(YDRouter.BOOKSHELF));
         });
         break;
       case PAGE_SOURCE:
         setState(() {
-          homeContainerKey.currentState.pushNamedAndRemoveUntil(YDRouter.BOOK_SOURCE_LIST,ModalRoute.withName(YDRouter.BOOK_SOURCE_LIST));
+          homeContainerKey.currentState?.pushNamedAndRemoveUntil(YDRouter.BOOK_SOURCE_LIST,ModalRoute.withName(YDRouter.BOOK_SOURCE_LIST));
         });
         break;
       case PAGE_EXPLORE:
         setState(() {
-          homeContainerKey.currentState.pushNamedAndRemoveUntil(YDRouter.EXPLORE,ModalRoute.withName(YDRouter.EXPLORE));
+          homeContainerKey.currentState?.pushNamedAndRemoveUntil(YDRouter.EXPLORE,ModalRoute.withName(YDRouter.EXPLORE));
         });
         break;
       case PAGE_SETTINGS:
         setState(() {
-          homeContainerKey.currentState.pushNamedAndRemoveUntil(YDRouter.SETTINGS,ModalRoute.withName(YDRouter.SETTINGS));
+          homeContainerKey.currentState?.pushNamedAndRemoveUntil(YDRouter.SETTINGS,ModalRoute.withName(YDRouter.SETTINGS));
         });
         break;
       case PAGE_DOWNLOAD:
         setState(() {
-          homeContainerKey.currentState.pushNamedAndRemoveUntil(YDRouter.DOWNLOAD,ModalRoute.withName(YDRouter.DOWNLOAD));
+          homeContainerKey.currentState?.pushNamedAndRemoveUntil(YDRouter.DOWNLOAD,ModalRoute.withName(YDRouter.DOWNLOAD));
         });
         break;
 
@@ -293,13 +293,13 @@ class _HomeMenuItem extends StatelessWidget {
   final bool isSelected;
   final IconData icon;
   final String text;
-  final Function onTap;
+  final void Function()? onTap;
   final Orientation orientation;
 
   const _HomeMenuItem(
     this.icon,
     this.text, {
-    Key key,
+    Key? key,
     this.isSelected = false,
     this.onTap,this.orientation = Orientation.landscape,
   }) : super(key: key);
@@ -344,7 +344,7 @@ class _HomeMenuItem extends StatelessWidget {
               child: Text(
             text,
             style: TextStyle(
-                fontSize: themeData.textTheme.headline5.fontSize,
+                fontSize: themeData.textTheme.headline5!.fontSize,
                 color: isSelected ? themeData.primaryColor : null),
           )),
         ],
@@ -368,7 +368,7 @@ class _HomeMenuItem extends StatelessWidget {
           Text(
             text,
             style: TextStyle(
-                fontSize: themeData.textTheme.subtitle2.fontSize,
+                fontSize: themeData.textTheme.subtitle2!.fontSize,
                 color: isSelected ? themeData.primaryColor : null),
           ),
         ],

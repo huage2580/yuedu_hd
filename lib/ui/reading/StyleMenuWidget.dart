@@ -16,7 +16,7 @@ class StyleMenu extends StatefulWidget{
   final OnReadingStyleChanged onReadingStyleChanged;
   final OnMoreClick onMoreClick;
 
-  const StyleMenu({Key key, this.onReadingStyleChanged, this.onMoreClick}) : super(key: key);
+  const StyleMenu({Key? key, required this.onReadingStyleChanged, required this.onMoreClick}) : super(key: key);
   @override
   _StyleMenuState createState() => _StyleMenuState();
 }

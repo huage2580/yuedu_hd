@@ -19,7 +19,7 @@ class PageSourceList extends StatefulWidget {
 }
 
 class _StateSourceList extends State<PageSourceList> {
-  List<BookSourceBean> bookSourceList = List<BookSourceBean>();
+  List<BookSourceBean> bookSourceList = [];
   bool showLoading = true;
   int _selectCount = 0;
   TextEditingController _searchController = TextEditingController();
@@ -62,7 +62,7 @@ class _StateSourceList extends State<PageSourceList> {
                       '添加书源',
                       style: TextStyle(
                           color: theme.primaryColor,
-                          fontSize: theme.textTheme.subtitle2.fontSize),
+                          fontSize: theme.textTheme.subtitle2!.fontSize),
                     )),
               ],
             ),
@@ -140,7 +140,7 @@ class _StateSourceList extends State<PageSourceList> {
         Checkbox(
           value: _selectCount == bookSourceList.length && _selectCount > 0,
           onChanged: (b) {
-            _selectAllSource(b);
+            _selectAllSource(b!);
           },
           activeColor: theme.primaryColor,
         ),
@@ -262,8 +262,8 @@ class _StateSourceList extends State<PageSourceList> {
           value: bean.localSelect,
           onChanged: (b) {
             setState(() {
-              _selectCount += b ? 1 : -1;
-              bean.localSelect = b;
+              _selectCount += b! ? 1 : -1;
+              bean.localSelect = b!;
             });
           },
           activeColor: theme.primaryColor,
@@ -294,7 +294,7 @@ class _StateSourceList extends State<PageSourceList> {
     );
   }
 
-  dynamic _fetchListAndUpdate(String title) async {
+  dynamic _fetchListAndUpdate(String? title) async {
     if (title != null) {
       // _searchController.text = title.trim();
       if (title.trim().isEmpty) {
@@ -336,7 +336,7 @@ class _StateSourceList extends State<PageSourceList> {
     if(_selectCount==0){
       return;
     }
-    var ids = List<int>();
+    List<int> ids = [];
     for (var value in bookSourceList) {
       if(value.localSelect){
         ids.add(value.id);
@@ -351,7 +351,7 @@ class _StateSourceList extends State<PageSourceList> {
     if(_selectCount==0){
       return;
     }
-    var ids = List<int>();
+    List<int> ids = [];
     for (var value in bookSourceList) {
       if(value.localSelect){
         ids.add(value.id);

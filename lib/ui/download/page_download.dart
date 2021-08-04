@@ -26,14 +26,14 @@ class PageDownLoad extends StatelessWidget{
 
 class DownloadInfoWidget extends StatefulWidget{
 
-  const DownloadInfoWidget({Key key}) : super(key: key);
+  const DownloadInfoWidget({Key? key}) : super(key: key);
 
   @override
   _DownloadInfoWidgetState createState() => _DownloadInfoWidgetState();
 }
 
 class _DownloadInfoWidgetState extends State<DownloadInfoWidget> {
-  BookDownloader downloader;
+  late BookDownloader downloader;
   @override
   void initState() {
     downloader = BookDownloader.getInstance();
@@ -57,7 +57,7 @@ class _DownloadInfoWidgetState extends State<DownloadInfoWidget> {
           padding: EdgeInsets.all(isLandscape?16:4),
           child: Row(
             children: [
-              Expanded(child: Text('${downloader.bookInfoBean.name} 待缓存章节: ${downloader.chapters.length}',style: isLandscape?Theme.of(context).textTheme.headline5:null,)),
+              Expanded(child: Text('${downloader.bookInfoBean!.name} 待缓存章节: ${downloader.chapters.length}',style: isLandscape?Theme.of(context).textTheme.headline5:null,)),
               IconButton(icon: Icon(Icons.stop), onPressed: (){
                 downloader.stop();
               })

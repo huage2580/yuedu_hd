@@ -35,7 +35,7 @@ class _PageReadingState extends State<PageReading> {
   var currChapterId;
   var chapterChangedCallBack;
 
-  BookInfoBean bookInfo;
+  BookInfoBean? bookInfo;
   int bookId = -1;
 
   var orientation = Orientation.landscape;
@@ -43,7 +43,7 @@ class _PageReadingState extends State<PageReading> {
   var notchHeight = 0.0;//刘海高度
 
   var _readingWidgetKey = GlobalKey();
-  PopupMenu styleMenu;
+  late PopupMenu styleMenu;
 
   @override
   void initState() {
@@ -69,7 +69,7 @@ class _PageReadingState extends State<PageReading> {
 
   @override
   Widget build(BuildContext context) {
-    var args = ModalRoute.of(context).settings.arguments as Map;
+    var args = ModalRoute.of(context)!.settings.arguments as Map;
     if (bookId == -1) {
       bookId = args['bookId'];
       _fetchBookInfo();
@@ -89,7 +89,7 @@ class _PageReadingState extends State<PageReading> {
       body: GestureDetector(
         onTapUp: (d) {
           var tapX = d.localPosition.dx;
-          var width = sizeKey.currentContext.size.width;
+          var width = sizeKey.currentContext!.size!.width;
           var threshold = width / 3;
           if (tapX < threshold) {
             //上一页
@@ -284,7 +284,7 @@ class _PageReadingState extends State<PageReading> {
                             icon:
                                 Icon(Icons.menu_book, color: theme.accentColor),
                             onPressed: () {
-                              _scaffoldKey.currentState.openEndDrawer();
+                              _scaffoldKey.currentState!.openEndDrawer();
                             }),
                       ],
                     ),
@@ -298,7 +298,7 @@ class _PageReadingState extends State<PageReading> {
               color: theme.canvasColor,
               child: Text(bookInfo == null
                   ? '获取书籍信息...'
-                  : '${bookInfo.name}[${bookInfo.author}] $currChapterName \n${bookInfo.bookUrl}',maxLines: 2,overflow: TextOverflow.ellipsis,),
+                  : '${bookInfo!.name}[${bookInfo!.author}] $currChapterName \n${bookInfo!.bookUrl}',maxLines: 2,overflow: TextOverflow.ellipsis,),
             )
           ],
         ),
@@ -311,7 +311,7 @@ class _PageReadingState extends State<PageReading> {
     var theme = Theme.of(context);
     styleMenu = PopupMenu(
         context: context,
-        contentHeight: min(350, sizeKey.currentContext.size.height-100),
+        contentHeight: min(350, sizeKey.currentContext!.size!.height-100),
         contentWidth: 260,
         backgroundColor: theme.cardColor,
         child: GestureDetector(

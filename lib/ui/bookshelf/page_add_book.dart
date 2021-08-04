@@ -20,7 +20,7 @@ class _PageAddBookState extends State<PageAddBook>{
   var _searchHelper = BookSearchHelper.getInstance();
   bool _canStop = false;
 
-  var _searchResultList = List<BookInfoBean>();
+  List<BookInfoBean> _searchResultList = [];
 
   var _selectBookId = -1;//5 for test,default -1
   var isLandscape = false;
@@ -244,7 +244,7 @@ class _PageAddBookState extends State<PageAddBook>{
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 100,width: 80,child: FadeInImageWithoutAuth.network(infoBean.coverUrl,
+            SizedBox(height: 100,width: 80,child: FadeInImageWithoutAuth.network(infoBean!.coverUrl!,
               // loadingBuilder: (BuildContext context, Widget child,
               //     ImageChunkEvent loadingProgress) {
               //   if (loadingProgress == null) return child;
@@ -269,9 +269,9 @@ class _PageAddBookState extends State<PageAddBook>{
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(infoBean.name,style: TextStyle(fontWeight: FontWeight.bold,fontSize: theme.textTheme.subtitle1.fontSize),),
-                Text(infoBean.author),
-                Text('${infoBean.sourceBean.bookSourceName}等${infoBean.sourceCount}个书源'),
+                Text(infoBean.name!,style: TextStyle(fontWeight: FontWeight.bold,fontSize: theme.textTheme.subtitle1!.fontSize),),
+                Text(infoBean.author!),
+                Text('${infoBean.sourceBean!.bookSourceName}等${infoBean.sourceCount}个书源'),
                 Text(infoBean.intro??'没有简介内容',maxLines: 3,overflow: TextOverflow.ellipsis,softWrap: true,)
               ],
             )),
@@ -292,7 +292,7 @@ class _PageAddBookState extends State<PageAddBook>{
       if(_searchResultList.contains(book)){
         var index = _searchResultList.indexOf(book);
         temp = _searchResultList[index];
-        if(temp.intro==null || temp.intro.isEmpty){//填充简介
+        if(temp.intro==null || temp.intro!.isEmpty){//填充简介
           temp.intro = book.intro;
         }
       }else{

@@ -11,50 +11,50 @@ typedef PopupMenuStateChanged = Function(bool isShow);
 class PopupMenu {
   final double contentWidth;
   final double contentHeight;
-  OverlayEntry _entry;
-  Widget child;
+  OverlayEntry? _entry;
+  Widget? child;
 
   static var arrowHeight = 10.0;
 
   /// The left top point of this menu.
-  Offset _offset;
+  Offset? _offset;
 
   /// Menu will show at above or under this rect
-  Rect _showRect;
+  Rect? _showRect;
 
   /// if false menu is show above of the widget, otherwise menu is show under the widget
   bool _isDown = true;
 
   /// callback
-  VoidCallback dismissCallback;
-  PopupMenuStateChanged stateChanged;
+  VoidCallback? dismissCallback;
+  PopupMenuStateChanged? stateChanged;
 
-  Size _screenSize; // 屏幕的尺寸
+  Size? _screenSize; // 屏幕的尺寸
 
   /// Cannot be null
-  static BuildContext context;
+  static late BuildContext context;
 
   /// style
-  Color _backgroundColor;
+  Color? _backgroundColor;
 
   /// It's showing or not.
   bool _isShow = false;
   bool get isShow => _isShow;
 
   //if it's not full screen, set offset:
-  double offsetX;
+  double offsetX=0;
 
   PopupMenu(
-      {double offsetX,
-        @required this.contentWidth,
-        @required this.contentHeight,
-        BuildContext context,
-        VoidCallback onDismiss,
-        Color backgroundColor,
-        Color highlightColor,
-        Color lineColor,
-        PopupMenuStateChanged stateChanged,
-        Widget child}) {
+      {double? offsetX,
+        required this.contentWidth,
+        required this.contentHeight,
+        required BuildContext context,
+        VoidCallback? onDismiss,
+        Color? backgroundColor,
+        Color? highlightColor,
+        Color? lineColor,
+        PopupMenuStateChanged? stateChanged,
+        Widget? child}) {
     this.offsetX = offsetX ?? 0;
     this.dismissCallback = onDismiss;
     this.stateChanged = stateChanged;
@@ -65,7 +65,7 @@ class PopupMenu {
     }
   }
 
-  void show({Rect rect, GlobalKey widgetKey, Widget child}) {
+  void show({Rect? rect, GlobalKey? widgetKey, Widget? child}) {
     if (rect == null && widgetKey == null) {
       print("'rect' and 'key' can't be both null");
       return;
@@ -73,25 +73,25 @@ class PopupMenu {
 
     this.child = child ?? this.child;
 
-    this._showRect = rect ?? PopupMenu.getWidgetGlobalRect(widgetKey, offsetX);
+    this._showRect = rect ?? PopupMenu.getWidgetGlobalRect(widgetKey!, offsetX);
     this._screenSize = window.physicalSize / window.devicePixelRatio;
     this.dismissCallback = dismissCallback;
 
     _calculatePosition(PopupMenu.context);
 
     _entry = OverlayEntry(builder: (context) {
-      return buildPopupMenuLayout(_offset);
+      return buildPopupMenuLayout(_offset!);
     });
 
-    Overlay.of(PopupMenu.context).insert(_entry);
+    Overlay.of(PopupMenu.context)?.insert(_entry!);
     _isShow = true;
     if (this.stateChanged != null) {
-      this.stateChanged(true);
+      this.stateChanged!(true);
     }
   }
 
   static Rect getWidgetGlobalRect(GlobalKey key, double offsetX) {
-    RenderBox renderBox = key.currentContext.findRenderObject();
+    RenderBox renderBox = (key.currentContext!.findRenderObject() as RenderBox);
     var offset = renderBox.localToGlobal(Offset.zero);
     return Rect.fromLTWH(offset.dx - offsetX, offset.dy, renderBox.size.width,
         renderBox.size.height);
@@ -104,20 +104,20 @@ class PopupMenu {
   }
 
   Offset _calculateOffset(BuildContext context) {
-    double dx = _showRect.left + _showRect.width / 2.0 - menuWidth() / 2.0;
+    double dx = _showRect!.left + _showRect!.width / 2.0 - menuWidth() / 2.0;
     if (dx < 10.0) {
       dx = 10.0;
     }
 
-    if (dx + menuWidth() > _screenSize.width && dx > 10.0) {
-      double tempDx = _screenSize.width - menuWidth() - 10;
+    if (dx + menuWidth() > _screenSize!.width && dx > 10.0) {
+      double tempDx = _screenSize!.width - menuWidth() - 10;
       if (tempDx > 10) dx = tempDx;
     }
 
-    double dy = _showRect.top - menuHeight();
+    double dy = _showRect!.top - menuHeight();
     if (dy <= MediaQuery.of(context).padding.top + 10) {
       // The have not enough space above, show menu under the widget.
-      dy = arrowHeight + _showRect.height + _showRect.top;
+      dy = arrowHeight + _showRect!.height + _showRect!.top;
       _isDown = false;
     } else {
       dy -= arrowHeight;
@@ -207,14 +207,14 @@ class PopupMenu {
 
     print("dismiss...");
 
-    _entry.remove();
+    _entry?.remove();
     _isShow = false;
     if (dismissCallback != null) {
-      dismissCallback();
+      dismissCallback!();
     }
 
     if (this.stateChanged != null) {
-      this.stateChanged(false);
+      this.stateChanged!(false);
     }
   }
 }

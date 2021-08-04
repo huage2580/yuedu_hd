@@ -26,7 +26,7 @@ class ReadingWidget extends StatefulWidget{
   final double notchHeight;
 
 
-  ReadingWidget(this.bookId, this.initChapterName,{this.notchHeight,key}):super(key: key);
+  ReadingWidget(this.bookId, this.initChapterName,{required this.notchHeight,key}):super(key: key);
 
   @override
   _ReadingWidgetState createState() => _ReadingWidgetState();
@@ -39,7 +39,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
 
   var tocHelper = BookTocHelper.getInstance();
   var contentHelper = BookContentHelper.getInstance();
-  var chaptersList = List<BookChapterBean>();
+  List<BookChapterBean> chaptersList = [];
   var currChapterIndex = 0;
   var initChapterId = -1;
   var initChapterName;//章节名
@@ -49,10 +49,10 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   var sizeKey = GlobalKey();
   var size = Size(-1, -1);
 
-  PageController _controller;
+  late PageController _controller;
   var firstPage = INIT_PAGE;
 
-  BookInfoBean bookInfoBean;
+  late BookInfoBean bookInfoBean;
 
   var reloadCallBack;
   var nextChapterCallBack;
@@ -62,9 +62,9 @@ class _ReadingWidgetState extends State<ReadingWidget> {
 
   var errorTips;
 
-  DisplayConfig config;
+  late DisplayConfig config;
 
-  String _tocCancelToken;
+  String? _tocCancelToken;
 
   @override
   void initState() {
@@ -78,7 +78,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     reloadCallBack = () {
       var errorPage = DisplayCache.getInstance().get(ReloadEvent.getInstance().pageIndex);
       print('重新加载...${ReloadEvent.getInstance().pageIndex}');
-      _loadChapter(errorPage.chapterIndex, errorPage.viewPageIndex, errorPage.fromEnd);
+      _loadChapter(errorPage!.chapterIndex!, errorPage!.viewPageIndex!, errorPage.fromEnd!);
     };
     ReloadEvent.getInstance().addListener(reloadCallBack);
     nextChapterCallBack = (){
@@ -90,14 +90,14 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     };
     PreviousChapterEvent.getInstance().addListener(previousChapterCallBack);
     nextPageCallBack = (){
-      var target = _controller.page.ceil() + 1;
+      var target = _controller.page!.ceil() + 1;
       if(DisplayCache.getInstance().get(target)!=null){
         _controller.animateToPage(target,duration: Duration(milliseconds: 300),curve: Curves.ease);
       }
     };
     NextPageEvent.getInstance().addListener(nextPageCallBack);
     previousPageCallBack = (){
-      var target = _controller.page.ceil() - 1;
+      var target = _controller.page!.ceil() - 1;
       if(DisplayCache.getInstance().get(target)!=null){
         _controller.animateToPage(target,duration: Duration(milliseconds: 300),curve: Curves.ease);
       }
@@ -129,7 +129,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
                 if(index < firstPage){
                   return _buildErrorIndex();
                 }
-                return DisplayCache.getInstance().get(index);
+                return DisplayCache.getInstance().get(index)!;
               },controller: _controller,
                 itemCount: MAX_PAGE,onPageChanged: (i){
                   Future.delayed(Duration(milliseconds: 500),(){
@@ -149,7 +149,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   void dispose() {
     super.dispose();
 
-    tocHelper.cancel(_tocCancelToken);
+    tocHelper.cancel(_tocCancelToken!);
     DisplayCache.getInstance().clear();
     ReloadEvent.getInstance().removeListener(reloadCallBack);
     NextChapterEvent.getInstance().removeListener(nextChapterCallBack);
@@ -172,7 +172,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     if(!mounted||sizeKey.currentContext == null){
       return;//横竖屏切换的bug
     }
-    size = Size.copy(sizeKey.currentContext.size);
+    size = Size.copy(sizeKey.currentContext!.size!);
     print(size);
     bookInfoBean = await _fetchBookInfo();
     if(widget.initChapterName == null){
@@ -273,12 +273,12 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     //标题，正文
     var pageBreaker = PageBreaker(
         _generateContentTextSpan(chapterContent),
-        _generateTitleTextSpan(chaptersList[chapterIndex].name),
+        _generateTitleTextSpan(chaptersList[chapterIndex].name!),
         _generateTextPageSize()
     );
     var pagesList = pageBreaker.splitPage();
     //分页完成填充数据
-    var batch = List<int>();
+    List<int> batch = [];
 
     if(config.isSinglePage == 1){
       //------单页------
@@ -362,11 +362,11 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     if(displayPage == null) {
       return;
     }
-    var tempChapter = chaptersList[displayPage.chapterIndex];
-    ChapterChangedEvent.getInstance().emit(tempChapter.name,tempChapter.id);
+    var tempChapter = chaptersList[displayPage.chapterIndex!];
+    ChapterChangedEvent.getInstance().emit(tempChapter.name!,tempChapter.id);
     //更新阅读记录
     if(displayPage.status == DisplayPage.STATUS_SUCCESS){
-      DatabaseHelper().updateLastReadChapter(widget.bookId, chaptersList[displayPage.chapterIndex].name,displayPage.currPage);
+      DatabaseHelper().updateLastReadChapter(widget.bookId, chaptersList[displayPage.chapterIndex!].name!,displayPage.currPage!);
     }
 
     //如果是章节第一页，加载前一章
@@ -375,7 +375,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       if(tempPage==null){
         //没有缓存加载
         print('加载上一章节');
-        _loadChapter(displayPage.chapterIndex-1, index-1, true);
+        _loadChapter(displayPage.chapterIndex!-1, index-1, true);
       }
 
     }
@@ -386,7 +386,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       if(tempPage==null){
         //没有缓存加载
         print('加载下一章节');
-        _loadChapter(displayPage.chapterIndex+1, index+1, false);
+        _loadChapter(displayPage.chapterIndex!+1, index+1, false);
       }
 
     }
@@ -394,22 +394,22 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   }
 
   void _nextChapter() async{
-    var displayPage = DisplayCache.getInstance().get(_controller.page.ceil());
-    if(displayPage.status == DisplayPage.STATUS_SUCCESS && displayPage.chapterIndex < chaptersList.length - 1){
+    var displayPage = DisplayCache.getInstance().get(_controller.page!.ceil());
+    if(displayPage!.status == DisplayPage.STATUS_SUCCESS && displayPage!.chapterIndex! < chaptersList.length - 1){
       DisplayCache.getInstance().clear();
       firstPage = INIT_PAGE;
-      await _loadChapter(displayPage.chapterIndex+1, INIT_PAGE, false);
+      await _loadChapter(displayPage.chapterIndex!+1, INIT_PAGE, false);
       _controller.jumpToPage(INIT_PAGE);
       notifyPageChanged(INIT_PAGE);
     }
   }
 
   void _previousChapter() async{
-    var displayPage = DisplayCache.getInstance().get(_controller.page.ceil());
-    if(displayPage.status == DisplayPage.STATUS_SUCCESS && displayPage.chapterIndex > 0){
+    var displayPage = DisplayCache.getInstance().get(_controller.page!.ceil());
+    if(displayPage!.status == DisplayPage.STATUS_SUCCESS && displayPage.chapterIndex! > 0){
       DisplayCache.getInstance().clear();
       firstPage = INIT_PAGE;
-      await _loadChapter(displayPage.chapterIndex - 1, INIT_PAGE, false);
+      await _loadChapter(displayPage!.chapterIndex! - 1, INIT_PAGE, false);
       _controller.jumpToPage(INIT_PAGE);
       notifyPageChanged(INIT_PAGE);
     }

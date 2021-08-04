@@ -52,6 +52,8 @@ dependencies:
   flutter_colorpicker: ^0.3.4
   #gbk
   fast_gbk: ^0.1.2+1
+  #isolate
+  isolate: ^2.1.1
 
 dev_dependencies:
   sqflite_common_ffi:
