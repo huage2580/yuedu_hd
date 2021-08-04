@@ -1,15 +1,15 @@
 
 
 class BookShelfBean{
-  int bookId;
-  String bookName;
-  String bookAuthor;
-  String coverUrl;
-  String lastChapter;
-  String lastReadChapter;
-  int updatetime;
+  late int bookId;
+  late String bookName;
+  late String bookAuthor;
+  late String coverUrl;
+  late String lastChapter;
+  late String lastReadChapter;
+  late int updatetime;
   //---章节相关---
-  int sourceId;
+  late int sourceId;
   int chaptersCount=0;
   int notReadChapterCount=0;
   int updateChapterCount=0;

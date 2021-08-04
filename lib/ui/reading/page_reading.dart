@@ -85,7 +85,6 @@ class _PageReadingState extends State<PageReading> {
     var theme = Theme.of(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      resizeToAvoidBottomPadding: false,
       key: _scaffoldKey,
       body: GestureDetector(
         onTapUp: (d) {

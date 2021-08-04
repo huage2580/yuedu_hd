@@ -1,15 +1,15 @@
 
 class BookChapterBean{
-  int id;
-  String name;
-  String url;
-  String content;
-  int hasRead;
+  int id=0;
+  String? name;
+  String? url;
+  String? content;
+  int hasRead=0;
 
-  int bookId;
-  int sourceId;
+  int bookId=0;
+  int sourceId=0;
 
-  int length;
+  int length=0;
 
   @override
   String toString() {

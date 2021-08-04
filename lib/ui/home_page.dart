@@ -44,7 +44,6 @@ class HomeState extends State<HomePage> {
     ThemeData themeData = Theme.of(context);
     bool isIOS = Theme.of(context).platform == TargetPlatform.iOS||Theme.of(context).platform == TargetPlatform.macOS;
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
       resizeToAvoidBottomInset: false,
       backgroundColor: themeData.backgroundColor,
       body: OrientationBuilder(builder: (context,orientation){

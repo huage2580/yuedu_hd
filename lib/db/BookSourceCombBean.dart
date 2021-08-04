@@ -2,14 +2,14 @@
 import 'package:yuedu_hd/db/BookSourceBean.dart';
 
 class BookSourceCombBean{
-  int id;
-  int bookid;
-  int sourceid;
-  String bookurl;
-  int used;
+  late int id;
+  late int bookid;
+  late int sourceid;
+  late String bookurl;
+  late int used;
 
-  BookSourceBean sourceBean;
-  String lastChapterName;
+  late BookSourceBean sourceBean;
+  late String lastChapterName;
 
   BookSourceCombBean.fromMap(Map map){
     id = map['_id'];

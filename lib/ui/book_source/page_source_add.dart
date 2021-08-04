@@ -26,7 +26,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
     _textEditingController = TextEditingController();
     // _textEditingController.text = 'https://gitee.com/gekunfei/web/raw/master/myBookshelf/xc1772006';
     if(!kReleaseMode){
-      _textEditingController.text = 'https://gitee.com/vpq/codes/hp702r1y56ekisd4xzjc875/raw?blob_name=sy.json';
+      _textEditingController.text = 'http://yck.mumuceo.com/d/J1vZ1';
     }
   }
 
@@ -35,7 +35,6 @@ class _PageSourceAddState extends State<PageSourceAdd> {
     ThemeData theme = Theme.of(context);
     isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
       resizeToAvoidBottomInset: false,
       body: Container(
         child: Container(

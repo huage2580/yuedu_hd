@@ -9,10 +9,8 @@ import 'package:worker_manager/worker_manager.dart';
 import 'package:yuedu_hd/db/BookSourceBean.dart';
 import 'package:yuedu_hd/db/CountLock.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
-import 'package:yuedu_parser/h_parser/dsoup/soup_object_cache.dart';
-import 'package:yuedu_parser/h_parser/h_eval_parser.dart';
-import 'package:yuedu_parser/h_parser/h_parser.dart';
-import 'package:yuedu_parser/h_parser/jscore/JSRuntime.dart';
+import 'package:reader_parser2/h_parser/h_eval_parser.dart';
+import 'package:reader_parser2/h_parser/h_parser.dart';
 import 'dart:developer' as developer;
 
 import 'BookInfoBean.dart';
@@ -30,16 +28,16 @@ typedef void UpdateList();//批量更新列表，怕太卡了
 ///5.通知数据更新
 ///并发，可取消
 class BookSearchHelper{
-  static BookSearchHelper _instance;
+  static BookSearchHelper? _instance;
   static BookSearchHelper getInstance(){
     if(_instance==null){
       _instance = BookSearchHelper._init();
     }
-    return _instance;
+    return _instance!;
   }
 
   var tokenList = ['none'];
-  Dio dio;
+  late Dio dio;
   var _countLocker = CountLock(8);
 
   BookSearchHelper._init(){
@@ -48,7 +46,7 @@ class BookSearchHelper{
   }
 
   ///
-  dynamic searchBookFromEnabledSource(String key,String cancelToken,{bool exactSearch = false,String author,OnBookSearch onBookSearch,UpdateList updateList}) async{
+  dynamic searchBookFromEnabledSource(String key,String cancelToken,{bool exactSearch = false,String? author,OnBookSearch? onBookSearch,UpdateList? updateList}) async{
     // await Executor().warmUp();
 
     var bookSources = await DatabaseHelper().queryAllBookSourceEnabled();
@@ -58,7 +56,7 @@ class BookSearchHelper{
     }
     tokenList.add(cancelToken);
     //不做分页了
-    var sourcesNotEmpty = List<BookSourceBean>();
+    List<BookSourceBean> sourcesNotEmpty = [];
     for (var value1 in bookSources) {
       if(value1.searchUrl!=null&&value1.searchUrl.isNotEmpty){
         sourcesNotEmpty.add(value1);
@@ -101,8 +99,8 @@ class BookSearchHelper{
   }
 
 
-  Future<dynamic> _request(BookSearchUrlBean options,OnBookSearch onBookSearch,UpdateList updateList) async{
-    var contentType = options.headers['content-type'];
+  Future<dynamic> _request(BookSearchUrlBean options,OnBookSearch? onBookSearch,UpdateList? updateList) async{
+    var contentType = options.headers!['content-type'];
     Options requestOptions = Options(method: options.method,headers: options.headers,contentType:contentType ,sendTimeout: 5000,receiveTimeout: 5000);
     if(options.charset == 'gbk'){
       requestOptions.responseDecoder = Utils.gbkDecoder;
@@ -127,12 +125,12 @@ class BookSearchHelper{
     return Future.value(0);
   }
 
-  dynamic _parseResponse(String response,BookSearchUrlBean options, OnBookSearch onBookSearch) async{
+  dynamic _parseResponse(String response,BookSearchUrlBean options, OnBookSearch? onBookSearch) async{
     int sourceId = options.sourceId;
     var tempTime = DateTime.now();
     developer.log('解析搜索返回内容：$sourceId|$tempTime');
-    BookSourceBean source = await DatabaseHelper().queryBookSourceById(sourceId);
-    var ruleBean = source.mapSearchRuleBean();
+    BookSourceBean? source = await DatabaseHelper().queryBookSourceById(sourceId);
+    var ruleBean = source!.mapSearchRuleBean();
     try{
       //填充需要传输的数据
       var kv = {
@@ -153,26 +151,26 @@ class BookSearchHelper{
       //用线程池执行解析，大概需要400ms
       var tmp = await Executor().execute(arg1:kv,fun1: _parse);
       developer.log('解析搜索返回内容结束：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
-      List<BookInfoBean> bookInfoList = List<BookInfoBean>();
+      List<BookInfoBean> bookInfoList = [];
       for(var t in tmp){
         bookInfoList.add(BookInfoBean.fromMap(t));
       }
       developer.log('解析搜索返回内容完成：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
       for (var bookInfo in bookInfoList) {
         //链接修正
-        bookInfo.bookUrl = Utils.checkLink(options.url, bookInfo.bookUrl);
-        bookInfo.coverUrl = Utils.checkLink(options.url, bookInfo.coverUrl);
+        bookInfo.bookUrl = Utils.checkLink(options.url!, bookInfo.bookUrl);
+        bookInfo.coverUrl = Utils.checkLink(options.url!, bookInfo.coverUrl);
         //-------关联到书源-------------
         bookInfo.source_id = source.id;
         bookInfo.sourceBean = source;
         if(bookInfo.name == null || bookInfo.author == null){
           continue;
         }
-        if(bookInfo.bookUrl == null || bookInfo.bookUrl.isEmpty){
+        if(bookInfo.bookUrl == null || bookInfo.bookUrl!.isEmpty){
           continue;
         }
-        bookInfo.name = bookInfo.name.trim();
-        bookInfo.author = bookInfo.author.trim();
+        bookInfo.name = bookInfo.name!.trim();
+        bookInfo.author = bookInfo.author!.trim();
         if(options.exactSearch){//精确搜索，要求书名和作者完全匹配
           if(bookInfo.name!=options.bookName || bookInfo.author!=options.bookAuthor){
             continue;
@@ -180,7 +178,7 @@ class BookSearchHelper{
         }
         var bookId = await DatabaseHelper().insertBookToDB(bookInfo);
         bookInfo.id = bookId;
-        onBookSearch(bookInfo);
+        onBookSearch!(bookInfo);
       }
     }catch(e){
       developer.log('搜索解析错误[${source.bookSourceName},${source.bookSourceUrl}]:$e');
@@ -212,58 +210,49 @@ List<Map<String,dynamic>> _parse(Map map){
   ruleBean.coverUrl = map['rule_coverUrl'];
 
 
-  List<BookInfoBean> result = List<BookInfoBean>();
+  List<BookInfoBean> result = [];
 
-  var objectCache = SoupObjectCache();
-  var argsMap = {'baseUrl':baseUrl};
-  JSRuntime jsCore = JSRuntime.init(objectCache);
   try{
     var hparser = HParser(response);
-    hparser.objectCache = objectCache;
-    argsMap['html_string'] = response;
-    hparser.injectArgs = argsMap;
-    hparser.jsRuntime = jsCore;
-    var bookList = hparser.parseRuleElements(ruleBean.bookList);
-    for (var bookElement in bookList) {
+
+    var bId = hparser.parseRuleRaw(ruleBean.bookList!);
+    var batchSize = hparser.queryBatchSize(bId);
+    for (var i=0;i<batchSize;i++) {
       var bookInfo = BookInfoBean();
 
-      var bookParser = HParser.forNode(bookElement);
-      argsMap['html_string'] = bookElement.outerHtml;
-      bookParser.objectCache = objectCache;
-      bookParser.injectArgs = argsMap;
-      bookParser.jsRuntime = jsCore;
-
-      bookInfo.name = bookParser.parseRuleString(ruleBean.name);
-      bookInfo.author = bookParser.parseRuleString(ruleBean.author);
-      var kinds = bookParser.parseRuleString(ruleBean.kind);
+      bookInfo.name = hparser.parseRuleStringForParent(bId,ruleBean.name,i);
+      bookInfo.author = hparser.parseRuleStringForParent(bId,ruleBean.author,i);
+      var kinds = hparser.parseRuleStringForParent(bId,ruleBean.kind,i);
       bookInfo.kind = kinds==null?'':kinds.replaceAll('\n','|');
-      bookInfo.intro = bookParser.parseRuleString(ruleBean.intro);
-      bookInfo.lastChapter = bookParser.parseRuleString(ruleBean.lastChapter);
-      bookInfo.wordCount = bookParser.parseRuleString(ruleBean.wordCount);
-      var url = bookParser.parseRuleStrings(ruleBean.bookUrl);
+      bookInfo.intro = hparser.parseRuleStringForParent(bId,ruleBean.intro,i);
+      bookInfo.lastChapter = hparser.parseRuleStringForParent(bId,ruleBean.lastChapter,i);
+      bookInfo.wordCount = hparser.parseRuleStringForParent(bId,ruleBean.wordCount,i);
+      var url = hparser.parseRuleStringsForParent(bId,ruleBean.bookUrl,i);
       bookInfo.bookUrl = url.isNotEmpty?url[0]:null;
       if(bookInfo.bookUrl == null){
-        bookInfo.bookUrl = bookParser.parseRuleString(ruleBean.tocUrl);
+        bookInfo.bookUrl = hparser.parseRuleStringForParent(bId,ruleBean.tocUrl,i);
       }
-      var coverUrl = bookParser.parseRuleStrings(ruleBean.coverUrl);
+      var coverUrl = hparser.parseRuleStringsForParent(bId,ruleBean.coverUrl,i);
       bookInfo.coverUrl = coverUrl.isNotEmpty?coverUrl[0]:null;
       if(bookInfo.name == null || bookInfo.author == null){
         continue;
       }
-      bookInfo.name = bookInfo.name.trim();
-      bookInfo.author = bookInfo.author.trim();
-      if(bookInfo.name.isEmpty || bookInfo.author.isEmpty){
+      bookInfo.name = bookInfo.name!.trim();
+      bookInfo.author = bookInfo.author!.trim();
+      if(bookInfo.name!.isEmpty || bookInfo.author!.isEmpty){
         continue;
       }
       result.add(bookInfo);
-      objectCache.destroy();
     }
+
+    hparser.destoryBatch(bId);
+    hparser.destory();
   }catch(e){
     developer.log('搜索解析错误:$e');
   }
-  jsCore.destroy();
-  objectCache.destroy();
-  var temp = List<Map<String,dynamic>>();
+  // jsCore.destroy();
+  // objectCache.destroy();
+  List<Map<String,dynamic>> temp = [];
   for (var value in result) {
     temp.add(value.toMap());
   }

@@ -38,7 +38,6 @@ class _PageBookShelfState extends State<PageBookShelf>
         MediaQuery.of(context).orientation == Orientation.portrait;
 
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
       resizeToAvoidBottomInset: false,
       body: Container(
         padding: EdgeInsets.all(isPortrait ? 8 : 20),

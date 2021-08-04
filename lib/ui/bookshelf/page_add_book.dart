@@ -47,7 +47,6 @@ class _PageAddBookState extends State<PageAddBook>{
     isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      resizeToAvoidBottomPadding: false,
       body: OrientationBuilder( builder: (context,orientation){
         if(isLandscape){
           return _buildPageLandscape(theme, context);

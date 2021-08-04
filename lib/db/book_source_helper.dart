@@ -5,15 +5,14 @@ import 'dart:convert';
 
 import 'package:yuedu_hd/db/BookSourceBean.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
-import 'package:yuedu_parser/h_parser/regexp_rule.dart';
 
 class BookSourceHelper{
-  static BookSourceHelper _instance;
+  static BookSourceHelper? _instance;
   static BookSourceHelper getInstance(){
     if(_instance == null){
       _instance = BookSourceHelper._init();
     }
-    return _instance;
+    return _instance!;
   }
 
   BookSourceHelper._init(){
@@ -25,7 +24,7 @@ class BookSourceHelper{
   Future<List<BookSourceBean>> parseSourceString(String jsonStr) async{
     _log.clear();
     _log.write('---解析---\n');
-    var result = List<BookSourceBean>();
+    List<BookSourceBean> result = [];
     var sourceList;
     try{
       jsonStr = jsonStr.replaceAll(r",{webView:“true”}'", '');
@@ -83,6 +82,12 @@ class BookSourceHelper{
 
     var itemStr = item.toString();
     if(itemStr.contains('@get:')){
+      return false;
+    }
+    if(itemStr.contains('@js')){
+      return false;
+    }
+    if(itemStr.contains('<js>')){
       return false;
     }
     if(itemStr.contains('java.ajax')){

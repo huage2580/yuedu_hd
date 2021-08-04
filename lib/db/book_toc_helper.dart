@@ -9,10 +9,8 @@ import 'package:yuedu_hd/db/BookInfoBean.dart';
 import 'package:yuedu_hd/db/BookSourceBean.dart';
 import 'package:yuedu_hd/db/bookChapterBean.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
-import 'package:yuedu_parser/h_parser/dsoup/soup_object_cache.dart';
 import 'dart:developer' as developer;
-import 'package:yuedu_parser/h_parser/h_parser.dart';
-import 'package:yuedu_parser/h_parser/jscore/JSRuntime.dart';
+import 'package:reader_parser2/h_parser/h_parser.dart';
 
 
 import 'utils.dart';
@@ -23,15 +21,15 @@ typedef void OnCancelToken(String cancelToken);
 
 ///目录更新!
 class BookTocHelper{
-  static BookTocHelper _instance;
+  static BookTocHelper? _instance;
   static BookTocHelper getInstance(){
     if(_instance == null){
       _instance = BookTocHelper._init();
     }
-    return _instance;
+    return _instance!;
   }
 
-  var cancelToken = List<String>();
+  var cancelToken = [];
   BookTocHelper._init(){
     //
   }
@@ -43,7 +41,7 @@ class BookTocHelper{
   }
 
 
-  Future<List<BookChapterBean>> updateChapterList(int bookId,int sourceId,{bool notUpdateDB = false,onlyLast = false,OnCancelToken onCancelToken}) async{
+  Future<List<BookChapterBean>> updateChapterList(int bookId,int sourceId,{bool notUpdateDB = false,onlyLast = false,OnCancelToken? onCancelToken}) async{
 
     var myCancelToken  = '${DateTime.now()}';
     if(onCancelToken ==null){
@@ -51,29 +49,29 @@ class BookTocHelper{
     }
     onCancelToken(myCancelToken);
     //warmup
-    List<BookChapterBean> result = List<BookChapterBean>();
+    List<BookChapterBean> result = [];
     //1.拿到书源
     //2.书链接
     BookInfoBean book = await DatabaseHelper().queryBookInfoFromBookIdCombSourceId(bookId, sourceId);
-    BookSourceBean sourceBean = book.sourceBean;
-    BookTocRuleBean ruleBean = book.sourceBean.mapTocRuleBean();
-    BookInfoRuleBean infoRuleBean;
-    if(book.sourceBean.ruleBookInfo!=null && book.sourceBean.ruleBookInfo.isNotEmpty){
-      infoRuleBean = book.sourceBean.mapInfoRuleBean();
+    BookSourceBean sourceBean = book.sourceBean!;
+    BookTocRuleBean ruleBean = book.sourceBean!.mapTocRuleBean();
+    BookInfoRuleBean? infoRuleBean;
+    if(book.sourceBean?.ruleBookInfo!=null && book.sourceBean!.ruleBookInfo.isNotEmpty){
+      infoRuleBean = book.sourceBean?.mapInfoRuleBean();
     }
-    var charset = sourceBean.mapSearchUrlBean().charset;
+    var charset = sourceBean.mapSearchUrlBean()?.charset;
     Options requestOptions = Options(contentType:ContentType.html.toString() ,sendTimeout: 10000,receiveTimeout: 10000);
     if(charset == 'gbk'){
       requestOptions.responseDecoder = Utils.gbkDecoder;
     }
     //3.请求网络
-    var bookUrl = book.bookUrl;
+    var bookUrl = book.bookUrl!;
 
     try{
       var dio = Utils.createDioClient();
       dio.options.connectTimeout = 10000;
       //解析真正的目录页
-      if(infoRuleBean!=null && infoRuleBean.tocUrl!=null && infoRuleBean.tocUrl.isNotEmpty){
+      if(infoRuleBean!=null && infoRuleBean.tocUrl!=null && infoRuleBean.tocUrl!.isNotEmpty){
         if(cancelToken.contains(myCancelToken)){
           cancelToken.remove(myCancelToken);
           throw Exception('用户取消');
@@ -85,7 +83,7 @@ class BookTocHelper{
           developer.log('解析真正的目录请求[$bookUrl] 结果[$tocUrl] 规则[${infoRuleBean.tocUrl}]');
           bookUrl = Utils.checkLink(bookUrl, tocUrl);
           if(bookUrl.isEmpty){
-            bookUrl = book.bookUrl;
+            bookUrl = book.bookUrl!;
           }
         }
         else{
@@ -93,10 +91,10 @@ class BookTocHelper{
         }
       }
       //剩余的目录分页
-      var tocUrlList = List<String>();
+      var tocUrlList = [];
       tocUrlList.add(bookUrl);
       //所有的目录分页，为了去重
-      var allTocUrlList = List<String>();
+      var allTocUrlList = [];
       allTocUrlList.add(bookUrl);
 
       while(tocUrlList.isNotEmpty){
@@ -113,12 +111,12 @@ class BookTocHelper{
         }
         if(response.statusCode == 200){
           developer.log('目录解析 $curUrl');
-          var chapters = await Executor().execute(arg1: response.data as String,arg2: ruleBean,arg3: curUrl,fun3: _parseResponse);
-          if(ruleBean.nextTocUrl!=null && ruleBean.nextTocUrl.trim().isNotEmpty){
+          var chapters = await Executor().execute(arg1: response.data as String,arg2: ruleBean,arg3: curUrl as String,fun3: _parseResponse);
+          if(ruleBean?.nextTocUrl!=null && ruleBean!.nextTocUrl!.trim().isNotEmpty){
             var nextUrl = await Executor().execute(arg1: response.data as String,arg2: ruleBean,arg3: curUrl,fun3: _parseNextUrl);
-            if(nextUrl!=null || nextUrl.trim().isNotEmpty){
+            if(nextUrl!=null || nextUrl!.trim().isNotEmpty){
               //可能是数组，采用逗号分割
-              var urls = nextUrl.split(',');
+              var urls = nextUrl!.split(',');
               urls.forEach((element) {
                 var next = Utils.checkLink(curUrl, element).trim();
                 if(next!=null && next.isNotEmpty && !allTocUrlList.contains(next)){
@@ -130,7 +128,7 @@ class BookTocHelper{
             }
           }
           for (var chapter in chapters) {
-            chapter.url = Utils.checkLink(curUrl, chapter.url);
+            chapter.url = Utils.checkLink(curUrl, chapter.url!);
             chapter.bookId = book.id;
             chapter.sourceId = book.source_id;
           }
@@ -197,33 +195,24 @@ class BookTocHelper{
 
 List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean,String url){
   var parser = HParser(data);
-  var cache =  SoupObjectCache();
-  JSRuntime jsCore = JSRuntime.init(cache);
-  var args = {'baseUrl':url};
-  parser.objectCache = cache;
-  parser.injectArgs = args;
-  //复用jsCore
-  parser.jsRuntime = jsCore;
 
-  var result = List<BookChapterBean>();
-  var eles = parser.parseRuleElements(ruleBean.chapterList);
+  List<BookChapterBean> result = [];
+  // var eles = parser.parseRuleElements(ruleBean.chapterList);
+  var batchId = parser.parseRuleRaw(ruleBean.chapterList!);
   developer.log('目录解析开始 ${DateTime.now()}');
-  for (var ele in eles) {
+  var batchSize = parser.queryBatchSize(batchId);
+  for (var i=0;i<batchSize;i++) {
     var chapterBean = BookChapterBean();
-    var eParser = HParser.forNode(ele);
-    eParser.objectCache = cache;
-    eParser.injectArgs = args;
-    eParser.jsRuntime = jsCore;
-    chapterBean.name = eParser.parseRuleString(ruleBean.chapterName).replaceAll('\n', '');//去掉换行符
-    var urls = eParser.parseRuleStrings(ruleBean.chapterUrl);
+    chapterBean.name = parser.parseRuleStringForParent(batchId,ruleBean.chapterName,i)?.replaceAll('\n', '');//去掉换行符
+    var urls = parser.parseRuleStringsForParent(batchId,ruleBean.chapterUrl,i);
     chapterBean.url = urls.isNotEmpty?urls[0]:null;
-    if(chapterBean.name == null || chapterBean.name.isEmpty){
+    if(chapterBean.name == null || chapterBean.name!.isEmpty){
       continue;
     }
     result.add(chapterBean);
-    cache.destroy();
   }
-  jsCore.destroy();
+  parser.destoryBatch(batchId);
+  parser.destory();
   developer.log('目录解析结束 ${DateTime.now()}');
   if(result.isNotEmpty){
     if(result.lastIndexOf(result[0]) > 0){
@@ -241,27 +230,21 @@ List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean,Strin
   // for(var t in result){
   //   developer.log(t.toString());
   // }
-  cache.destroy();
+  // cache.destroy();
   developer.log('解析的总目录${result.length}');
   return result;
 }
 
-String _parseNextUrl(String data, BookTocRuleBean ruleBean,String url){
+String? _parseNextUrl(String data, BookTocRuleBean ruleBean,String url){
   var parser = HParser(data);
-  var cache =  SoupObjectCache();
-  parser.objectCache = cache;
-  parser.injectArgs = {'baseUrl':url};
   var result = parser.parseRuleStrings(ruleBean.nextTocUrl);
-  cache.destroy();
+  parser.destory();
   return result.isNotEmpty?result[0]:null;
 }
 
-String _parseTocUrl(String data, BookInfoRuleBean ruleBean,String url){
+String? _parseTocUrl(String data, BookInfoRuleBean ruleBean,String url){
   var parser = HParser(data);
-  var cache =  SoupObjectCache();
-  parser.objectCache = cache;
-  parser.injectArgs = {'baseUrl':url};
   var result = parser.parseRuleStrings(ruleBean.tocUrl);
-  cache.destroy();
+  parser.destory();
   return result.isNotEmpty?result[0]:null;
 }

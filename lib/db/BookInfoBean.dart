@@ -2,23 +2,23 @@
 import 'package:yuedu_hd/db/BookSourceBean.dart';
 
 class BookInfoBean{
-  int id;
-  String name;
-  String author;
-  String bookUrl;
-  String coverUrl;
-  String intro;
-  String kind;
-  String lastChapter;
-  String wordCount;
-  String lastReadChapter;
+  int id=0;
+  String? name;
+  String? author;
+  String? bookUrl;
+  String? coverUrl;
+  String? intro;
+  String? kind;
+  String? lastChapter;
+  String? wordCount;
+  String? lastReadChapter;
   int groupId = -1;
   int inbookShelf = 0;
   int lastReadPage = 1;
 
   //关联的书源
-  int source_id;
-  BookSourceBean sourceBean;
+  int source_id = -1;
+  BookSourceBean? sourceBean;
   int sourceCount = 0;
 
 

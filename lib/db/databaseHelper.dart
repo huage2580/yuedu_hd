@@ -138,9 +138,9 @@ ON "book_chapter" (
 
 
   //----------------------------------------------------------------------
-  static DatabaseHelper _instance;
+  static DatabaseHelper? _instance;
 
-  Database _database;
+  Database? _database;
 
   static _getInstance() {
     if (_instance == null) {
@@ -267,7 +267,7 @@ ON "book_chapter" (
   }
 
   /// 全部书源
-  Future<List<BookSourceBean>> queryAllBookSource({String title}) async {
+  Future<List<BookSourceBean>> queryAllBookSource({String? title}) async {
     var db = await withDB();
     var result = await db.query(TABLE_SOURCE,
         where: title != null ? "bookSourceName LIKE '%$title%'" : null);
@@ -284,7 +284,7 @@ ON "book_chapter" (
     return Future.value(beanList.toList());
   }
 
-  Future<BookSourceBean> queryBookSourceById(int id) async{
+  Future<BookSourceBean?> queryBookSourceById(int id) async{
     return await withDB().then((db) => db.query(TABLE_SOURCE,where: '_id = $id').then((value){
       if(value.isEmpty){return null;}
       return BookSourceBean.fromJson(value[0]);
@@ -296,7 +296,7 @@ ON "book_chapter" (
     var args = ids.fold(
         '0',
             (previousValue, element) =>
-        previousValue += (',' + element.toString()));
+        previousValue = (previousValue as String) + ',' + element.toString());
     return await withDB().then((db) => db.transaction((txn) async{
       await txn.delete(TABLE_SOURCE, where: '_id in ($args)');
       await txn.delete(TABLE_BOOK_COMB_SOURCE,where: 'sourceid in ($args)');
@@ -311,7 +311,7 @@ ON "book_chapter" (
     var args = ids.fold(
         '0',
             (previousValue, element) =>
-        previousValue += (',' + element.toString()));
+        previousValue = (previousValue as String) + (',' + element.toString()));
     return await withDB().then((db) => db.update(TABLE_SOURCE, {'enabled':enabled?1:0},where: '_id in ($args)'));
   }
   //-------------书籍管理-----------------
@@ -343,16 +343,16 @@ ON "book_chapter" (
       var id = bookBean['_id'];
       //check need Update
       var updateKV = Map<String,dynamic>();
-      if(infoBean.lastChapter != null && infoBean.lastChapter.isNotEmpty){
+      if(infoBean.lastChapter != null && infoBean.lastChapter!.isNotEmpty){
         updateKV['lastChapter'] = infoBean.lastChapter;
       }
-      if(infoBean.wordCount != null && infoBean.wordCount.isNotEmpty){
+      if(infoBean.wordCount != null && infoBean.wordCount!.isNotEmpty){
         updateKV['wordCount'] = infoBean.wordCount;
       }
-      if(bookBean['coverUrl'] == null || bookBean['coverUrl'].isEmpty){
+      if(bookBean['coverUrl'] == null || (bookBean['coverUrl'] as String).isEmpty){
         updateKV['coverUrl'] = infoBean.coverUrl;
       }
-      if(bookBean['intro'] == null || bookBean['intro'].isEmpty){
+      if(bookBean['intro'] == null || (bookBean['intro'] as String).isEmpty){
         updateKV['intro'] = infoBean.intro;
       }
 
@@ -417,11 +417,11 @@ ON "book_chapter" (
         var count = await txn.rawQuery('''
         SELECT COUNT(*) AS chaptersCount FROM "book_chapter" WHERE book_chapter.bookId = ${book.bookId} AND book_chapter.sourceId = ${book.sourceId}
         ''');
-        book.chaptersCount = count[0]['chaptersCount'];
+        book.chaptersCount = count[0]['chaptersCount'] as int;
         var notReadCount = await txn.rawQuery('''
         SELECT COUNT(*) AS notReadChapterCount FROM "book_chapter" WHERE book_chapter.bookId = ${book.bookId} AND book_chapter.sourceId = ${book.sourceId} AND _id > (SELECT _id FROM book_chapter WHERE book_chapter.name LIKE '%${book.lastReadChapter??''}%' AND book_chapter.sourceId = ${book.sourceId} LIMIT 1)
         ''');
-        book.notReadChapterCount = notReadCount[0]['notReadChapterCount'];
+        book.notReadChapterCount = notReadCount[0]['notReadChapterCount'] as int;
       }
       return Future.value(bookList);
     })
@@ -447,23 +447,23 @@ ON "book_chapter" (
       if(usedSourceId <= 0){//未指定书源，先查出所有能用的书源
         for (var value in bookComb) {
           if(value['used'] == 1){
-            bookInfo.bookUrl = value['bookurl'];
-            usedSourceId = value['sourceid'];
+            bookInfo.bookUrl = value['bookurl'] as String;
+            usedSourceId = value['sourceid'] as int;
             break;
           }
         }
         //没有指定默认书源,先把第一个指定成默认书源
         if(bookInfo.bookUrl == null){
           var comb = bookComb[0];
-          usedSourceId = comb['sourceid'];
+          usedSourceId = comb['sourceid'] as int;
           var combId = comb['_id'];
           await txn.update(TABLE_BOOK_COMB_SOURCE, {'used':1},where: '_id = ?',whereArgs: [combId]);
-          bookInfo.bookUrl = comb['bookurl'];
+          bookInfo.bookUrl = comb['bookurl'] as String;
         }
       }//check sources
       else{//指定了书源
         var query = await txn.query(TABLE_BOOK_COMB_SOURCE,where: 'sourceid = $usedSourceId and bookid = $bookId');
-        bookInfo.bookUrl = query[0]['bookurl'];
+        bookInfo.bookUrl = query[0]['bookurl'] as String;
       }
 
       var sourceList = await txn.query(TABLE_SOURCE,where: '_id = $usedSourceId').then((list) => list.map((e) => BookSourceBean.fromJson(e)).toList());
@@ -520,7 +520,7 @@ ON "book_chapter" (
       	AND book_sources.enabled = 1
       ''');
     } );
-    var result = List<BookSourceCombBean>();
+    var result = [];
     for (var data in queryResult) {
       var info = BookSourceCombBean.fromMap(data);
       info.sourceBean = BookSourceBean.fromJson(data);//id会出错,不能使用里面的id
@@ -562,9 +562,9 @@ ON "book_chapter" (
   Future<String> queryChapterContent(int chapterId) async{
     return await withDB().then((db) => db.query(TABLE_CHAPTER,columns: ['content'],where: '_id = $chapterId')).then((value){
       if(value.isEmpty){
-        return null;
+        return "";
       }
-      return value[0]['content'];
+      return value[0]['content'] as String;
     });
   }
 
@@ -584,7 +584,7 @@ ON "book_chapter" (
   ///查询章节的地址
   Future<String> queryChapterUrl(int chapterId) async{
     return withDB().then((db) => db.query(TABLE_CHAPTER,columns: ['url'],where: '_id = $chapterId'))
-        .then((value) => value[0]['url']);
+        .then((value) => value[0]['url'] as String);
   }
 
   ///更新章节内容

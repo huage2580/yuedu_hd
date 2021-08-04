@@ -37,7 +37,6 @@ class _StateSourceList extends State<PageSourceList> {
     isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     ThemeData theme = Theme.of(context);
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
       resizeToAvoidBottomInset: false,
       body: Container(
         padding: EdgeInsets.all(isLandscape?20:4),

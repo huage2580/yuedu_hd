@@ -3,26 +3,26 @@ import 'dart:convert';
 
 class BookSourceBean{
 
-  int id;
-  String bookSourceName;
-  String bookSourceGroup;
-  String bookSourceUrl;
-  String bookUrlPattern;
-  int bookSourceType;
-  bool enabled;
-  bool enabledExplore;
-  String header;
-  String loginUrl;
-  String bookSourceComment;
-  num lastUpdateTime;
-  int weight;
-  String exploreUrl;
-  String ruleExplore;//json
-  String searchUrl;
-  String ruleSearch;//json
-  String ruleBookInfo;//json
-  String ruleToc;//json
-  String ruleContent;//json
+  late int id;
+  late String bookSourceName;
+  late String bookSourceGroup;
+  late String bookSourceUrl;
+  late String bookUrlPattern;
+  late int bookSourceType;
+  late bool enabled;
+  late bool enabledExplore;
+  late String header;
+  late String loginUrl;
+  late String bookSourceComment;
+  late num lastUpdateTime;
+  late int weight;
+  late String exploreUrl;
+  late String ruleExplore;//json
+  late String searchUrl;
+  late String ruleSearch;//json
+  late String ruleBookInfo;//json
+  late String ruleToc;//json
+  late String ruleContent;//json
 
   //--------
   bool localSelect = false;
@@ -123,7 +123,7 @@ class BookSourceBean{
   }
 
 
-  BookSearchUrlBean mapSearchUrlBean(){
+  BookSearchUrlBean? mapSearchUrlBean(){
     if(searchUrl == null || searchUrl.isEmpty){
       return null;
     }
@@ -136,8 +136,8 @@ class BookSourceBean{
       temp.add(searchUrl.substring(index+1));
     }
     bean.url = temp[0];
-    if(!bean.url.startsWith('http')){
-      bean.url = bookSourceUrl + bean.url;
+    if(!bean.url!.startsWith('http')){
+      bean.url = bookSourceUrl + bean.url!;
     }
     bean.method = 'GET';
     bean.charset = 'utf8';
@@ -155,7 +155,7 @@ class BookSourceBean{
       bean.method = map['method']==null?'GET':map['method'];
       try{
         bean.headers = map['headers']==null?{}:jsonDecode(map['headers']);
-        if(bean.method == 'POST' && bean.headers.isEmpty){
+        if(bean.method == 'POST' && bean.headers!.isEmpty){
           bean.headers = {'content-type':r"application/x-www-form-urlencoded"};
         }
       }catch(e){
@@ -163,7 +163,7 @@ class BookSourceBean{
       }
       bean.body = map['body'];
       bean.charset = map['charset']==null?'utf8':map['charset'];
-      if(bean.charset.startsWith('gb')){
+      if(bean.charset!.startsWith('gb')){
         bean.charset = 'gbk';
       }else{
         bean.charset = 'utf8';
@@ -219,17 +219,17 @@ class BookSourceBean{
 }
 
 class BookSearchUrlBean{
-  String url;
-  Map<String,String> headers;
-  String method;
-  String body;
-  String charset;
-  int sourceId;
+  String? url;
+  Map<String,String>? headers;
+  String? method;
+  String? body;
+  String? charset;
+  int sourceId=0;
 
   //参数
   bool exactSearch = false;
-  String bookName;
-  String bookAuthor;
+  String? bookName;
+  String? bookAuthor;
 
   @override
   String toString() {
@@ -241,16 +241,16 @@ class BookSearchUrlBean{
 
 
 class BookSearchRuleBean{
-  String name;
-  String author;
-  String bookList;
-  String bookUrl;
-  String coverUrl;
-  String intro;
-  String kind;
-  String lastChapter;
-  String wordCount;
-  String tocUrl;
+  String? name;
+  String? author;
+  String? bookList;
+  String? bookUrl;
+  String? coverUrl;
+  String? intro;
+  String? kind;
+  String? lastChapter;
+  String? wordCount;
+  String? tocUrl;
 
   @override
   String toString() {
@@ -259,10 +259,10 @@ class BookSearchRuleBean{
 }
 
 class BookTocRuleBean{
-  String chapterList;
-  String chapterName;
-  String chapterUrl;
-  String nextTocUrl;
+  String? chapterList;
+  String? chapterName;
+  String? chapterUrl;
+  String? nextTocUrl;
 
   @override
   String toString() {
@@ -272,9 +272,9 @@ class BookTocRuleBean{
 
 
 class BookContentRuleBean{
-  String content;
-  String nextContentUrl;
-  String replaceRegex;
+  String? content;
+  String? nextContentUrl;
+  String? replaceRegex;
 
   @override
   String toString() {
@@ -283,9 +283,9 @@ class BookContentRuleBean{
 }
 
 class BookInfoRuleBean{
-  String intro;
-  String coverUrl;
-  String tocUrl;
+  String? intro;
+  String? coverUrl;
+  String? tocUrl;
 
   @override
   String toString() {
