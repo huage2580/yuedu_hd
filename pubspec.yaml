@@ -39,19 +39,19 @@ dependencies:
   #数据库
   sqflite: ^2.0.0+3
   #网络请求
-  dio: 3.0.10
+  dio: 4.0.0
   # 线程管理
   worker_manager: ^4.2.2
   # 可拖动的scrollbar
-  draggable_scrollbar: ^0.0.4
+  draggable_scrollbar: ^0.1.0
   # gridView
   waterfall_flow: any
   # toast
-  bot_toast: ^3.0.5
+  bot_toast: ^4.0.1
   # 颜色选择
-  flutter_colorpicker: ^0.3.4
+  flutter_colorpicker: ^0.4.0
   #gbk
-  fast_gbk: ^0.1.2+1
+  fast_gbk: ^1.0.0-rc
   #isolate
   isolate: ^2.1.1
 

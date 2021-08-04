@@ -78,7 +78,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     reloadCallBack = () {
       var errorPage = DisplayCache.getInstance().get(ReloadEvent.getInstance().pageIndex);
       print('重新加载...${ReloadEvent.getInstance().pageIndex}');
-      _loadChapter(errorPage!.chapterIndex!, errorPage!.viewPageIndex!, errorPage.fromEnd!);
+      _loadChapter(errorPage!.chapterIndex!, errorPage.viewPageIndex!, errorPage.fromEnd!);
     };
     ReloadEvent.getInstance().addListener(reloadCallBack);
     nextChapterCallBack = (){
@@ -366,7 +366,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     ChapterChangedEvent.getInstance().emit(tempChapter.name!,tempChapter.id);
     //更新阅读记录
     if(displayPage.status == DisplayPage.STATUS_SUCCESS){
-      DatabaseHelper().updateLastReadChapter(widget.bookId, chaptersList[displayPage.chapterIndex!].name!,displayPage.currPage!);
+      DatabaseHelper().updateLastReadChapter(widget.bookId, chaptersList[displayPage.chapterIndex!].name,displayPage.currPage!);
     }
 
     //如果是章节第一页，加载前一章
@@ -395,7 +395,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
 
   void _nextChapter() async{
     var displayPage = DisplayCache.getInstance().get(_controller.page!.ceil());
-    if(displayPage!.status == DisplayPage.STATUS_SUCCESS && displayPage!.chapterIndex! < chaptersList.length - 1){
+    if(displayPage!.status == DisplayPage.STATUS_SUCCESS && displayPage.chapterIndex! < chaptersList.length - 1){
       DisplayCache.getInstance().clear();
       firstPage = INIT_PAGE;
       await _loadChapter(displayPage.chapterIndex!+1, INIT_PAGE, false);
@@ -409,7 +409,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     if(displayPage!.status == DisplayPage.STATUS_SUCCESS && displayPage.chapterIndex! > 0){
       DisplayCache.getInstance().clear();
       firstPage = INIT_PAGE;
-      await _loadChapter(displayPage!.chapterIndex! - 1, INIT_PAGE, false);
+      await _loadChapter(displayPage.chapterIndex! - 1, INIT_PAGE, false);
       _controller.jumpToPage(INIT_PAGE);
       notifyPageChanged(INIT_PAGE);
     }

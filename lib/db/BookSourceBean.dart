@@ -18,7 +18,7 @@ class BookSourceBean{
   late int weight;
   late String exploreUrl;
   late String ruleExplore;//json
-  late String searchUrl;
+  String? searchUrl;
   late String ruleSearch;//json
   late String ruleBookInfo;//json
   late String ruleToc;//json
@@ -124,16 +124,16 @@ class BookSourceBean{
 
 
   BookSearchUrlBean? mapSearchUrlBean(){
-    if(searchUrl == null || searchUrl.isEmpty){
+    if(searchUrl == null || searchUrl!.isEmpty){
       return null;
     }
     var bean = BookSearchUrlBean();
     bean.sourceId = id;
-    var index = searchUrl.indexOf(',');
+    var index = searchUrl!.indexOf(',');
     var temp = [searchUrl];
     if(index > 0){
-      temp[0] = searchUrl.substring(0,index);
-      temp.add(searchUrl.substring(index+1));
+      temp[0] = searchUrl!.substring(0,index);
+      temp.add(searchUrl!.substring(index+1));
     }
     bean.url = temp[0];
     if(!bean.url!.startsWith('http')){
@@ -147,7 +147,7 @@ class BookSourceBean{
       var map;
 
       try{
-        map = jsonDecode(temp[1]);
+        map = jsonDecode(temp[1]!);
       }catch(e){
         print(e);
         return null;

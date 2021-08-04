@@ -593,7 +593,7 @@ ON "book_chapter" (
   }
 
   ///更新阅读的章节
-  dynamic updateLastReadChapter(int bookId,String chapterName,int lastReadPage){
+  dynamic updateLastReadChapter(int bookId,String? chapterName,int lastReadPage){
     return withDB().then((db) => db.update(TABLE_BOOK, {'lastReadChapter':(chapterName??'').trim(),'lastReadPage':lastReadPage},where: '_id = $bookId'));
   }
 

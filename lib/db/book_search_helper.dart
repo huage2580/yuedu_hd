@@ -58,7 +58,7 @@ class BookSearchHelper{
     //不做分页了
     List<BookSourceBean> sourcesNotEmpty = [];
     for (var value1 in bookSources) {
-      if(value1.searchUrl!=null&&value1.searchUrl.isNotEmpty){
+      if(value1.searchUrl!=null&&value1.searchUrl!.isNotEmpty){
         sourcesNotEmpty.add(value1);
       }
     }
@@ -109,7 +109,7 @@ class BookSearchHelper{
     try{
 
       dio.options.connectTimeout = 5000;
-      var response = await dio.request(options.url,options: requestOptions,data: options.body).timeout(Duration(seconds: 8));
+      var response = await dio.request(options.url!,options: requestOptions,data: options.body).timeout(Duration(seconds: 8));
       if(response.statusCode == 200){
         await _parseResponse(response.data,options,onBookSearch);
         if(updateList!=null){

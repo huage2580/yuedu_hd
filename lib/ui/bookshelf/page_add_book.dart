@@ -244,7 +244,7 @@ class _PageAddBookState extends State<PageAddBook>{
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 100,width: 80,child: FadeInImageWithoutAuth.network(infoBean!.coverUrl!,
+            SizedBox(height: 100,width: 80,child: FadeInImageWithoutAuth.network(infoBean.coverUrl!,
               // loadingBuilder: (BuildContext context, Widget child,
               //     ImageChunkEvent loadingProgress) {
               //   if (loadingProgress == null) return child;

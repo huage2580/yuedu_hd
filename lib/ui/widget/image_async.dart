@@ -281,8 +281,8 @@ class _ImageProviderResolver {
     ));
     assert(_imageStream != null);
 
-    if (_imageStream!.key != oldImageStream?.key) {
-      oldImageStream?.removeListener(listener);
+    if (_imageStream!.key != oldImageStream.key) {
+      oldImageStream.removeListener(listener);
       _imageStream!.addListener(listener);
     }
   }
@@ -302,7 +302,7 @@ class _FadeInImageState extends State<FadeInImageWithoutAuth> with TickerProvide
   late _ImageProviderResolver _placeholderResolver;
 
   late AnimationController _controller;
-  late Animation<double> _animation;
+  Animation<double>? _animation;
 
   FadeInImagePhase _phase = FadeInImagePhase.start;
   FadeInImagePhase get phase => _phase;

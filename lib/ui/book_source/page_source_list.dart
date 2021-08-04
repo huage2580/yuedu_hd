@@ -263,7 +263,7 @@ class _StateSourceList extends State<PageSourceList> {
           onChanged: (b) {
             setState(() {
               _selectCount += b! ? 1 : -1;
-              bean.localSelect = b!;
+              bean.localSelect = b;
             });
           },
           activeColor: theme.primaryColor,

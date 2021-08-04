@@ -8,8 +8,8 @@ class BookSourceCombBean{
   late String bookurl;
   late int used;
 
-  late BookSourceBean sourceBean;
-  late String lastChapterName;
+  BookSourceBean? sourceBean;
+  String? lastChapterName;
 
   BookSourceCombBean.fromMap(Map map){
     id = map['_id'];

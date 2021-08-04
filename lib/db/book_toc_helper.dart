@@ -77,7 +77,7 @@ class BookTocHelper{
           throw Exception('用户取消');
         }
 
-        var response = await dio.get(book.bookUrl,options: requestOptions);
+        var response = await dio.get(book.bookUrl!,options: requestOptions);
         if(response.statusCode == 200){
           var tocUrl = await Executor().execute(arg1: response.data as String,arg2: infoRuleBean,arg3: bookUrl,fun3: _parseTocUrl);
           developer.log('解析真正的目录请求[$bookUrl] 结果[$tocUrl] 规则[${infoRuleBean.tocUrl}]');
@@ -112,11 +112,11 @@ class BookTocHelper{
         if(response.statusCode == 200){
           developer.log('目录解析 $curUrl');
           var chapters = await Executor().execute(arg1: response.data as String,arg2: ruleBean,arg3: curUrl as String,fun3: _parseResponse);
-          if(ruleBean?.nextTocUrl!=null && ruleBean!.nextTocUrl!.trim().isNotEmpty){
+          if(ruleBean.nextTocUrl!=null && ruleBean.nextTocUrl!.trim().isNotEmpty){
             var nextUrl = await Executor().execute(arg1: response.data as String,arg2: ruleBean,arg3: curUrl,fun3: _parseNextUrl);
             if(nextUrl!=null || nextUrl!.trim().isNotEmpty){
               //可能是数组，采用逗号分割
-              var urls = nextUrl!.split(',');
+              var urls = nextUrl.split(',');
               urls.forEach((element) {
                 var next = Utils.checkLink(curUrl, element).trim();
                 if(next!=null && next.isNotEmpty && !allTocUrlList.contains(next)){

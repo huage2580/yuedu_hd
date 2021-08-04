@@ -14,7 +14,7 @@ packages:
       name: bot_toast
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.0.5"
+    version: "4.0.1"
   characters:
     dependency: transitive
     description:
@@ -56,14 +56,14 @@ packages:
       name: dio
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.0.10"
+    version: "4.0.0"
   draggable_scrollbar:
     dependency: "direct main"
     description:
       name: draggable_scrollbar
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.0.4"
+    version: "0.1.0"
   expressions:
     dependency: transitive
     description:
@@ -91,7 +91,7 @@ packages:
       name: fast_gbk
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.1.2+1"
+    version: "1.0.0-rc"
   ffi:
     dependency: transitive
     description:
@@ -110,14 +110,14 @@ packages:
       name: flutter_colorpicker
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.3.5"
+    version: "0.4.0"
   http_parser:
     dependency: transitive
     description:
       name: http_parser
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.1.4"
+    version: "4.0.0"
   isolate:
     dependency: "direct main"
     description:

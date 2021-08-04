@@ -29,7 +29,7 @@ class BookContentHelper{
   Future<String> getChapterContent(int chapterId) async{
     developer.log('企图获取章节内容 $chapterId');
     var contentFromDB = await DatabaseHelper().queryChapterContent(chapterId);
-    if(contentFromDB != null && contentFromDB.isNotEmpty){
+    if(contentFromDB.isNotEmpty){
       return Future.value(contentFromDB);
     }
     return fetchContentFromNetwork(chapterId);
@@ -59,7 +59,7 @@ class BookContentHelper{
           throw Exception('正文请求失败 null');
         }
         //解析内容
-        String c = await Executor().execute(arg1: bookUrl!,arg2: htmlString,arg3: contentRule,fun3: parseContent);
+        String c = await Executor().execute(arg1: bookUrl,arg2: htmlString,arg3: contentRule,fun3: parseContent);
         developer.log('完成解析正文 $bookUrl');
         content += c;
         //解析下一页

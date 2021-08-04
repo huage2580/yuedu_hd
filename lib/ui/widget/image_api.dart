@@ -41,7 +41,7 @@ class ImageApi {
       final HttpClientResponse response = await request.close();
       if (response.statusCode != HttpStatus.ok)
         throw Exception(
-            'HTTP request failed, statusCode: ${response?.statusCode}, $resolved');
+            'HTTP request failed, statusCode: ${response.statusCode}, $resolved');
 
       final Uint8List bytes =
       await consolidateHttpClientResponseBytes(response);

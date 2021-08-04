@@ -95,7 +95,7 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${bean.sourceBean.bookSourceName}',maxLines: 2,overflow: TextOverflow.ellipsis,),
+                  Text('${bean.sourceBean?.bookSourceName}',maxLines: 2,overflow: TextOverflow.ellipsis,),
                   Text('${bean.lastChapterName?? '正在获取目录~'}')
                 ],
               ),
