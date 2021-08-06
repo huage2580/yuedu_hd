@@ -26,7 +26,8 @@ class _PageSourceAddState extends State<PageSourceAdd> {
     _textEditingController = TextEditingController();
     // _textEditingController.text = 'https://gitee.com/gekunfei/web/raw/master/myBookshelf/xc1772006';
     if(!kReleaseMode){
-      _textEditingController.text = 'http://yck.mumuceo.com/d/MpJRW';
+      // _textEditingController.text = 'http://yck.mumuceo.com/d/MpJRW';
+      _textEditingController.text = 'http://shuyuan.miaogongzi.net/shuyuan/1627741986.json';
     }
   }
 
@@ -198,7 +199,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
 
     });
     try{
-      var req = await Dio().get(_textEditingController.text.trim());
+      var req = await Dio(BaseOptions(responseType: ResponseType.plain)).get(_textEditingController.text.trim());
       var jsonStr = req.data;
       setState(() {
         _log += '网络请求成功->${_textEditingController.text}\n';

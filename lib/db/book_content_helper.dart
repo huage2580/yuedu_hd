@@ -1,6 +1,7 @@
 
 
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:worker_manager/worker_manager.dart';
@@ -25,20 +26,24 @@ class BookContentHelper{
     //pass
   }
 
-  ///根据章节id获取内容，优先数据库获取，没有缓存从网络获取
-  Future<String> getChapterContent(int chapterId) async{
+  ///根据章节id获取内容，优先数据库获取，没有缓存从网络获取 [nextChapterId]用来判断内容分页，有些下一页就是下一章节
+  Future<String> getChapterContent(int chapterId,int? nextChapterId) async{
     developer.log('企图获取章节内容 $chapterId');
     var contentFromDB = await DatabaseHelper().queryChapterContent(chapterId);
     if(contentFromDB.isNotEmpty){
       return Future.value(contentFromDB);
     }
-    return fetchContentFromNetwork(chapterId);
+    return fetchContentFromNetwork(chapterId,nextChapterId);
 
   }
 
-  Future<String> fetchContentFromNetwork(int chapterId) async{
+  Future<String> fetchContentFromNetwork(int chapterId,int? nextChapterId) async{
     var source = await DatabaseHelper().queryBookSourceByChapterId(chapterId);
     String? bookUrl = await DatabaseHelper().queryChapterUrl(chapterId);
+    String? nextBookUrl;
+    if(nextChapterId!=null){
+      nextBookUrl = await DatabaseHelper().queryChapterUrl(nextChapterId);
+    }
     var contentRule = source.mapContentRuleBean();
     //请求网络
     var charset = source.mapSearchUrlBean()!.charset;
@@ -54,14 +59,15 @@ class BookContentHelper{
         if(counter > 10){
           throw Exception('正文分页超过十页');
         }
-        String htmlString = await _request(requestOptions, bookUrl);
+        String? htmlString = await _request(requestOptions, bookUrl);
         if(htmlString == null || htmlString.isEmpty){
           throw Exception('正文请求失败 null');
         }
         //解析内容
-        String c = await Executor().execute(arg1: bookUrl,arg2: htmlString,arg3: contentRule,fun3: parseContent);
-        developer.log('完成解析正文 $bookUrl');
-        content += c;
+        String? c = await Executor().execute(arg1: bookUrl,arg2: htmlString,arg3: contentRule,fun3: parseContent);
+        String cNotEmpty = c??"";
+        developer.log('完成解析正文 $bookUrl -> ${cNotEmpty.substring(0,min(100, cNotEmpty.length))}...');
+        content += cNotEmpty;
         //解析下一页
         if(contentRule.nextContentUrl!=null && contentRule.nextContentUrl!.isNotEmpty){
           String? nextUrl = await Executor().execute(arg1: bookUrl,arg2: htmlString,arg3: contentRule.nextContentUrl!,fun3: parseNextPage);
@@ -70,6 +76,10 @@ class BookContentHelper{
           }else{
             bookUrl = Utils.checkLink(bookUrl, nextUrl);
             developer.log('下一页链接 $bookUrl');
+            //下一页就是下一章，不获取数据
+            if(bookUrl == nextBookUrl){
+              bookUrl = null;
+            }
           }
         }else{
           bookUrl = null;
@@ -88,8 +98,15 @@ class BookContentHelper{
     return Future.value(null);
   }
 
-  Future<String> _request(Options requestOptions,String bookUrl) async{
+  Future<String?> _request(Options requestOptions,String bookUrl) async{
     try{
+      var headers = Map<String,dynamic>();
+      headers["user-agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36";
+      if(requestOptions.headers!=null){
+        requestOptions.headers!.addAll(headers);
+      }else{
+        requestOptions.headers = headers;
+      }
       developer.log('正文请求 $bookUrl');
       var dio = Utils.createDioClient();
       var response = await dio.get(bookUrl,options: requestOptions);
@@ -108,7 +125,7 @@ class BookContentHelper{
 
 }
 
-String parseContent(String url,String html,BookContentRuleBean rule){
+String? parseContent(String url,String html,BookContentRuleBean rule){
   developer.log('开始解析正文 $rule');
   var parser = HParser(html);
   var content = parser.parseRuleString(rule.content);
@@ -117,13 +134,13 @@ String parseContent(String url,String html,BookContentRuleBean rule){
     return content??"";
   }
   parser.destory();
-  return HParser.parseReplaceRule(content!,rule.replaceRegex!);
+  return HParser.parseReplaceRule(content??"",rule.replaceRegex!);
 }
 
 String? parseNextPage(String url,String html,String next){
   developer.log('解析下一页的链接');
   var parser = HParser(html);
-  var result = parser.parseRuleString(next);
+  var result = parser.parseRuleStrings(next);
   parser.destory();
-  return result;
+  return result.isNotEmpty?result[0]:null;
 }

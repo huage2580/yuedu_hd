@@ -17,7 +17,7 @@ class BookInfoBean{
   int lastReadPage = 1;
 
   //关联的书源
-  int source_id = -1;
+  int? source_id = -1;
   BookSourceBean? sourceBean;
   int sourceCount = 0;
 

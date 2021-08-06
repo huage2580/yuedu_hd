@@ -3,7 +3,7 @@ import 'dart:convert';
 
 class BookSourceBean{
 
-  late int id;
+  int? id;
   late String bookSourceName;
   String? bookSourceGroup;
   late String bookSourceUrl;
@@ -89,7 +89,7 @@ class BookSourceBean{
 
 
     //---------------------------------------
-    id = map['_id']??-1;
+    id = map['_id'];
     bookSourceName = map['bookSourceName'];
     bookSourceGroup = map['bookSourceGroup'];
     bookSourceUrl = map['bookSourceUrl'];
@@ -224,7 +224,7 @@ class BookSearchUrlBean{
   String? method;
   String? body;
   String? charset;
-  int sourceId=0;
+  int? sourceId=-1;
 
   //参数
   bool exactSearch = false;

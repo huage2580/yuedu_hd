@@ -138,7 +138,7 @@ class _PageBookShelfState extends State<PageBookShelf>
   Widget _buildList(context, bool isPortrait) {
     if (_bookList.isEmpty) {
       return Center(
-        child: Text('请添加书源，然后再搜索书籍'),
+        child: Text('你的书架空空如也~\n\n\n😀\n\n请先添加书源:\n下方【书源】->点击【添加书源】\n然后点击右下角[+]按钮开始搜索书籍',textAlign: TextAlign.center,),
       );
     }
     return RefreshIndicator(
@@ -179,30 +179,34 @@ class _PageBookShelfState extends State<PageBookShelf>
         padding: EdgeInsets.all(8),
         child: Row(
           children: [
-            SizedBox(
-                height: 120,
-                width: 100,
-                child: Image.network(
-                  bean.coverUrl,
-                  loadingBuilder: (BuildContext context, Widget child,
-                      ImageChunkEvent? loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      height: 120,
-                      width: 100,
-                      color: Colors.grey,
-                      child: Center(child: Text('loading'),),
-                    );
-                  },
-                  errorBuilder: (BuildContext context, Object exception,
-                      StackTrace? stackTrace) {
-                    return Container(
-                      height: 120,
-                      width: 100,
-                      color: Colors.grey,
-                    );
-                  },
-                )),
+            Container(
+              color: Colors.grey,
+              child: SizedBox(
+                  height: 120,
+                  width: 100,
+                  child: Image.network(
+                    bean.coverUrl,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (BuildContext context, Widget child,
+                        ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: 120,
+                        width: 100,
+                        color: Colors.grey,
+                        child: Center(child: Text('loading'),),
+                      );
+                    },
+                    errorBuilder: (BuildContext context, Object exception,
+                        StackTrace? stackTrace) {
+                      return Container(
+                        height: 120,
+                        width: 100,
+                        color: Colors.grey,
+                      );
+                    },
+                  )),
+            ),
             HSpace(8),
             Expanded(
               child: Column(

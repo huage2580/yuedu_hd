@@ -131,7 +131,7 @@ class _WidgetSelectSourceState extends State<WidgetSelectSource> {
       if(index == -1){
         //添加书源
         var t = BookSourceCombBean();
-        t.sourceid = b.source_id;
+        t.sourceid = b.source_id!;
         t.bookid = b.id;
         t.sourceBean = b.sourceBean!;
         sourceList.add(t);

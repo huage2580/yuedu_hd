@@ -34,7 +34,7 @@ class BookTocHelper{
     //
   }
 
-  void cancel(String token){
+  void cancel(String? token){
     if(token !=null && token.isNotEmpty){
       cancelToken.add(token);
     }
@@ -64,6 +64,9 @@ class BookTocHelper{
     if(charset == 'gbk'){
       requestOptions.responseDecoder = Utils.gbkDecoder;
     }
+    var headers = Map<String,String>();
+    headers["user-agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36";
+    requestOptions.headers = headers;
     //3.请求网络
     var bookUrl = book.bookUrl!;
 
@@ -130,7 +133,7 @@ class BookTocHelper{
           for (var chapter in chapters) {
             chapter.url = Utils.checkLink(curUrl, chapter.url!);
             chapter.bookId = book.id;
-            chapter.sourceId = book.source_id;
+            chapter.sourceId = book.source_id!;
           }
           if(chapters.isEmpty){
             break;
@@ -199,7 +202,7 @@ List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean,Strin
   List<BookChapterBean> result = [];
   // var eles = parser.parseRuleElements(ruleBean.chapterList);
   var batchId = parser.parseRuleRaw(ruleBean.chapterList!);
-  developer.log('目录解析开始 ${DateTime.now()}');
+  developer.log('目录解析开始 ${DateTime.now()}->$ruleBean');
   var batchSize = parser.queryBatchSize(batchId);
   for (var i=0;i<batchSize;i++) {
     var chapterBean = BookChapterBean();

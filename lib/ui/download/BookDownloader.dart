@@ -47,7 +47,7 @@ class BookDownloader{
       await _locker.request();
       var task = chapters.removeAt(0);
       //下面不采取await，为了并发
-      contentHelper.fetchContentFromNetwork(task.id).whenComplete((){
+      contentHelper.fetchContentFromNetwork(task.id,null).whenComplete((){
         _locker.release();
         downLoadCallBack();
       });

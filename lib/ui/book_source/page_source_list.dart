@@ -285,7 +285,7 @@ class _StateSourceList extends State<PageSourceList> {
             bean.enabled = b;
             setState((){
               var helper = DatabaseHelper();
-              helper.updateBookSourceStateById(bean.id,b);
+              helper.updateBookSourceStateById(bean.id!,b);
             });
           },
           activeColor: theme.primaryColor,
@@ -339,7 +339,7 @@ class _StateSourceList extends State<PageSourceList> {
     List<int> ids = [];
     for (var value in bookSourceList) {
       if(value.localSelect){
-        ids.add(value.id);
+        ids.add(value.id!);
       }
     }
     var helper = DatabaseHelper();
@@ -354,7 +354,7 @@ class _StateSourceList extends State<PageSourceList> {
     List<int> ids = [];
     for (var value in bookSourceList) {
       if(value.localSelect){
-        ids.add(value.id);
+        ids.add(value.id!);
       }
     }
     var helper = DatabaseHelper();

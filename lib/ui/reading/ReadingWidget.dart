@@ -151,7 +151,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
   void dispose() {
     super.dispose();
 
-    tocHelper.cancel(_tocCancelToken!);
+    tocHelper.cancel(_tocCancelToken);
     DisplayCache.getInstance().clear();
     ReloadEvent.getInstance().removeListener(reloadCallBack);
     NextChapterEvent.getInstance().removeListener(nextChapterCallBack);
@@ -258,7 +258,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       }
     });
     //获取正文
-    String chapterContent = await contentHelper.getChapterContent(chaptersList[chapterIndex].id).catchError((e){
+    String chapterContent = await contentHelper.getChapterContent(chaptersList[chapterIndex].id,mayNextChapterId(chapterIndex)).catchError((e){
       DisplayCache.getInstance().put(pageIndex, DisplayPage(DisplayPage.STATUS_ERROR, null,errorMsg:e.toString(),chapterIndex: chapterIndex,currPage: 1,fromEnd: fromEnd,viewPageIndex: pageIndex,));
       setState(() {
         //失败?
@@ -315,6 +315,13 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     });
     //通知该章节加载完成
     return Future.value(pagesList.length);
+  }
+
+  int? mayNextChapterId(int chapterIndex){
+    if(chapterIndex >= chaptersList.length -1){
+      return null;//没有下一章节
+    }
+    return chaptersList[chapterIndex+1].id;
   }
 
   //正文的样式

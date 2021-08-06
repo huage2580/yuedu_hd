@@ -436,7 +436,7 @@ ON "book_chapter" (
 
 
   ///书籍信息，完整关联
-  ///[sourceId] >= 0 表示使用当前指定的书源,没有的话默认一个
+  ///[sourceId] >= 0 表示使用当前指定的书源,没有的话默认启用的一个
   dynamic queryBookInfoFromBookIdCombSourceId(int bookId,int sourceId) async{
     var db = await withDB();
     return await db.transaction((txn) async{

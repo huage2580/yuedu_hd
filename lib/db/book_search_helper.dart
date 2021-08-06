@@ -101,6 +101,11 @@ class BookSearchHelper{
 
   Future<dynamic> _request(BookSearchUrlBean options,OnBookSearch? onBookSearch,UpdateList? updateList) async{
     var contentType = options.headers!['content-type'];
+    var headers = Map<String,String>();
+    headers["user-agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36";
+    if(options.headers!=null){
+      options.headers!.addAll(headers);
+    }
     Options requestOptions = Options(method: options.method,headers: options.headers,contentType:contentType ,sendTimeout: 5000,receiveTimeout: 5000);
     if(options.charset == 'gbk'){
       requestOptions.responseDecoder = Utils.gbkDecoder;
@@ -109,6 +114,7 @@ class BookSearchHelper{
     try{
 
       dio.options.connectTimeout = 5000;
+      developer.log('搜索书籍:$options');
       var response = await dio.request(options.url!,options: requestOptions,data: options.body).timeout(Duration(seconds: 8));
       if(response.statusCode == 200){
         await _parseResponse(response.data,options,onBookSearch);
@@ -126,7 +132,7 @@ class BookSearchHelper{
   }
 
   dynamic _parseResponse(String response,BookSearchUrlBean options, OnBookSearch? onBookSearch) async{
-    int sourceId = options.sourceId;
+    int sourceId = options.sourceId!;
     var tempTime = DateTime.now();
     developer.log('解析搜索返回内容：$sourceId|$tempTime');
     BookSourceBean? source = await DatabaseHelper().queryBookSourceById(sourceId);
@@ -234,12 +240,12 @@ List<Map<String,dynamic>> _parse(Map map){
       }
       var coverUrl = hparser.parseRuleStringsForParent(bId,ruleBean.coverUrl,i);
       bookInfo.coverUrl = coverUrl.isNotEmpty?coverUrl[0]:null;
-      if(bookInfo.name == null || bookInfo.author == null){
+      if(bookInfo.name == null || bookInfo.author == null || bookInfo.bookUrl == null){
         continue;
       }
       bookInfo.name = bookInfo.name!.trim();
       bookInfo.author = bookInfo.author!.trim();
-      if(bookInfo.name!.isEmpty || bookInfo.author!.isEmpty){
+      if(bookInfo.name!.isEmpty || bookInfo.author!.isEmpty|| bookInfo.bookUrl!.isEmpty){
         continue;
       }
       result.add(bookInfo);
