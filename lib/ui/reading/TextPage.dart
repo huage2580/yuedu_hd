@@ -26,7 +26,7 @@ class YDPainter extends CustomPainter{
     var page = ydPage;
     var titleOffset = Offset(0, 0);
     if(page.titlePainter != null){
-      page.titlePainter.paint(canvas, Offset.zero);
+      page.titlePainter?.paint(canvas, Offset.zero);
       titleOffset = Offset(0, page.titleOffset);
     }
     page.pagePainter.paint(canvas, titleOffset);

@@ -56,7 +56,7 @@ class BookTocHelper{
     BookSourceBean sourceBean = book.sourceBean!;
     BookTocRuleBean ruleBean = book.sourceBean!.mapTocRuleBean();
     BookInfoRuleBean? infoRuleBean;
-    if(book.sourceBean?.ruleBookInfo!=null && book.sourceBean!.ruleBookInfo.isNotEmpty){
+    if(book.sourceBean?.ruleBookInfo!=null && book.sourceBean!.ruleBookInfo!.isNotEmpty){
       infoRuleBean = book.sourceBean?.mapInfoRuleBean();
     }
     var charset = sourceBean.mapSearchUrlBean()?.charset;

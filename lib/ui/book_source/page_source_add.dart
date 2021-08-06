@@ -26,7 +26,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
     _textEditingController = TextEditingController();
     // _textEditingController.text = 'https://gitee.com/gekunfei/web/raw/master/myBookshelf/xc1772006';
     if(!kReleaseMode){
-      _textEditingController.text = 'http://yck.mumuceo.com/d/J1vZ1';
+      _textEditingController.text = 'http://yck.mumuceo.com/d/MpJRW';
     }
   }
 

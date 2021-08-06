@@ -57,7 +57,7 @@ class BookInfoBean{
 
 
   BookInfoBean.fromMap(Map map){
-    id = map['_id'];
+    id = map['_id']??-1;
     name = map['name'];
     author = map['author'];
     bookUrl = map['bookUrl'];
@@ -67,9 +67,9 @@ class BookInfoBean{
     lastChapter = map['lastChapter'];
     wordCount = map['wordCount'];
     lastReadChapter = map['lastReadChapter'];
-    groupId = map['groupId'];
-    inbookShelf = map['inbookShelf'];
-    lastReadPage = map['lastReadPage'];
+    groupId = map['groupId']??-1;
+    inbookShelf = map['inbookShelf']??0;
+    lastReadPage = map['lastReadPage']??1;
   }
 
 }

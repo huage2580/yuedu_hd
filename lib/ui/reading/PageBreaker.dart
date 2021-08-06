@@ -64,7 +64,7 @@ class PageBreaker{
       // developer.log('-----------------------------------');
       var textPainter = TextPainter(text: TextSpan(text: currText,style: contentString.style),textDirection: TextDirection.ltr,);
       textPainter.layout(maxWidth: drawSize.width);
-      var tempPage = YDPage(titleOffset,titlePainter!, textPainter);
+      var tempPage = YDPage(titleOffset,titlePainter, textPainter);
       results.add(tempPage);
 
       currText = overText;
@@ -80,7 +80,7 @@ class PageBreaker{
 class YDPage{
   //只有第一页会有的标题
   double titleOffset = 0;
-  TextPainter titlePainter;
+  TextPainter? titlePainter;
   TextPainter pagePainter;
 
   YDPage(this.titleOffset, this.titlePainter, this.pagePainter);

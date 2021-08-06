@@ -11,18 +11,18 @@ class BookSourceBean{
   late int bookSourceType;
   late bool enabled;
   late bool enabledExplore;
-  late String header;
-  late String loginUrl;
-  late String bookSourceComment;
-  late num lastUpdateTime;
-  late int weight;
-  late String exploreUrl;
-  late String ruleExplore;//json
+  String? header;
+  String? loginUrl;
+  String? bookSourceComment;
+  num? lastUpdateTime;
+  late int? weight;
+  String? exploreUrl;
+  late String? ruleExplore;//json
   String? searchUrl;
-  late String ruleSearch;//json
-  late String ruleBookInfo;//json
-  late String ruleToc;//json
-  late String ruleContent;//json
+  late String? ruleSearch;//json
+  late String? ruleBookInfo;//json
+  late String? ruleToc;//json
+  late String? ruleContent;//json
 
   //--------
   bool localSelect = false;
@@ -89,7 +89,7 @@ class BookSourceBean{
 
 
     //---------------------------------------
-    id = map['_id'];
+    id = map['_id']??-1;
     bookSourceName = map['bookSourceName'];
     bookSourceGroup = map['bookSourceGroup'];
     bookSourceUrl = map['bookSourceUrl'];
@@ -175,7 +175,7 @@ class BookSourceBean{
 
   BookSearchRuleBean mapSearchRuleBean(){
     BookSearchRuleBean bean = BookSearchRuleBean();
-    var map = jsonDecode(jsonDecode(ruleSearch));
+    var map = jsonDecode(jsonDecode(ruleSearch!));
     bean.name = map['name'];
     bean.author = map['author'];
     bean.bookList = map['bookList'];
@@ -190,7 +190,7 @@ class BookSourceBean{
 
   BookTocRuleBean mapTocRuleBean(){
     BookTocRuleBean bean = BookTocRuleBean();
-    var map = jsonDecode(jsonDecode(ruleToc));
+    var map = jsonDecode(jsonDecode(ruleToc!));
     bean.chapterList = map['chapterList'];
     bean.chapterName = map['chapterName'];
     bean.chapterUrl = map['chapterUrl'];
@@ -200,7 +200,7 @@ class BookSourceBean{
 
   BookContentRuleBean mapContentRuleBean(){
     BookContentRuleBean bean = BookContentRuleBean();
-    var map = jsonDecode(jsonDecode(ruleContent));
+    var map = jsonDecode(jsonDecode(ruleContent!));
     bean.content = map['content'];
     bean.nextContentUrl = map['nextContentUrl'];
     bean.replaceRegex = map['replaceRegex'];
@@ -209,7 +209,7 @@ class BookSourceBean{
 
   BookInfoRuleBean mapInfoRuleBean(){
     BookInfoRuleBean bean = BookInfoRuleBean();
-    var map = jsonDecode(jsonDecode(ruleBookInfo));
+    var map = jsonDecode(jsonDecode(ruleBookInfo!));
     bean.coverUrl = map['coverUrl'];
     bean.tocUrl = map['tocUrl'];
     bean.intro = map['intro'];

@@ -520,7 +520,7 @@ ON "book_chapter" (
       	AND book_sources.enabled = 1
       ''');
     } );
-    var result = [];
+    List<BookSourceCombBean> result = [];
     for (var data in queryResult) {
       var info = BookSourceCombBean.fromMap(data);
       info.sourceBean = BookSourceBean.fromJson(data);//id会出错,不能使用里面的id
@@ -564,7 +564,7 @@ ON "book_chapter" (
       if(value.isEmpty){
         return "";
       }
-      return value[0]['content'] as String;
+      return (value[0]['content'] as String?) ??"";
     });
   }
 

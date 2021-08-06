@@ -127,7 +127,7 @@ class FadeInImageWithoutAuth extends StatefulWidget {
   }) : assert(placeholder != null),
         assert(image != null),
         // placeholder = placeholderScale != null
-        //     ? ExactAssetImage(placeholder, bundle: bundle, scale: placeholderScale)
+        // placeholder = ExactAssetImage(placeholder, bundle: bundle, scale: placeholderScale??0),
         //     : NetworkImageWithoutAuth(placeholder),
         // placeholder = ExactAssetImage(placeholder, bundle: bundle, scale: placeholderScale!),
         placeholder = NetworkImageWithoutAuth(placeholder),
@@ -273,7 +273,7 @@ class _ImageProviderResolver {
   ImageInfo? _imageInfo;
 
   void resolve(ImageProvider provider) {
-    final ImageStream oldImageStream = _imageStream!;
+    final ImageStream? oldImageStream = _imageStream;
     final ImageStreamListener listener = ImageStreamListener(_handleImageChanged);
     _imageStream = provider.resolve(createLocalImageConfiguration(
         state!.context,
@@ -281,8 +281,8 @@ class _ImageProviderResolver {
     ));
     assert(_imageStream != null);
 
-    if (_imageStream!.key != oldImageStream.key) {
-      oldImageStream.removeListener(listener);
+    if (_imageStream!.key != oldImageStream?.key) {
+      oldImageStream?.removeListener(listener);
       _imageStream!.addListener(listener);
     }
   }
@@ -293,7 +293,9 @@ class _ImageProviderResolver {
   }
 
   void stopListening() {
-    _imageStream?.removeListener(imageStreamListener!);
+    if(imageStreamListener!=null){
+      _imageStream?.removeListener(imageStreamListener!);
+    }
   }
 }
 

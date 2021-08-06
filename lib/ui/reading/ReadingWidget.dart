@@ -1,6 +1,7 @@
 
 import 'dart:collection';
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
@@ -22,7 +23,7 @@ import 'package:yuedu_hd/ui/reading/event/PreviousPageEvent.dart';
 
 class ReadingWidget extends StatefulWidget{
   final int bookId;
-  final String initChapterName;
+  final String? initChapterName;
   final double notchHeight;
 
 
@@ -123,15 +124,16 @@ class _ReadingWidgetState extends State<ReadingWidget> {
             SizedBox(
               width: double.maxFinite,
               height: double.maxFinite,
-              child: PageView.builder(scrollDirection: config.isVertical==1?Axis.vertical:Axis.horizontal,
+              child: PageView.custom(scrollDirection: config.isVertical==1?Axis.vertical:Axis.horizontal,
                 pageSnapping: config.isVertical != 1,
-                itemBuilder: (ctx,index){
-                if(index < firstPage){
-                  return _buildErrorIndex();
-                }
-                return DisplayCache.getInstance().get(index)!;
-              },controller: _controller,
-                itemCount: MAX_PAGE,onPageChanged: (i){
+                childrenDelegate: SliverChildBuilderDelegate((ctx,index){
+                  if(index < firstPage){
+                    return _buildErrorIndex();
+                  }
+                  return DisplayCache.getInstance().get(index);
+                }, childCount: MAX_PAGE),
+                controller: _controller,
+                onPageChanged: (i){
                   Future.delayed(Duration(milliseconds: 500),(){
                     notifyPageChanged(i);
                   });
@@ -162,7 +164,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     return Container(
       color: Color(config.backgroundColor),
       child: Center(
-        child: Text('没有了啦',style: TextStyle(color: Color(config.textColor)),),
+        child: Text('💪/(ㄒoㄒ)/~~\n探索到世界的尽头\n少年，不要再翻了',style: TextStyle(fontSize: 20,color: Color(config.textColor)),textAlign: TextAlign.center,),
       ),
     );
   }
