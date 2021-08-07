@@ -10,6 +10,7 @@ import 'package:yuedu_hd/ui/bookshelf/page_bookshelf.dart';
 import 'package:yuedu_hd/ui/download/page_download.dart';
 import 'package:yuedu_hd/ui/explore/page_explore.dart';
 import 'package:yuedu_hd/ui/settings/page_settings.dart';
+import 'package:yuedu_hd/ui/store/page_store.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 
 class HomePage extends StatefulWidget {
@@ -25,6 +26,7 @@ class HomeState extends State<HomePage> {
   static const PAGE_SOURCE = 2;
   static const PAGE_SETTINGS = 3;
   static const PAGE_DOWNLOAD = 4;
+  static const PAGE_STORE = 5;
 
   int currPage = 0;
   var homeContainerKey = GlobalKey<NavigatorState>();
@@ -155,11 +157,11 @@ class HomeState extends State<HomePage> {
         //   },
         // ),
         _HomeMenuItem(
-          Icons.arrow_circle_down_outlined,
-          "下载",
-          isSelected: currPage == PAGE_DOWNLOAD,
+          Icons.apps_outlined,
+          "社区",
+          isSelected: currPage == PAGE_STORE,
           onTap: () {
-            switchPageTo(PAGE_DOWNLOAD);
+            switchPageTo(PAGE_STORE);
           },
         ),
         _HomeMenuItem(
@@ -197,11 +199,11 @@ class HomeState extends State<HomePage> {
           orientation: Orientation.portrait,
         ),),
         Expanded(child:  _HomeMenuItem(
-          Icons.arrow_circle_down_outlined,
-          "下载",
-          isSelected: currPage == PAGE_DOWNLOAD,
+          Icons.apps_outlined,
+          "社区",
+          isSelected: currPage == PAGE_STORE,
           onTap: () {
-            switchPageTo(PAGE_DOWNLOAD);
+            switchPageTo(PAGE_STORE);
           },
           orientation: Orientation.portrait,
 
@@ -263,6 +265,11 @@ class HomeState extends State<HomePage> {
           homeContainerKey.currentState?.pushNamedAndRemoveUntil(YDRouter.DOWNLOAD,ModalRoute.withName(YDRouter.DOWNLOAD));
         });
         break;
+      case PAGE_STORE:
+        setState(() {
+          homeContainerKey.currentState?.pushNamedAndRemoveUntil(YDRouter.STORE,ModalRoute.withName(YDRouter.STORE));
+        });
+        break;
 
 
     }
@@ -283,6 +290,7 @@ class HomeState extends State<HomePage> {
           YDRouter.SETTINGS:(context)=>PageSettings(),
           YDRouter.BOOK_ADD:(context)=>PageAddBook(),
           YDRouter.DOWNLOAD:(context)=>PageDownLoad(),
+          YDRouter.STORE:(context)=>PageStore(),
         },
       ),
     );

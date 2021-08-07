@@ -8,6 +8,8 @@ class YDRouter{
   static const String EXPLORE = "explore";
   static const String DOWNLOAD = "download";
   static const String SETTINGS = "settings";
+  static const String STORE = "store";
+
 
 
   static const String BOOK_SOURCE_LIST = "source_list";
