@@ -1,8 +1,11 @@
 
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:yuedu_hd/db/databaseHelper.dart';
 import 'package:yuedu_hd/ui/YDRouter.dart';
+import 'package:yuedu_hd/ui/download/page_download.dart';
 import 'package:yuedu_hd/ui/settings/MoreStyleSettingsMenu.dart';
 
 class PageSettings extends StatefulWidget{
@@ -24,6 +27,16 @@ class _PageSettingsState extends State<PageSettings> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(margin: EdgeInsets.only(top: 10,bottom: 10),child: Text('下载管理',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),)),
+                  DownloadInfoWidget(),
+                  Container(margin: EdgeInsets.only(top: 10,bottom: 10),child: Text('数据缓存',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),)),
+                  ListTile(title: Text("数据库"),subtitle: Text("点击清空书源和书籍缓存"),trailing: Icon(Icons.delete_forever_rounded),onTap: () async{
+                    var result = await _showClearDatabaseDialog(context);
+                    if(result == "done"){
+                      await DatabaseHelper().clearAllData();
+                      BotToast.showText(text: "清除成功!");
+                    }
+                  },),
                   Container(margin: EdgeInsets.only(top: 10,bottom: 10),child: Text('阅读设置',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),)),
                   MoreStyleSettingsMenu(),
                   Container(margin: EdgeInsets.only(top: 10,bottom: 10),child: Text('关于',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),)),
@@ -193,6 +206,19 @@ When using the reading HD network service to conduct online transactions, you wi
         ),
       );
     }));
+  }
+
+  dynamic _showClearDatabaseDialog(context) async{
+    return await showDialog(context: context, builder: (context){
+      return AlertDialog(title: Text("警告"),content: Text("确定清除所有书源和书籍？"),actions: [
+        TextButton(onPressed: (){
+          Navigator.of(context).pop('cancel');
+        }, child: Text('不了不了')),
+        TextButton(onPressed: (){
+          Navigator.of(context).pop('done');
+        }, child: Text('确定')),
+      ],);
+    });
   }
 
 }
