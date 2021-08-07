@@ -145,23 +145,37 @@ class BookSourceBean{
 
     if(temp.length == 2){
       var map;
-
+      var trans = temp[1]!;
+      var needTrans = trans.contains("'method'");
       try{
-        map = jsonDecode(temp[1]!);
+        if(needTrans){//单引号
+          trans = trans.replaceAll("\"", "^");
+          trans = trans.replaceAll("'", "\"");
+        }
+        map = jsonDecode(trans);//有些奇怪的会用单引号
       }catch(e){
-        print(e);
+        print("book source map search error->$e");
         return null;
       }
       bean.method = map['method']==null?'GET':map['method'];
       try{
-        bean.headers = map['headers']==null?{}:jsonDecode(map['headers']);
+        var headerStr = map['headers'] as String?;
+        if(needTrans){
+          headerStr = headerStr?.replaceAll("^", "\"");
+        }
+        bean.headers = headerStr==null?{}:jsonDecode(headerStr);
         if(bean.method == 'POST' && bean.headers!.isEmpty){
           bean.headers = {'content-type':r"application/x-www-form-urlencoded"};
         }
       }catch(e){
         //pass 有些headers没有双引号，不兼容
+        print("book source map headers error->$e");
       }
-      bean.body = map['body'];
+      var bodyStr = map['body'] as String?;
+      if(needTrans){
+        bodyStr = bodyStr?.replaceAll("^", "\"");
+      }
+      bean.body = bodyStr;
       bean.charset = map['charset']==null?'utf8':map['charset'];
       if(bean.charset!.startsWith('gb')){
         bean.charset = 'gbk';

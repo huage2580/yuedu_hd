@@ -106,7 +106,7 @@ class BookSearchHelper{
     if(options.headers!=null){
       options.headers!.addAll(headers);
     }
-    Options requestOptions = Options(method: options.method,headers: options.headers,contentType:contentType ,sendTimeout: 5000,receiveTimeout: 5000);
+    Options requestOptions = Options(method: options.method,headers: options.headers,sendTimeout: 5000,receiveTimeout: 5000,followRedirects: true);
     if(options.charset == 'gbk'){
       requestOptions.responseDecoder = Utils.gbkDecoder;
       options.body = UrlGBKEncode().encode(options.body);
@@ -125,7 +125,7 @@ class BookSearchHelper{
         developer.log('搜索错误:书源错误${response.statusCode}');
       }
     }catch(e){
-      developer.log('搜索错误:$e');
+      developer.log('搜索错误[${options.url}]:$e');
     }
 
     return Future.value(0);
