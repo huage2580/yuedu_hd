@@ -84,7 +84,7 @@ class BookSearchHelper{
       var b = searchOptionList.removeAt(0);
       if(b!=null){
         await _countLocker.request();
-        _request(b, onBookSearch,updateList).whenComplete(() => _countLocker.release());
+        request(b, onBookSearch,updateList).whenComplete(() => _countLocker.release());
       }
     }
     cancelSearch(cancelToken);
@@ -99,7 +99,7 @@ class BookSearchHelper{
   }
 
 
-  Future<dynamic> _request(BookSearchUrlBean options,OnBookSearch? onBookSearch,UpdateList? updateList) async{
+  Future<dynamic> request(BookSearchUrlBean options,OnBookSearch? onBookSearch,UpdateList? updateList,{BookSourceBean? sourceBean}) async{
     var contentType = options.headers!['content-type'];
     var headers = Map<String,String>();
     headers["user-agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36";
@@ -117,7 +117,7 @@ class BookSearchHelper{
       developer.log('搜索书籍:$options');
       var response = await dio.request(options.url!,options: requestOptions,data: options.body).timeout(Duration(seconds: 8));
       if(response.statusCode == 200){
-        await _parseResponse(response.data,options,onBookSearch);
+        await _parseResponse(response.data,options,onBookSearch,sourceBean: sourceBean);
         if(updateList!=null){
           updateList();//更新列表UI
         }
@@ -131,11 +131,17 @@ class BookSearchHelper{
     return Future.value(0);
   }
 
-  dynamic _parseResponse(String response,BookSearchUrlBean options, OnBookSearch? onBookSearch) async{
-    int sourceId = options.sourceId!;
+  dynamic _parseResponse(String response,BookSearchUrlBean options, OnBookSearch? onBookSearch,{BookSourceBean? sourceBean}) async{
+    BookSourceBean? source;
+    int sourceId = -1;
+    if(options.sourceId == null){//校验的时候
+      source = sourceBean;
+    }else{
+      sourceId = options.sourceId!;
+      source = await DatabaseHelper().queryBookSourceById(sourceId);
+    }
     var tempTime = DateTime.now();
     developer.log('解析搜索返回内容：$sourceId|$tempTime');
-    BookSourceBean? source = await DatabaseHelper().queryBookSourceById(sourceId);
     var ruleBean = source!.mapSearchRuleBean();
     try{
       //填充需要传输的数据
@@ -167,23 +173,25 @@ class BookSearchHelper{
         bookInfo.bookUrl = Utils.checkLink(options.url!, bookInfo.bookUrl);
         bookInfo.coverUrl = Utils.checkLink(options.url!, bookInfo.coverUrl);
         //-------关联到书源-------------
-        bookInfo.source_id = source.id;
-        bookInfo.sourceBean = source;
-        if(bookInfo.name == null || bookInfo.author == null){
-          continue;
-        }
-        if(bookInfo.bookUrl == null || bookInfo.bookUrl!.isEmpty){
-          continue;
-        }
-        bookInfo.name = bookInfo.name!.trim();
-        bookInfo.author = bookInfo.author!.trim();
-        if(options.exactSearch){//精确搜索，要求书名和作者完全匹配
-          if(bookInfo.name!=options.bookName || bookInfo.author!=options.bookAuthor){
+        if(sourceBean == null){
+          bookInfo.source_id = source.id;
+          bookInfo.sourceBean = source;
+          if(bookInfo.name == null || bookInfo.author == null){
             continue;
           }
+          if(bookInfo.bookUrl == null || bookInfo.bookUrl!.isEmpty){
+            continue;
+          }
+          bookInfo.name = bookInfo.name!.trim();
+          bookInfo.author = bookInfo.author!.trim();
+          if(options.exactSearch){//精确搜索，要求书名和作者完全匹配
+            if(bookInfo.name!=options.bookName || bookInfo.author!=options.bookAuthor){
+              continue;
+            }
+          }
+          var bookId = await DatabaseHelper().insertBookToDB(bookInfo);
+          bookInfo.id = bookId;
         }
-        var bookId = await DatabaseHelper().insertBookToDB(bookInfo);
-        bookInfo.id = bookId;
         onBookSearch!(bookInfo);
       }
     }catch(e){

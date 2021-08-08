@@ -1,5 +1,9 @@
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:yuedu_hd/ui/store/dialog_import_source.dart';
 
 class PageStore extends StatefulWidget{
   @override
@@ -7,10 +11,141 @@ class PageStore extends StatefulWidget{
 }
 
 class _PageStoreState extends State<PageStore> {
+
+  late TextEditingController _textEditingController;
+  late NavigationDelegate _navigationDelegate;
+  WebViewController? _controller;
+  String showUrl = "http://yck.mumuceo.com/yuedu/shuyuan/index.html";
+
+  @override
+  void initState() {
+    _textEditingController = TextEditingController();
+    _navigationDelegate = (request){
+      // 判断URL
+      if (request.url.startsWith('yuedu')) {
+        print(request.url);
+        var urlMatch = RegExp('src=([^&]*)');
+        var matchResult = urlMatch.firstMatch(request.url);
+        var jsonUrl = matchResult?.group(1);
+        _importJsonUrl(jsonUrl);
+        return NavigationDecision.prevent;
+      }
+      if(request.url.startsWith('http')){
+        return NavigationDecision.navigate;
+      }
+      if(request.url.startsWith('ftp')){
+        return NavigationDecision.navigate;
+      }
+      return NavigationDecision.prevent;
+    };
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
     return Scaffold(
-      body: Center(child: Text('还没做呢，你发现个锤子'),),
+      body: Container(
+        child: Column(children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                IconButton(onPressed: (){
+                  _controller?.canGoBack().then((value){
+                    if(value){_controller?.goBack();}
+                  });
+                }, icon: Icon(Icons.arrow_back_ios_new)),
+                Expanded(child: _buildLinkInput(theme)),
+              ],
+            ),
+          ),
+          Expanded(
+              child: _buildWebView(context),
+          ),
+        ],),
+      ),
     );
   }
+
+
+  Container _buildLinkInput(ThemeData theme) {
+    return Container(
+      height: 40,
+      padding: EdgeInsets.only(left: 8,right: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(5)),
+        color: theme.canvasColor,
+      ),
+      child: Center(
+        child: TextField(
+          controller: _textEditingController,
+          maxLines: 1,
+          decoration: InputDecoration(
+            isCollapsed: true,
+            contentPadding: EdgeInsets.all(0),
+            hintText: '输入网址访问',
+            border: InputBorder.none,
+          ),
+          onSubmitted: (text){
+            showUrl = text;
+            _controller?.loadUrl(showUrl);
+          },
+          textInputAction: TextInputAction.go,
+        ),
+      ),
+    );
+  }
+
+  WebView _buildWebView(context){
+    return WebView(
+      initialUrl: showUrl,
+      javascriptMode: JavascriptMode.unrestricted,
+      gestureNavigationEnabled: true,
+      navigationDelegate: _navigationDelegate,
+      onWebViewCreated: (WebViewController webViewController) {
+        _controller = webViewController;
+      },
+      onPageStarted: (url){
+        showUrl = url;
+        setState(() {
+          _textEditingController.text = showUrl;
+        });
+      },
+    );
+  }
+
+  void _importJsonUrl(String? url) async{
+    if(url == null){
+      return;
+    }
+    print("webView import: $url");
+    var select = await showDialog(context: context, builder: (context){
+      return AlertDialog(
+        title: Text("导入书源"),
+        content: Text("$url \n\n 请选择是否校验导入。(只有单个书源才能校验，多个书源不校验直接导入)"),
+        actions: [
+          TextButton(onPressed: (){
+            Navigator.of(context).pop('not');
+          }, child: Text('直接导入')),
+          TextButton(onPressed: (){
+            Navigator.of(context).pop('check');
+          }, child: Text('校验')),
+        ],
+      );
+    });
+    if(select == "not"){
+      _showImportDialog(url, false);
+    }else if(select == "check"){
+      _showImportDialog(url, true);
+    }
+  }
+
+  void _showImportDialog(String url,bool needCheck){
+    showDialog(context: context, builder: (context){
+      return DialogImportSource(url: url, needCheck: needCheck);
+    });
+  }
+
+
 }

@@ -41,7 +41,7 @@ class BookTocHelper{
   }
 
 
-  Future<List<BookChapterBean>> updateChapterList(int bookId,int sourceId,{bool notUpdateDB = false,onlyLast = false,OnCancelToken? onCancelToken}) async{
+  Future<List<BookChapterBean>> updateChapterList(int bookId,int sourceId,{BookInfoBean? bookBean,bool notUpdateDB = false,onlyLast = false,OnCancelToken? onCancelToken}) async{
 
     var myCancelToken  = '${DateTime.now()}';
     if(onCancelToken ==null){
@@ -52,7 +52,12 @@ class BookTocHelper{
     List<BookChapterBean> result = [];
     //1.拿到书源
     //2.书链接
-    BookInfoBean book = await DatabaseHelper().queryBookInfoFromBookIdCombSourceId(bookId, sourceId);
+    BookInfoBean book;
+    if(bookBean!=null){//使用外面给的数据
+      book = bookBean;
+    }else{
+      book = await DatabaseHelper().queryBookInfoFromBookIdCombSourceId(bookId, sourceId);
+    }
     BookSourceBean sourceBean = book.sourceBean!;
     BookTocRuleBean ruleBean = book.sourceBean!.mapTocRuleBean();
     BookInfoRuleBean? infoRuleBean;

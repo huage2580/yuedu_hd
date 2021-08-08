@@ -37,13 +37,28 @@ class BookContentHelper{
 
   }
 
-  Future<String> fetchContentFromNetwork(int chapterId,int? nextChapterId) async{
-    var source = await DatabaseHelper().queryBookSourceByChapterId(chapterId);
-    String? bookUrl = await DatabaseHelper().queryChapterUrl(chapterId);
-    String? nextBookUrl;
-    if(nextChapterId!=null){
-      nextBookUrl = await DatabaseHelper().queryChapterUrl(nextChapterId);
+  Future<String> fetchContentFromNetwork(int chapterId,int? nextChapterId,{BookSourceBean? sourceBean,String? chapterUrl,String? nextChapterUrl}) async{
+    BookSourceBean source;
+    if(sourceBean == null){
+      source = await DatabaseHelper().queryBookSourceByChapterId(chapterId);
+    }else{
+      source = sourceBean;
     }
+    String? bookUrl;
+    if(chapterUrl == null){
+      bookUrl = await DatabaseHelper().queryChapterUrl(chapterId);
+    }else{
+      bookUrl = chapterUrl;
+    }
+    String? nextBookUrl;
+    if(nextChapterUrl == null){
+      if(nextChapterId!=null){
+        nextBookUrl = await DatabaseHelper().queryChapterUrl(nextChapterId);
+      }
+    }else{
+      nextBookUrl = nextChapterUrl;
+    }
+
     var contentRule = source.mapContentRuleBean();
     //请求网络
     var charset = source.mapSearchUrlBean()!.charset;
@@ -88,7 +103,9 @@ class BookContentHelper{
       if(content==null || content.isEmpty){
         throw Exception('正文请求成功 解析失败');
       }
-      await DatabaseHelper().updateChapterContent(chapterId, content);
+      if(chapterId > 0){
+        await DatabaseHelper().updateChapterContent(chapterId, content);
+      }
       return Future.value(content);
     }catch(e){
       developer.log('正文获取异常 $e');
