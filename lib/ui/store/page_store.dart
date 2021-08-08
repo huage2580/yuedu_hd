@@ -22,7 +22,7 @@ class _PageStoreState extends State<PageStore> {
     _textEditingController = TextEditingController();
     _navigationDelegate = (request){
       // 判断URL
-      if (request.url.startsWith('yuedu')) {
+      if (request.url.startsWith('yuedu')||request.url.startsWith('legado')) {
         print(request.url);
         var urlMatch = RegExp('src=([^&]*)');
         var matchResult = urlMatch.firstMatch(request.url);

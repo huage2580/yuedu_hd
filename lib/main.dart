@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
       builder: BotToastInit(), //1. call BotToastInit
       navigatorObservers: [BotToastNavigatorObserver()],
       navigatorKey: YDRouter.mainRouter,
-      title: '阅读hd',
+      title: '三目阅读',
       theme: ThemeData(
         // This is the theme of your application.
         primaryColor: YColors.primary,

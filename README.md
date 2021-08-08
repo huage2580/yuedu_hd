@@ -1,4 +1,4 @@
-# 阅读HD 
+# 三目阅读 
 
 ## 声明
 感谢 飞哥的开源项目[阅读](https://github.com/gedoor/legado)  
@@ -9,7 +9,7 @@ https://github.com/huage2580/yuedu_hd
 
 ## releases
 [安卓apk,和windows版本](https://github.com/huage2580/yuedu_hd/releases)  
-[IOS](https://apps.apple.com/cn/app/%E9%98%85%E8%AF%BBHD/id1544754759) 也可以appstore 搜索'阅读HD'  
+[IOS](https://apps.apple.com/cn/app/%E9%98%85%E8%AF%BBHD/id1544754759) 也可以appstore 搜索'三目阅读'  
 
 
 ## 截图  
@@ -35,7 +35,7 @@ static const JSCFunctionListEntry js_math_funcs[] = {
 
 ## 免责声明
 
-阅读HD(以下简称为阅读)是一款提供网络文学搜索的工具，为广大网络文学爱好者提供一种方便、快捷舒适的试读体验。
+三目阅读(以下简称为阅读)是一款提供网络文学搜索的工具，为广大网络文学爱好者提供一种方便、快捷舒适的试读体验。
 
 当您搜索一本书的时，阅读会将该书的书名以关键词的形式提交到各个第三方网络文学网站。 各第三方网站返回的内容与阅读无关，阅读对其概不负责，亦不承担任何法律责任。 任何通过使用阅读而链接到的第三方网页均系他人制作或提供，您可能从第三方网页上获得其他服务， 阅读对其合法性概不负责，亦不承担任何法律责任。 第三方搜索引擎结果根据您提交的书名自动搜索获得并提供试读， 不代表阅读赞成或被搜索链接到的第三方网页上的内容或立场。 您应该对使用搜索引擎的结果自行承担风险。
 

@@ -152,6 +152,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
 参考:https://alanskycn.gitee.io/teachme/
 你可以从搜索引擎，gitee,github，酷安等社区获取别人分享的书源。
 推荐关注公众号[开源阅读]获取书源。
+推荐从下面Tab【社区】中浏览社区并导入书源。
 '''),
         actions: [
           TextButton(onPressed: (){

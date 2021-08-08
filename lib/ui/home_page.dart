@@ -128,7 +128,7 @@ class HomeState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "阅读",
+                "三目",
                 style: themeData.textTheme.headline4,
               ),
               HSpace(4),
