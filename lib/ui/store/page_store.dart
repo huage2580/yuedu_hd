@@ -1,6 +1,8 @@
 
 import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:yuedu_hd/ui/store/dialog_import_source.dart';
@@ -16,9 +18,12 @@ class _PageStoreState extends State<PageStore> {
   late NavigationDelegate _navigationDelegate;
   WebViewController? _controller;
   String showUrl = "http://yck.mumuceo.com/yuedu/shuyuan/index.html";
+  var showLoading = true;
 
   @override
   void initState() {
+    if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
+
     _textEditingController = TextEditingController();
     _navigationDelegate = (request){
       // 判断URL
@@ -86,6 +91,8 @@ class _PageStoreState extends State<PageStore> {
             contentPadding: EdgeInsets.all(0),
             hintText: '输入网址访问',
             border: InputBorder.none,
+            suffixIconConstraints: BoxConstraints(minWidth: 30, maxHeight: 30),
+            suffixIcon: showLoading?CupertinoActivityIndicator():null,
           ),
           onSubmitted: (text){
             showUrl = text;
@@ -98,6 +105,16 @@ class _PageStoreState extends State<PageStore> {
   }
 
   WebView _buildWebView(context){
+    /**
+     * iOS
+        我们需要在 IOS 模块的 Runner 中的 info.plist 文件中添加如下字段：
+
+        <key>NSAppTransportSecurity</key>
+        <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+        </dict>
+     */
     return WebView(
       initialUrl: showUrl,
       javascriptMode: JavascriptMode.unrestricted,
@@ -110,6 +127,11 @@ class _PageStoreState extends State<PageStore> {
         showUrl = url;
         setState(() {
           _textEditingController.text = showUrl;
+        });
+      },
+      onProgress: (i){
+        setState(() {
+          showLoading = i!=100;
         });
       },
     );
