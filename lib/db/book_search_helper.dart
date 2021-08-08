@@ -51,7 +51,7 @@ class BookSearchHelper{
 
     var bookSources = await DatabaseHelper().queryAllBookSourceEnabled();
     if(tokenList.contains(cancelToken)){
-      developer.log('---***搜索结束[token重复]***---');
+      print('---***搜索结束[token重复]***---');
       return Future.value(-1);
     }
     tokenList.add(cancelToken);
@@ -80,7 +80,7 @@ class BookSearchHelper{
       return bean;
     }).toList();
     while(tokenList.contains(cancelToken) && searchOptionList.isNotEmpty){
-      developer.log('开启一轮搜索:本次剩余书源->${searchOptionList.length}');
+      print('开启一轮搜索:本次剩余书源->${searchOptionList.length}');
       var b = searchOptionList.removeAt(0);
       if(b!=null){
         await _countLocker.request();
@@ -89,13 +89,13 @@ class BookSearchHelper{
     }
     cancelSearch(cancelToken);
     await _countLocker.waitDone();
-    developer.log('---***搜索结束***---');
+    print('---***搜索结束***---');
     return Future.value(0);
   }
 
   dynamic cancelSearch(String token){
     tokenList.remove(token);
-    developer.log('搜索企图终止->$token');
+    print('搜索企图终止->$token');
   }
 
 
@@ -114,18 +114,19 @@ class BookSearchHelper{
     try{
 
       dio.options.connectTimeout = 5000;
-      developer.log('搜索书籍:$options');
+      print('搜索书籍:$options');
       var response = await dio.request(options.url!,options: requestOptions,data: options.body).timeout(Duration(seconds: 8));
       if(response.statusCode == 200){
+        print('搜索请求成功[${options.url}]');
         await _parseResponse(response.data,options,onBookSearch,sourceBean: sourceBean);
         if(updateList!=null){
           updateList();//更新列表UI
         }
       }else{
-        developer.log('搜索错误:书源错误${response.statusCode}');
+        print('搜索错误:书源错误${response.statusCode}');
       }
     }catch(e){
-      developer.log('搜索错误[${options.url}]:$e');
+      print('搜索错误[${options.url}]:$e');
     }
 
     return Future.value(0);
@@ -141,7 +142,7 @@ class BookSearchHelper{
       source = await DatabaseHelper().queryBookSourceById(sourceId);
     }
     var tempTime = DateTime.now();
-    developer.log('解析搜索返回内容：$sourceId|$tempTime');
+    print('解析搜索返回内容：$sourceId|$tempTime');
     var ruleBean = source!.mapSearchRuleBean();
     try{
       //填充需要传输的数据
@@ -159,15 +160,15 @@ class BookSearchHelper{
         'rule_tocUrl':ruleBean.tocUrl,
         'rule_coverUrl':ruleBean.coverUrl,
       };
-      developer.log('解析搜索返回内容开始：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
+      print('解析搜索返回内容开始：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
       //用线程池执行解析，大概需要400ms
       var tmp = await Executor().execute(arg1:kv,fun1: _parse);
-      developer.log('解析搜索返回内容结束：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
+      print('解析搜索返回内容结束：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
       List<BookInfoBean> bookInfoList = [];
       for(var t in tmp){
         bookInfoList.add(BookInfoBean.fromMap(t));
       }
-      developer.log('解析搜索返回内容完成：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
+      print('解析搜索返回内容完成：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
       for (var bookInfo in bookInfoList) {
         //链接修正
         bookInfo.bookUrl = Utils.checkLink(options.url!, bookInfo.bookUrl);
@@ -195,7 +196,7 @@ class BookSearchHelper{
         onBookSearch!(bookInfo);
       }
     }catch(e){
-      developer.log('搜索解析错误[${source.bookSourceName},${source.bookSourceUrl}]:$e');
+      print('搜索解析错误[${source.bookSourceName},${source.bookSourceUrl}]:$e');
     }
     return Future.value(0);
   }
@@ -262,7 +263,7 @@ List<Map<String,dynamic>> _parse(Map map){
     hparser.destoryBatch(bId);
     hparser.destory();
   }catch(e){
-    developer.log('搜索解析错误:$e');
+    print('搜索解析错误:$e');
   }
   // jsCore.destroy();
   // objectCache.destroy();
