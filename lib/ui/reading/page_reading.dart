@@ -86,49 +86,74 @@ class _PageReadingState extends State<PageReading> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       key: _scaffoldKey,
-      body: GestureDetector(
-        onTapUp: (d) {
-          var tapX = d.localPosition.dx;
-          var width = sizeKey.currentContext!.size!.width;
-          var threshold = width / 3;
-          if (tapX < threshold) {
-            //上一页
-            _hideMenuBar();
-            PreviousPageEvent.getInstance().emit();
-          } else if (tapX > threshold * 2) {
-            //下一页
-            _hideMenuBar();
-            NextPageEvent.getInstance().emit();
-          } else {
-            //菜单
-            _switchMenuBar();
+      body: RawKeyboardListener(
+        focusNode: FocusNode(),
+        onKey: (e){
+          if(e is RawKeyDownEvent){
+            switch(e.logicalKey.keyId){
+              case 0x00000000061://A
+                _hideMenuBar();
+                PreviousPageEvent.getInstance().emit();
+                break;
+              case 0x00000000064://D
+                _hideMenuBar();
+                NextPageEvent.getInstance().emit();
+                break;
+              case 0x00100070050://左
+                _hideMenuBar();
+                PreviousPageEvent.getInstance().emit();
+                break;
+              case 0x0010007004f://右
+                _hideMenuBar();
+                NextPageEvent.getInstance().emit();
+                break;
+            }
           }
         },
-        child: Stack(
-          key: sizeKey,
-          children: [
-            OrientationBuilder(builder: (ctx, or) {
-              if (or != orientation) {
-                //横竖屏切换重新渲染阅读页
-                _readingWidgetKey = GlobalKey();
-                orientation = or;
-              }
-              if(or == orientation){//window size changed
-                var currSize = Size.copy(MediaQuery.of(context).size);
-                if(currSize != size){
-                  size = currSize;
+        child: GestureDetector(
+          onTapUp: (d) {
+            var tapX = d.localPosition.dx;
+            var width = sizeKey.currentContext!.size!.width;
+            var threshold = width / 3;
+            if (tapX < threshold) {
+              //上一页
+              _hideMenuBar();
+              PreviousPageEvent.getInstance().emit();
+            } else if (tapX > threshold * 2) {
+              //下一页
+              _hideMenuBar();
+              NextPageEvent.getInstance().emit();
+            } else {
+              //菜单
+              _switchMenuBar();
+            }
+          },
+          child: Stack(
+            key: sizeKey,
+            children: [
+              OrientationBuilder(builder: (ctx, or) {
+                if (or != orientation) {
+                  //横竖屏切换重新渲染阅读页
                   _readingWidgetKey = GlobalKey();
+                  orientation = or;
                 }
-              }
-              return ReadingWidget(
-                bookId,
-                initChapterName,
-                key: _readingWidgetKey,
-                notchHeight: notchHeight,
-              );
-            }),
-            _buildMenuBar(context, theme),
-          ],
+                if(or == orientation){//window size changed
+                  var currSize = Size.copy(MediaQuery.of(context).size);
+                  if(currSize != size){
+                    size = currSize;
+                    _readingWidgetKey = GlobalKey();
+                  }
+                }
+                return ReadingWidget(
+                  bookId,
+                  initChapterName,
+                  key: _readingWidgetKey,
+                  notchHeight: notchHeight,
+                );
+              }),
+              _buildMenuBar(context, theme),
+            ],
+          ),
         ),
       ),
       endDrawerEnableOpenDragGesture: false,

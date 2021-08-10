@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +13,7 @@ import 'package:yuedu_hd/ui/explore/page_explore.dart';
 import 'package:yuedu_hd/ui/settings/page_settings.dart';
 import 'package:yuedu_hd/ui/store/page_store.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
+import 'dart:io';
 
 class HomePage extends StatefulWidget {
   @override
@@ -266,6 +268,10 @@ class HomeState extends State<HomePage> {
         });
         break;
       case PAGE_STORE:
+        if(Platform.isWindows){
+          BotToast.showText(text: "电脑端不支持社区！自己去网页导入书源(●'◡'●)");
+          return;
+        }
         setState(() {
           homeContainerKey.currentState?.pushNamedAndRemoveUntil(YDRouter.STORE,ModalRoute.withName(YDRouter.STORE));
         });
