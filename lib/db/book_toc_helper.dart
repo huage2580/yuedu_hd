@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:reader_parser2/h_parser/h_eval_parser.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'package:yuedu_hd/db/BookInfoBean.dart';
 import 'package:yuedu_hd/db/BookSourceBean.dart';
@@ -65,19 +66,18 @@ class BookTocHelper{
       infoRuleBean = book.sourceBean?.mapInfoRuleBean();
     }
     var charset = sourceBean.mapSearchUrlBean()?.charset;
-    Options requestOptions = Options(contentType:ContentType.html.toString() ,sendTimeout: 10000,receiveTimeout: 10000);
-    if(charset == 'gbk'){
+    Options requestOptions = Options(sendTimeout: 10000,receiveTimeout: 10000);
+    // if(charset == 'gbk'){
       requestOptions.responseDecoder = Utils.gbkDecoder;
-    }
-    var headers = Map<String,String>();
-    headers["user-agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36";
+    // }
+    var headers = Utils.buildHeaders(book.bookUrl!,ContentType.html.toString(), null);
     requestOptions.headers = headers;
     //3.请求网络
     var bookUrl = book.bookUrl!;
 
     try{
       var dio = Utils.createDioClient();
-      dio.options.connectTimeout = 10000;
+      dio.options.connectTimeout = 15000;
       //解析真正的目录页
       if(infoRuleBean!=null && infoRuleBean.tocUrl!=null && infoRuleBean.tocUrl!.isNotEmpty){
         if(cancelToken.contains(myCancelToken)){
@@ -254,5 +254,9 @@ String? _parseTocUrl(String data, BookInfoRuleBean ruleBean,String url){
   var parser = HParser(data);
   var result = parser.parseRuleStrings(ruleBean.tocUrl);
   parser.destory();
+  if(result.isEmpty || result[0] == "null"){//奇怪的办法去兼容需要注入参数的规则，暂时不实现参数的注入
+    var eparser = HEvalParser({'baseUrl':url});
+    return eparser.parse(ruleBean.tocUrl);
+  }
   return result.isNotEmpty?result[0]:null;
 }

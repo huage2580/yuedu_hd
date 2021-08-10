@@ -46,7 +46,13 @@ class SourceVerifyHelper{
         await BookSourceHelper.getInstance().updateDataBases(sources);
         onVerifyProgress.call("导入成功...",true);
       }else{
-        var verifyResult = await _verify(sources[0],onVerifyProgress);
+        var verifyResult = await _verify(sources[0],onVerifyProgress).catchError((e){
+          onVerifyProgress.call("可能不兼容书源(T_T)",true);
+        });
+        if(verifyResult==null){
+          onVerifyProgress.call("出错了!可能不兼容书源(T_T)",true);
+          return;
+        }
         if(verifyResult){
           onVerifyProgress.call("校验成功...",false);
           await BookSourceHelper.getInstance().updateDataBases(sources);
@@ -60,7 +66,7 @@ class SourceVerifyHelper{
   }
 
 
-  Future<bool> _verify(BookSourceBean sourceBean,OnVerifyProgress onVerifyProgress) async{
+  Future<bool?> _verify(BookSourceBean sourceBean,OnVerifyProgress onVerifyProgress) async{
     sourceBean.ruleSearch = jsonEncode(sourceBean.ruleSearch);
     sourceBean.ruleBookInfo = jsonEncode(sourceBean.ruleBookInfo);
     sourceBean.ruleToc = jsonEncode(sourceBean.ruleToc);

@@ -62,10 +62,10 @@ class BookContentHelper{
     var contentRule = source.mapContentRuleBean();
     //请求网络
     var charset = source.mapSearchUrlBean()!.charset;
-    Options requestOptions = Options(contentType:ContentType.html.toString() ,sendTimeout: 10000,receiveTimeout: 5000);
-    if(charset == 'gbk'){
+    Options requestOptions = Options(contentType:ContentType.html.toString() ,sendTimeout: 10000,receiveTimeout: 10000);
+    // if(charset == 'gbk'){
       requestOptions.responseDecoder = Utils.gbkDecoder;
-    }
+    // }
     var content = "";
     try{
       var counter = 0;
@@ -117,14 +117,9 @@ class BookContentHelper{
 
   Future<String?> _request(Options requestOptions,String bookUrl) async{
     try{
-      var headers = Map<String,dynamic>();
-      headers["user-agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36";
-      if(requestOptions.headers!=null){
-        requestOptions.headers!.addAll(headers);
-      }else{
-        requestOptions.headers = headers;
-      }
-      developer.log('正文请求 $bookUrl');
+      var headers = Utils.buildHeaders(bookUrl,ContentType.html.toString(), requestOptions.headers);
+      requestOptions.headers = headers;
+      developer.log('正文请求 $bookUrl,$headers');
       var dio = Utils.createDioClient();
       var response = await dio.get(bookUrl,options: requestOptions);
       if(response.statusCode == 200) {

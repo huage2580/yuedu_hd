@@ -100,21 +100,16 @@ class BookSearchHelper{
 
 
   Future<dynamic> request(BookSearchUrlBean options,OnBookSearch? onBookSearch,UpdateList? updateList,{BookSourceBean? sourceBean}) async{
-    var contentType = options.headers!['content-type'];
-    var headers = Map<String,String>();
-    headers["user-agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36";
-    if(options.headers!=null){
-      options.headers!.addAll(headers);
-    }
-    Options requestOptions = Options(method: options.method,headers: options.headers,sendTimeout: 5000,receiveTimeout: 5000,followRedirects: true);
+    var headers = Utils.buildHeaders(options.url!,ContentType.html.toString(), options.headers);
+    Options requestOptions = Options(method: options.method,headers: headers,sendTimeout: 5000,receiveTimeout: 5000,followRedirects: true);
     if(options.charset == 'gbk'){
-      requestOptions.responseDecoder = Utils.gbkDecoder;
       options.body = UrlGBKEncode().encode(options.body);
     }
+    requestOptions.responseDecoder = Utils.gbkDecoder;
     try{
 
-      dio.options.connectTimeout = 5000;
-      print('搜索书籍:$options');
+      dio.options.connectTimeout = 10000;
+      print('搜索书籍:$options,$headers');
       var response = await dio.request(options.url!,options: requestOptions,data: options.body).timeout(Duration(seconds: 8));
       if(response.statusCode == 200){
         print('搜索请求成功[${options.url}]');
@@ -224,6 +219,7 @@ List<Map<String,dynamic>> _parse(Map map){
   ruleBean.tocUrl = map['rule_tocUrl'];
   ruleBean.coverUrl = map['rule_coverUrl'];
 
+  print("搜索解析规则->[$ruleBean]");
 
   List<BookInfoBean> result = [];
 

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:fast_gbk/fast_gbk.dart';
@@ -6,7 +8,12 @@ class Utils{
   Utils._();
 
   static String gbkDecoder(List<int> responseBytes, RequestOptions options, ResponseBody responseBody) {
-    return gbk.decode(responseBytes);
+    var type = responseBody.headers["content-type"].toString();
+    if(type.contains("gbk")){
+      return gbk.decode(responseBytes);
+    }else{
+      return Utf8Decoder().convert(responseBytes);
+    }
   }
 
   static String checkLink(String host,String? input){
@@ -43,6 +50,42 @@ class Utils{
       return (host + sep + input).trim();
     }
   }
+
+  static String getHost(String? url){
+    if(url == null){
+      return "";
+    }
+    var realHost;
+    var urlRegexp = RegExp(r'http[s]?:\/\/([^\/\?]*)');
+    var match = urlRegexp.firstMatch(url);
+    if(match!=null){
+      realHost = match.group(1)!;
+    }
+    return realHost??"";
+  }
+
+  static Map<String,String> buildHeaders(String url,String? contentType,Map<String,dynamic>? oldHeaders){
+    var headers = Map<String,String>();
+    headers["user-agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36";
+    headers["host"] = Utils.getHost(url);
+    headers["accept"] = "*/*";
+    headers["Accept-Encoding"] = "gzip, deflate";
+    headers["Connection"] = "keep-alive";
+    if(contentType!=null){
+      headers["content-type"] = contentType;
+    }
+    if(oldHeaders!=null){
+      oldHeaders.forEach((key, value) {
+        headers[key] = value.toString();
+        if(key == "Content-Type"){
+          headers.remove("content-type");
+        }
+      });
+    }
+    return headers;
+  }
+
+
 
   static Dio createDioClient(){
     var dio = Dio(BaseOptions(connectTimeout: 15000,receiveTimeout: 5000,sendTimeout: 5000,responseType: ResponseType.plain,followRedirects: true));
