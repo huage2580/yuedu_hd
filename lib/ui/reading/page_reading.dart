@@ -245,7 +245,7 @@ class _PageReadingState extends State<PageReading> {
                                 BookDownloader.getInstance().startDownload(bookId,from: currChapterId,limit: 10);
                                 break;
                             }
-                            BotToast.showText(text:"开始缓存");
+                            BotToast.showText(text:"开始缓存,请到【设置】查看下载进度~");
                           },
                           itemBuilder: (ctx) {
                             return [

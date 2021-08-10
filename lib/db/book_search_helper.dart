@@ -51,7 +51,7 @@ class BookSearchHelper{
 
     var bookSources = await DatabaseHelper().queryAllBookSourceEnabled();
     if(tokenList.contains(cancelToken)){
-      developer.log('---***搜索结束[token重复]***---');
+      print('---***搜索结束[token重复]***---');
       return Future.value(-1);
     }
     tokenList.add(cancelToken);
@@ -80,33 +80,33 @@ class BookSearchHelper{
       return bean;
     }).toList();
     while(tokenList.contains(cancelToken) && searchOptionList.isNotEmpty){
-      developer.log('开启一轮搜索:本次剩余书源->${searchOptionList.length}');
+      print('开启一轮搜索:本次剩余书源->${searchOptionList.length}');
       var b = searchOptionList.removeAt(0);
       if(b!=null){
         await _countLocker.request();
-        _request(b, onBookSearch,updateList).whenComplete(() => _countLocker.release());
+        request(b, onBookSearch,updateList).whenComplete(() => _countLocker.release());
       }
     }
     cancelSearch(cancelToken);
     await _countLocker.waitDone();
-    developer.log('---***搜索结束***---');
+    print('---***搜索结束***---');
     return Future.value(0);
   }
 
   dynamic cancelSearch(String token){
     tokenList.remove(token);
-    developer.log('搜索企图终止->$token');
+    print('搜索企图终止->$token');
   }
 
 
-  Future<dynamic> _request(BookSearchUrlBean options,OnBookSearch? onBookSearch,UpdateList? updateList) async{
+  Future<dynamic> request(BookSearchUrlBean options,OnBookSearch? onBookSearch,UpdateList? updateList,{BookSourceBean? sourceBean}) async{
     var contentType = options.headers!['content-type'];
     var headers = Map<String,String>();
     headers["user-agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36";
     if(options.headers!=null){
       options.headers!.addAll(headers);
     }
-    Options requestOptions = Options(method: options.method,headers: options.headers,contentType:contentType ,sendTimeout: 5000,receiveTimeout: 5000);
+    Options requestOptions = Options(method: options.method,headers: options.headers,sendTimeout: 5000,receiveTimeout: 5000,followRedirects: true);
     if(options.charset == 'gbk'){
       requestOptions.responseDecoder = Utils.gbkDecoder;
       options.body = UrlGBKEncode().encode(options.body);
@@ -114,28 +114,35 @@ class BookSearchHelper{
     try{
 
       dio.options.connectTimeout = 5000;
-      developer.log('搜索书籍:$options');
+      print('搜索书籍:$options');
       var response = await dio.request(options.url!,options: requestOptions,data: options.body).timeout(Duration(seconds: 8));
       if(response.statusCode == 200){
-        await _parseResponse(response.data,options,onBookSearch);
+        print('搜索请求成功[${options.url}]');
+        await _parseResponse(response.data,options,onBookSearch,sourceBean: sourceBean);
         if(updateList!=null){
           updateList();//更新列表UI
         }
       }else{
-        developer.log('搜索错误:书源错误${response.statusCode}');
+        print('搜索错误:书源错误${response.statusCode}');
       }
     }catch(e){
-      developer.log('搜索错误:$e');
+      print('搜索错误[${options.url}]:$e');
     }
 
     return Future.value(0);
   }
 
-  dynamic _parseResponse(String response,BookSearchUrlBean options, OnBookSearch? onBookSearch) async{
-    int sourceId = options.sourceId!;
+  dynamic _parseResponse(String response,BookSearchUrlBean options, OnBookSearch? onBookSearch,{BookSourceBean? sourceBean}) async{
+    BookSourceBean? source;
+    int sourceId = -1;
+    if(options.sourceId == null){//校验的时候
+      source = sourceBean;
+    }else{
+      sourceId = options.sourceId!;
+      source = await DatabaseHelper().queryBookSourceById(sourceId);
+    }
     var tempTime = DateTime.now();
-    developer.log('解析搜索返回内容：$sourceId|$tempTime');
-    BookSourceBean? source = await DatabaseHelper().queryBookSourceById(sourceId);
+    print('解析搜索返回内容：$sourceId|$tempTime');
     var ruleBean = source!.mapSearchRuleBean();
     try{
       //填充需要传输的数据
@@ -153,41 +160,43 @@ class BookSearchHelper{
         'rule_tocUrl':ruleBean.tocUrl,
         'rule_coverUrl':ruleBean.coverUrl,
       };
-      developer.log('解析搜索返回内容开始：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
+      print('解析搜索返回内容开始：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
       //用线程池执行解析，大概需要400ms
       var tmp = await Executor().execute(arg1:kv,fun1: _parse);
-      developer.log('解析搜索返回内容结束：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
+      print('解析搜索返回内容结束：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
       List<BookInfoBean> bookInfoList = [];
       for(var t in tmp){
         bookInfoList.add(BookInfoBean.fromMap(t));
       }
-      developer.log('解析搜索返回内容完成：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
+      print('解析搜索返回内容完成：$sourceId|${DateTime.now().difference(tempTime).inMilliseconds}');
       for (var bookInfo in bookInfoList) {
         //链接修正
         bookInfo.bookUrl = Utils.checkLink(options.url!, bookInfo.bookUrl);
         bookInfo.coverUrl = Utils.checkLink(options.url!, bookInfo.coverUrl);
         //-------关联到书源-------------
-        bookInfo.source_id = source.id;
-        bookInfo.sourceBean = source;
-        if(bookInfo.name == null || bookInfo.author == null){
-          continue;
-        }
-        if(bookInfo.bookUrl == null || bookInfo.bookUrl!.isEmpty){
-          continue;
-        }
-        bookInfo.name = bookInfo.name!.trim();
-        bookInfo.author = bookInfo.author!.trim();
-        if(options.exactSearch){//精确搜索，要求书名和作者完全匹配
-          if(bookInfo.name!=options.bookName || bookInfo.author!=options.bookAuthor){
+        if(sourceBean == null){
+          bookInfo.source_id = source.id;
+          bookInfo.sourceBean = source;
+          if(bookInfo.name == null || bookInfo.author == null){
             continue;
           }
+          if(bookInfo.bookUrl == null || bookInfo.bookUrl!.isEmpty){
+            continue;
+          }
+          bookInfo.name = bookInfo.name!.trim();
+          bookInfo.author = bookInfo.author!.trim();
+          if(options.exactSearch){//精确搜索，要求书名和作者完全匹配
+            if(bookInfo.name!=options.bookName || bookInfo.author!=options.bookAuthor){
+              continue;
+            }
+          }
+          var bookId = await DatabaseHelper().insertBookToDB(bookInfo);
+          bookInfo.id = bookId;
         }
-        var bookId = await DatabaseHelper().insertBookToDB(bookInfo);
-        bookInfo.id = bookId;
         onBookSearch!(bookInfo);
       }
     }catch(e){
-      developer.log('搜索解析错误[${source.bookSourceName},${source.bookSourceUrl}]:$e');
+      print('搜索解析错误[${source.bookSourceName},${source.bookSourceUrl}]:$e');
     }
     return Future.value(0);
   }
@@ -254,7 +263,7 @@ List<Map<String,dynamic>> _parse(Map map){
     hparser.destoryBatch(bId);
     hparser.destory();
   }catch(e){
-    developer.log('搜索解析错误:$e');
+    print('搜索解析错误:$e');
   }
   // jsCore.destroy();
   // objectCache.destroy();

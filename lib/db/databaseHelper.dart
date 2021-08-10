@@ -607,5 +607,15 @@ ON "book_chapter" (
   Future<DisplayConfig> loadConfig() async{
     return withDB().then((db) => db.query(TABLE_CONFIG)).then((value) => DisplayConfig.fromMap(value[0]));
   }
+  
+  ///清空所有数据
+  dynamic clearAllData() async{
+    return withDB().then((db) async{
+      await db.delete(TABLE_BOOK);
+      await db.delete(TABLE_BOOK_COMB_SOURCE);
+      await db.delete(TABLE_CHAPTER);
+      await db.delete(TABLE_SOURCE);
+    });
+  }
 
 }

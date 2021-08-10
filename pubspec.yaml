@@ -54,6 +54,8 @@ dependencies:
   fast_gbk: ^1.0.0-rc
   #isolate
   isolate: ^2.1.1
+  #webview
+  webview_flutter: ^2.0.10
 
 dev_dependencies:
   sqflite_common_ffi:

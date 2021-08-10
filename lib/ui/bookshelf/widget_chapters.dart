@@ -123,9 +123,13 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
         break;
       }
     }//for
-    _scrollController.jumpTo(index * _itemKey.currentContext!.size!.height);
-    setState(() {
+    var eachHeight = _itemKey.currentContext?.size?.height;
+    if(eachHeight !=null){
+      _scrollController.jumpTo(index * (eachHeight));
+      setState(() {
 
-    });
+      });
+    }
+
   }
 }
