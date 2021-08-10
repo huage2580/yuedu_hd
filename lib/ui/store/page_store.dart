@@ -121,7 +121,7 @@ class _PageStoreState extends State<PageStore> {
      */
     return WebView(
       // initialUrl: "http://yck.mumuceo.com/yuedu/shuyuan/index.html",
-      initialUrl: "http://47.107.39.107/",
+      initialUrl: "http://47.107.39.107/index.html",
       javascriptMode: JavascriptMode.unrestricted,
       gestureNavigationEnabled: true,
       navigationDelegate: _navigationDelegate,
