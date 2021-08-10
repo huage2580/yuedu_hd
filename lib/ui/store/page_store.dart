@@ -17,7 +17,7 @@ class _PageStoreState extends State<PageStore> {
   late TextEditingController _textEditingController;
   late NavigationDelegate _navigationDelegate;
   WebViewController? _controller;
-  String showUrl = "http://yck.mumuceo.com/yuedu/shuyuan/index.html";
+  String showUrl = "";
   var showLoading = true;
 
   @override
@@ -34,6 +34,10 @@ class _PageStoreState extends State<PageStore> {
         var jsonUrl = matchResult?.group(1);
         _importJsonUrl(jsonUrl);
         return NavigationDecision.prevent;
+      }
+      if(request.url.endsWith('.json')){
+        _importJsonUrl(request.url);
+        return NavigationDecision.navigate;
       }
       if(request.url.startsWith('http')){
         return NavigationDecision.navigate;
@@ -116,7 +120,8 @@ class _PageStoreState extends State<PageStore> {
         </dict>
      */
     return WebView(
-      initialUrl: showUrl,
+      // initialUrl: "http://yck.mumuceo.com/yuedu/shuyuan/index.html",
+      initialUrl: "http://47.107.39.107/",
       javascriptMode: JavascriptMode.unrestricted,
       gestureNavigationEnabled: true,
       navigationDelegate: _navigationDelegate,
@@ -124,6 +129,7 @@ class _PageStoreState extends State<PageStore> {
         _controller = webViewController;
       },
       onPageStarted: (url){
+        print("onPageStarted $url");
         showUrl = url;
         setState(() {
           _textEditingController.text = showUrl;
