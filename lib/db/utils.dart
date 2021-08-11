@@ -22,7 +22,7 @@ class Utils{
   }
 
   static String checkLink(String host,String? input){
-    if(input == null || input.isEmpty){
+    if(input == null || input.isEmpty || input == "null"){
       return "";
     }
     input = input.trim();

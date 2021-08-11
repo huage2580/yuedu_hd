@@ -103,6 +103,7 @@ class BookSearchHelper{
     var headers = Utils.buildHeaders(options.url!,ContentType.html.toString(), options.headers);
     Options requestOptions = Options(method: options.method,headers: headers,sendTimeout: 5000,receiveTimeout: 5000,followRedirects: true);
     if(options.charset == 'gbk'){
+      options.url = UrlGBKEncode().encode(options.url);
       options.body = UrlGBKEncode().encode(options.body);
     }
     requestOptions.responseDecoder = Utils.gbkDecoder;

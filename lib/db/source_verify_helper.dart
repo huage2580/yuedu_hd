@@ -33,7 +33,8 @@ class SourceVerifyHelper{
     }
 
     if(sources.isEmpty){
-      onVerifyProgress.call("NULL",true);
+      var log = BookSourceHelper.getInstance().getLog();
+      onVerifyProgress.call("NULL 获取书源失败\n$log",true);
       return;
     }else if(sources.length > 1){
       //直接导入数据库

@@ -86,7 +86,7 @@ class BookContentHelper{
         //解析下一页
         if(contentRule.nextContentUrl!=null && contentRule.nextContentUrl!.isNotEmpty){
           String? nextUrl = await Executor().execute(arg1: bookUrl,arg2: htmlString,arg3: contentRule.nextContentUrl!,fun3: parseNextPage);
-          if(nextUrl == null || nextUrl.trim().isEmpty){
+          if(nextUrl == null || nextUrl.trim().isEmpty || nextUrl == "null"){
             bookUrl = null;
           }else{
             bookUrl = Utils.checkLink(bookUrl, nextUrl);
@@ -137,7 +137,7 @@ class BookContentHelper{
 
 }
 
-String? parseContent(String url,String html,BookContentRuleBean rule){
+String parseContent(String url,String html,BookContentRuleBean rule){
   developer.log('开始解析正文 $rule');
   var parser = HParser(html);
   var content = parser.parseRuleString(rule.content);
@@ -149,10 +149,10 @@ String? parseContent(String url,String html,BookContentRuleBean rule){
   return HParser.parseReplaceRule(content??"",rule.replaceRegex!);
 }
 
-String? parseNextPage(String url,String html,String next){
-  developer.log('解析下一页的链接');
+String parseNextPage(String url,String html,String next){
+  developer.log('解析下一页的链接 rule->$next');
   var parser = HParser(html);
   var result = parser.parseRuleStrings(next);
   parser.destory();
-  return result.isNotEmpty?result[0]:null;
+  return result.isNotEmpty?result[0]:"";
 }

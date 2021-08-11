@@ -122,12 +122,12 @@ class BookTocHelper{
           var chapters = await Executor().execute(arg1: response.data as String,arg2: ruleBean,arg3: curUrl as String,fun3: _parseResponse);
           if(ruleBean.nextTocUrl!=null && ruleBean.nextTocUrl!.trim().isNotEmpty){
             var nextUrl = await Executor().execute(arg1: response.data as String,arg2: ruleBean,arg3: curUrl,fun3: _parseNextUrl);
-            if(nextUrl!=null || nextUrl!.trim().isNotEmpty){
+            if(nextUrl!=null || nextUrl.trim().isNotEmpty && nextUrl != "null"){
               //可能是数组，采用逗号分割
               var urls = nextUrl.split(',');
               urls.forEach((element) {
                 var next = Utils.checkLink(curUrl, element).trim();
-                if(next!=null && next.isNotEmpty && !allTocUrlList.contains(next)){
+                if(element != "null" && next!="null" && next.isNotEmpty && !allTocUrlList.contains(next)){
                   tocUrlList.add(next);
                   allTocUrlList.add(next);
                 }
@@ -243,14 +243,14 @@ List<BookChapterBean> _parseResponse(String data, BookTocRuleBean ruleBean,Strin
   return result;
 }
 
-String? _parseNextUrl(String data, BookTocRuleBean ruleBean,String url){
+String _parseNextUrl(String data, BookTocRuleBean ruleBean,String url){
   var parser = HParser(data);
   var result = parser.parseRuleStrings(ruleBean.nextTocUrl);
   parser.destory();
-  return result.isNotEmpty?result[0]:null;
+  return result.isNotEmpty?result[0]:"";
 }
 
-String? _parseTocUrl(String data, BookInfoRuleBean ruleBean,String url){
+String _parseTocUrl(String data, BookInfoRuleBean ruleBean,String url){
   var parser = HParser(data);
   var result = parser.parseRuleStrings(ruleBean.tocUrl);
   parser.destory();
@@ -258,5 +258,5 @@ String? _parseTocUrl(String data, BookInfoRuleBean ruleBean,String url){
     var eparser = HEvalParser({'baseUrl':url});
     return eparser.parse(ruleBean.tocUrl);
   }
-  return result.isNotEmpty?result[0]:null;
+  return result.isNotEmpty?result[0]:"";
 }
