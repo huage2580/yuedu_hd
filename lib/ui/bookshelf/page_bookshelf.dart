@@ -1,4 +1,5 @@
 import 'package:bot_toast/bot_toast.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -184,28 +185,40 @@ class _PageBookShelfState extends State<PageBookShelf>
               child: SizedBox(
                   height: 120,
                   width: 100,
-                  child: Image.network(
+                  child:
+                  ExtendedImage.network(
                     bean.coverUrl,
+                    width: 80,
+                    height: 100,
                     fit: BoxFit.cover,
-                    loadingBuilder: (BuildContext context, Widget child,
-                        ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        height: 120,
-                        width: 100,
-                        color: Colors.grey,
-                        child: Center(child: Text('loading'),),
-                      );
-                    },
-                    errorBuilder: (BuildContext context, Object exception,
-                        StackTrace? stackTrace) {
-                      return Container(
-                        height: 120,
-                        width: 100,
-                        color: Colors.grey,
-                      );
-                    },
-                  )),
+                    cache: true,
+                    borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                    //cancelToken: cancellationToken,
+                  ),
+
+                  // Image.network(
+                  //   bean.coverUrl,
+                  //   fit: BoxFit.cover,
+                  //   loadingBuilder: (BuildContext context, Widget child,
+                  //       ImageChunkEvent? loadingProgress) {
+                  //     if (loadingProgress == null) return child;
+                  //     return Container(
+                  //       height: 120,
+                  //       width: 100,
+                  //       color: Colors.grey,
+                  //       child: Center(child: Text('loading'),),
+                  //     );
+                  //   },
+                  //   errorBuilder: (BuildContext context, Object exception,
+                  //       StackTrace? stackTrace) {
+                  //     return Container(
+                  //       height: 120,
+                  //       width: 100,
+                  //       color: Colors.grey,
+                  //     );
+                  //   },
+                  // )
+              ),
             ),
             HSpace(8),
             Expanded(

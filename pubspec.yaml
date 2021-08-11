@@ -54,8 +54,10 @@ dependencies:
   fast_gbk: ^1.0.0-rc
   #isolate
   isolate: ^2.1.1
-  #webview
+  #webview 只支持mobile
   webview_flutter: ^2.0.10
+  #扩展的图片，用来支持本地缓存
+  extended_image: ^4.0.0
 
 dev_dependencies:
   sqflite_common_ffi:

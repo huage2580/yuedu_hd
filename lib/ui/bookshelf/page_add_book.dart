@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yuedu_hd/db/BookInfoBean.dart';
@@ -246,7 +247,17 @@ class _PageAddBookState extends State<PageAddBook>{
           children: [
             Container(
               color: Colors.grey,
-              child: SizedBox(height: 100,width: 80,child: FadeInImageWithoutAuth.network(infoBean.coverUrl!,
+              child: SizedBox(height: 100,width: 80,child:
+              ExtendedImage.network(
+                infoBean.coverUrl!,
+                width: 80,
+                height: 100,
+                fit: BoxFit.fill,
+                cache: true,
+                borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                //cancelToken: cancellationToken,
+              ),
+              // FadeInImageWithoutAuth.network(infoBean.coverUrl!,
                 // loadingBuilder: (BuildContext context, Widget child,
                 //     ImageChunkEvent? loadingProgress) {
                 //   if (loadingProgress == null) return child;
@@ -265,7 +276,8 @@ class _PageAddBookState extends State<PageAddBook>{
                 //     color: Colors.grey,
                 //   );
                 // },
-              )),
+              // )
+            ),
             ),
             HSpace(8),
             Expanded(child: Column(
