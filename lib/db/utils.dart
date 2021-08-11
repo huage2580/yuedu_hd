@@ -9,10 +9,15 @@ class Utils{
 
   static String gbkDecoder(List<int> responseBytes, RequestOptions options, ResponseBody responseBody) {
     var type = responseBody.headers["content-type"].toString();
-    if(type.contains("gbk")){
+    print("dio response content-type: $type");
+    if(type.contains("gb")){//gbk gb2132
       return gbk.decode(responseBytes);
     }else{
-      return Utf8Decoder().convert(responseBytes);
+      try{
+        return Utf8Decoder().convert(responseBytes);
+      }catch(e){
+        return gbk.decode(responseBytes);
+      }
     }
   }
 
@@ -63,6 +68,18 @@ class Utils{
     }
     return realHost??"";
   }
+
+  static String comLocation(String url,String location){
+    String nUrl = location;
+    if(nUrl.startsWith("http")){
+      return nUrl;
+    }
+    if(nUrl.startsWith("/")){
+
+    }
+    return nUrl;
+  }
+
 
   static Map<String,String> buildHeaders(String url,String? contentType,Map<String,dynamic>? oldHeaders){
     var headers = Map<String,String>();

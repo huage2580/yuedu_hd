@@ -121,6 +121,21 @@ class BookSearchHelper{
         print('搜索错误:书源错误${response.statusCode}');
       }
     }catch(e){
+      //POST导致的302重新处理
+      if(e is DioError){
+        var rsp = (e).response;
+        if(rsp?.statusCode == 302){
+          var location = rsp?.headers["location"];
+          var linkRegexp = RegExp(r'http:.*\/');
+          var sep = linkRegexp.stringMatch(options.url!);
+          var nUrl = Utils.checkLink(sep??"", location?[0]);
+          print("302 error 重构请求->$nUrl");
+          options.url = nUrl;
+          options.method = "GET";
+          options.body = "";
+          return request(options, onBookSearch,updateList,sourceBean: sourceBean);
+        }
+      }
       print('搜索错误[${options.url}]:$e');
     }
 

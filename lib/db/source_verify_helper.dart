@@ -89,6 +89,24 @@ class SourceVerifyHelper{
     }, () {
 
     },sourceBean: sourceBean);
+
+    //二次搜索，使用长一点的关键词
+    if(books.isEmpty){
+      //搜索
+      BookSearchUrlBean? searchUrlBean = sourceBean.mapSearchUrlBean();
+      if(searchUrlBean == null){
+        return Future.value(false);
+      }
+      var eparser = HEvalParser({'page':1,'key':"凡人修仙"});
+      searchUrlBean.url = eparser.parse(searchUrlBean.url);
+      searchUrlBean.body = eparser.parse(searchUrlBean.body);
+      searchUrlBean.exactSearch = false;
+      await BookSearchHelper.getInstance().request(searchUrlBean, (data) {
+        books.add(data);
+      }, () {
+
+      },sourceBean: sourceBean);
+    }
     if(books.isEmpty){
       onVerifyProgress.call("搜索书籍失败",false);
       developer.log("source import _verify books.isEmpty");
