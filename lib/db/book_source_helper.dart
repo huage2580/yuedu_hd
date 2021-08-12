@@ -99,7 +99,7 @@ class BookSourceHelper{
     if(item['bookSourceType'] !=null && item['bookSourceType'].toString() != "0"){//只兼容文字源
       return false;
     }
-    item['bookSourceType'] = int.tryParse(item['bookSourceType']);
+    item['bookSourceType'] = int.tryParse(item['bookSourceType'].toString());
     return true;
   }
 
