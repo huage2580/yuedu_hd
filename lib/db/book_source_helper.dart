@@ -96,9 +96,10 @@ class BookSourceHelper{
     if(itemStr.contains('Jsoup.connect')){
       return false;
     }
-    if(item['bookSourceType'] !=null && item['bookSourceType'] != 0){//只兼容文字源
+    if(item['bookSourceType'] !=null && item['bookSourceType'].toString() != "0"){//只兼容文字源
       return false;
     }
+    item['bookSourceType'] = int.tryParse(item['bookSourceType']);
     return true;
   }
 
