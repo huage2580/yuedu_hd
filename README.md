@@ -11,6 +11,12 @@ https://github.com/huage2580/yuedu_hd
 [安卓apk,和windows版本](https://github.com/huage2580/yuedu_hd/releases)  
 [IOS](https://apps.apple.com/cn/app/%E9%98%85%E8%AF%BBHD/id1544754759) 也可以appstore 搜索'三目阅读'  
 
+## 推荐书源  
+使用一程维护的3.0书源 https://gitee.com/vpq/yd  
+
+## Windows说明  
+电脑端无法使用社区，自行导入书源。阅读界面，A、D或者左、右键快捷翻页，如果没反应，先点一下窗口获取焦点。  
+
 
 ## 截图  
 ![1](https://github.com/huage2580/yuedu_hd/raw/master/screenshot/1242x2688bb%201.png)
