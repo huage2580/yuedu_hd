@@ -171,7 +171,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
     });
      if(result!=null){
        if(result == "use"){
-         _textEditingController.text = 'http://47.107.39.107/sy.json';
+         _textEditingController.text = 'https://yuedu-hd.netlify.app/sy.json';
        }
        setState(() {
 
