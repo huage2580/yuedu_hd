@@ -330,6 +330,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       color: Color(config.textColor),
       fontSize: config.textSize,
       fontWeight: config.isTextBold==1?FontWeight.bold:FontWeight.normal,
+      fontFamily: config.fontPath,
       height: config.lineSpace,
     );
 
@@ -345,7 +346,8 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     final titleStyle = TextStyle(
         color: Color(config.titleColor),
         fontSize: config.titleSize,
-        fontWeight: config.isTitleBold==1?FontWeight.bold:FontWeight.normal
+        fontWeight: config.isTitleBold==1?FontWeight.bold:FontWeight.normal,
+        fontFamily: config.fontPath,
     );
     final titleSpan = TextSpan(
       text: title.trim(),

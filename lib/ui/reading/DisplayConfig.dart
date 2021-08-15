@@ -20,6 +20,7 @@ class DisplayConfig{
   double lineSpace = 1.2;//行距
   int isTitleBold = 1;//标题加粗
   int isTextBold = 0;//正文加粗
+  String? fontPath = "";//选择字体
 
   static DisplayConfig? _default;
 
@@ -54,6 +55,7 @@ class DisplayConfig{
     lineSpace = map['lineSpace'];
     isTitleBold = map['isTitleBold'];
     isTextBold = map['isTextBold'];
+    fontPath = map['fontPath'];
 
     _default = this;
   }
@@ -77,7 +79,7 @@ class DisplayConfig{
     map['lineSpace'] = lineSpace;
     map['isTitleBold'] = isTitleBold;
     map['isTextBold'] = isTextBold;
-
+    map['fontPath'] = fontPath;
     return map;
   }
 }

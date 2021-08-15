@@ -104,8 +104,47 @@ class _MoreStyleSettingsMenuState extends State<MoreStyleSettingsMenu> {
           config.isTextBold = b?1:0;
           _saveConfig();
         },),
+        ListTile(title: Text('自定义字体'),subtitle:Text('选择使用内置的字体'),trailing: Text('${config.fontPath}'),onTap: () async{
+          var result = await showDialog(context: context,builder: (ctx)=>SimpleDialog(
+            title: Text("选择字体"),
+            children: _getFontList(config,ctx),
+          ));
+
+          if(result!=null){
+            config.fontPath = result;
+            _saveConfig();
+          }
+        },),
       ],
     );
+  }
+
+  List<Widget> _getFontList(DisplayConfig config, BuildContext ctx){
+    var f = config.fontPath;
+    var fonts = [{"name":"系统默认","font":""},
+      {"name":"HarmonyOS_Sans","font":"HarmonyOS_Sans"},
+      {"name":"汉字拼音体","font":"Hanzi-Pinyin"},
+      {"name":"站酷快乐体","font":"zcool_happy"},
+      {"name":"青松手写体","font":"handwrite"},];
+    List<Widget> items = [];
+    for (var value in fonts) {
+      items.add(Container(
+        padding: EdgeInsets.symmetric(vertical: 8,horizontal: 16),
+        child: GestureDetector(
+          onTap: (){
+            Navigator.of(ctx).pop(value["font"]);
+          },
+          child: Row(
+            children: [
+              Expanded(child: Text(value["name"]!,style: TextStyle(fontSize: 24),)),
+              if(value["font"] == f)
+                Icon(Icons.done)
+            ],
+          ),
+        ),
+      ));
+    }
+    return items;
   }
 
   void _saveConfig(){
