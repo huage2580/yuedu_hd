@@ -88,10 +88,10 @@ flutter:
         - asset: assets/handwrite.ttf
     - family: fz_kai
       fonts:
-        - asset: assets/方正楷体简.ttf
+        - asset: assets/fz_kai.ttf
     - family: fz_song
       fonts:
-        - asset: assets/方正仿宋简体.ttf
+        - asset: assets/fz_song.ttf
 
 
   # To add assets to your application, add an assets section, like this:
