@@ -133,7 +133,7 @@ ON "book_chapter" (
     "lineSpace" REAL NOT NULL,
     "isTitleBold" integer NOT NULL DEFAULT 1,
     "isTextBold" integer NOT NULL DEFAULT 0,
-    "fontPath" TEXT,
+    "fontPath" TEXT
   );
   ''';
 

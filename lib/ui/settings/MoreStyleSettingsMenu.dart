@@ -121,11 +121,13 @@ class _MoreStyleSettingsMenuState extends State<MoreStyleSettingsMenu> {
 
   List<Widget> _getFontList(DisplayConfig config, BuildContext ctx){
     var f = config.fontPath;
-    var fonts = [{"name":"系统默认","font":""},
+    var fonts = [{"name":"默认字体","font":""},
       {"name":"HarmonyOS_Sans","font":"HarmonyOS_Sans"},
+      {"name":"方正仿宋简","font":"fz_song"},
+      {"name":"方正楷体简","font":"fz_kai"},
       {"name":"汉字拼音体","font":"Hanzi-Pinyin"},
       {"name":"站酷快乐体","font":"zcool_happy"},
-      {"name":"青松手写体","font":"handwrite"},];
+      {"name":"清松手写体","font":"handwrite"},];
     List<Widget> items = [];
     for (var value in fonts) {
       items.add(Container(
@@ -136,7 +138,7 @@ class _MoreStyleSettingsMenuState extends State<MoreStyleSettingsMenu> {
           },
           child: Row(
             children: [
-              Expanded(child: Text(value["name"]!,style: TextStyle(fontSize: 24),)),
+              Expanded(child: Text(value["name"]!,style: TextStyle(fontSize: 20),)),
               if(value["font"] == f)
                 Icon(Icons.done)
             ],
