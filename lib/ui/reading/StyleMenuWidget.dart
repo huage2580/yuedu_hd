@@ -134,10 +134,22 @@ class _StyleMenuState extends State<StyleMenu> {
             scrollDirection: Axis.horizontal,
             children: [
               _buildColorItem(context, Color(config.backgroundColor), Color(config.textColor),isSelected: true),
+              //护眼
               _buildColorItem(context, Color(0xffCCE8CF), Colors.black),
+              _buildColorItem(context, Color(0xffC8ddd8), Color(0xff151920)),
+              //色
+              _buildColorItem(context, Color(0xffe2d8c9), Color(0xff423e35)),
+              _buildColorItem(context, Color(0xffaaabad), Color(0xff423e35)),
+              _buildColorItem(context, Color(0xffe4ddc8), Color(0xff423e35)),
+              _buildColorItem(context, Color(0xffc2bdad), Color(0xff000000)),
+              //夜间
               _buildColorItem(context, Color(0xff373737), Color(0xffcecece)),
               _buildColorItem(context, Color(0xff2a2c37), Color(0xffcaccdf)),
+              _buildColorItem(context, Color(0xff3c4542), Color(0xff7e837f)),
+              _buildColorItem(context, Color(0xff181C22), Color(0xff5B5953)),
+              //白
               _buildColorItem(context, Color(0xfff5f5f5), Color(0xff151920)),
+              _buildColorItem(context, Color(0xfff0f0f0), Color(0xff151920)),
               _buildColorItem(context, Color(0xffFFFFFF), Color(0xff000000)),
             ],
           );
