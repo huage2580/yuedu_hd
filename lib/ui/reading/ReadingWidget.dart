@@ -93,14 +93,22 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     nextPageCallBack = (){
       var target = _controller.page!.ceil() + 1;
       if(DisplayCache.getInstance().get(target)!=null){
-        _controller.animateToPage(target,duration: Duration(milliseconds: 300),curve: Curves.ease);
+        if(DisplayConfig.getDefault().animPage){
+          _controller.animateToPage(target,duration: Duration(milliseconds: 300),curve: Curves.ease);
+        }else{
+          _controller.jumpToPage(target);
+        }
       }
     };
     NextPageEvent.getInstance().addListener(nextPageCallBack);
     previousPageCallBack = (){
       var target = _controller.page!.ceil() - 1;
       if(DisplayCache.getInstance().get(target)!=null){
-        _controller.animateToPage(target,duration: Duration(milliseconds: 300),curve: Curves.ease);
+        if(DisplayConfig.getDefault().animPage){
+          _controller.animateToPage(target,duration: Duration(milliseconds: 300),curve: Curves.ease);
+        }else{
+          _controller.jumpToPage(target);
+        }
       }
     };
     PreviousPageEvent.getInstance().addListener(previousPageCallBack);

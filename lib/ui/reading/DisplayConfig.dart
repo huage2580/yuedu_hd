@@ -1,5 +1,7 @@
 
 //阅读的配置项目
+import 'dart:convert';
+
 class DisplayConfig{
   int isSinglePage = 1;
   int isVertical = 0;
@@ -21,6 +23,8 @@ class DisplayConfig{
   int isTitleBold = 1;//标题加粗
   int isTextBold = 0;//正文加粗
   String? fontPath = "";//选择字体
+  int direction = 0;//0 默认跟随系统，1竖直，2横屏
+  bool animPage = true;//点击翻页是否有动画
 
   static DisplayConfig? _default;
 
@@ -56,6 +60,10 @@ class DisplayConfig{
     isTitleBold = map['isTitleBold'];
     isTextBold = map['isTextBold'];
     fontPath = map['fontPath'];
+    //ext
+    Map<String,dynamic> extConfig = jsonDecode(map['extConfig']??"{}");
+    direction = extConfig['direction']??0;
+    animPage = extConfig['animPage']??true;
 
     _default = this;
   }
@@ -80,6 +88,13 @@ class DisplayConfig{
     map['isTitleBold'] = isTitleBold;
     map['isTextBold'] = isTextBold;
     map['fontPath'] = fontPath;
+
+    Map<String,dynamic> extConfig = Map();
+    extConfig['direction'] = direction;
+    extConfig['animPage'] = animPage;
+
+    map['extConfig'] = jsonEncode(extConfig);
+
     return map;
   }
 }

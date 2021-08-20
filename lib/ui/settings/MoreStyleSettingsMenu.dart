@@ -104,6 +104,11 @@ class _MoreStyleSettingsMenuState extends State<MoreStyleSettingsMenu> {
           config.isTextBold = b?1:0;
           _saveConfig();
         },),
+        //翻页动画
+        SwitchListTile(title: Text('翻页动画'),activeColor: theme.primaryColor,value: config.animPage,onChanged: (b){
+          config.animPage = b;
+          _saveConfig();
+        },),
         ListTile(title: Text('自定义字体'),subtitle:Text('选择使用内置的字体'),trailing: Text('${config.fontPath}'),onTap: () async{
           var result = await showDialog(context: context,builder: (ctx)=>SimpleDialog(
             title: Text("选择字体"),
@@ -115,6 +120,19 @@ class _MoreStyleSettingsMenuState extends State<MoreStyleSettingsMenu> {
             _saveConfig();
           }
         },),
+        //方向
+        ListTile(title: Text('阅读方向'),subtitle:Text('自定义阅读界面的方向'),trailing: Text(_mapDirection(config.direction)),onTap: () async{
+          var result = await showDialog(context: context,builder: (ctx)=>SimpleDialog(
+            title: Text("选择方向"),
+            children: _getDirectionList(config,ctx),
+          ));
+
+          if(result!=null){
+            config.direction = result;
+            _saveConfig();
+          }
+        },),
+
       ],
     );
   }
@@ -147,6 +165,37 @@ class _MoreStyleSettingsMenuState extends State<MoreStyleSettingsMenu> {
       ));
     }
     return items;
+  }
+
+  List<Widget> _getDirectionList(DisplayConfig config, BuildContext ctx){
+    var f = config.direction;
+    var fonts = [{"name":"跟随系统","value":"0"},
+      {"name":"竖直","value":"1"},
+      {"name":"横屏","value":"2"},
+    ];
+    List<Widget> items = [];
+    for (var value in fonts) {
+      items.add(Container(
+        padding: EdgeInsets.symmetric(vertical: 8,horizontal: 16),
+        child: GestureDetector(
+          onTap: (){
+            Navigator.of(ctx).pop(int.parse(value["value"]!));
+          },
+          child: Row(
+            children: [
+              Expanded(child: Text(value["name"]!,style: TextStyle(fontSize: 20))),
+                if(value["value"] == (f.toString()))
+                Icon(Icons.done),
+            ],
+          ),
+        ),
+      ));
+    }
+    return items;
+  }
+
+  String _mapDirection(int v){
+    return ["跟随系统","竖直","横屏"][v];
   }
 
   void _saveConfig(){

@@ -9,6 +9,7 @@ import 'package:yuedu_hd/db/databaseHelper.dart';
 import 'package:yuedu_hd/ui/book_source/widget_select_source.dart';
 import 'package:yuedu_hd/ui/bookshelf/widget_chapters.dart';
 import 'package:yuedu_hd/ui/download/BookDownloader.dart';
+import 'package:yuedu_hd/ui/reading/DisplayConfig.dart';
 import 'package:yuedu_hd/ui/reading/ReadingWidget.dart';
 import 'package:yuedu_hd/ui/reading/event/ChapterChangedEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/NextChapterEvent.dart';
@@ -49,12 +50,7 @@ class _PageReadingState extends State<PageReading> {
   void initState() {
     super.initState();
     //可以竖屏
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.portraitUp
-    ]);
+    _setSystemDirection();
     // SystemChrome.setEnabledSystemUIOverlays([]);
 
     chapterChangedCallBack = () {
@@ -371,10 +367,39 @@ class _PageReadingState extends State<PageReading> {
     })).then((value){
       showMenuBar = false;
       _readingWidgetKey = GlobalKey();
+      //设置方向
+      _setSystemDirection();
       setState(() {
 
       });
     });
+  }
+
+  void _setSystemDirection(){
+    var d = DisplayConfig.getDefault().direction;
+    switch(d){
+      case 0://系统
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+          DeviceOrientation.portraitDown,
+          DeviceOrientation.portraitUp
+        ]);
+        break;
+      case 1://竖直
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitDown,
+          DeviceOrientation.portraitUp
+        ]);
+        break;
+      case 2://横屏
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+        ]);
+        break;
+
+    }
   }
 
   void _showSourceSelectDialog(BuildContext context) async {
@@ -402,6 +427,12 @@ class _PageReadingState extends State<PageReading> {
     super.dispose();
     ChapterChangedEvent.getInstance().removeListener(chapterChangedCallBack);
     // SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.portraitUp
+    ]);
   }
 
   void _switchMenuBar() {

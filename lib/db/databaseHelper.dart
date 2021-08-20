@@ -133,7 +133,8 @@ ON "book_chapter" (
     "lineSpace" REAL NOT NULL,
     "isTitleBold" integer NOT NULL DEFAULT 1,
     "isTextBold" integer NOT NULL DEFAULT 0,
-    "fontPath" TEXT
+    "fontPath" TEXT,
+    "extConfig" TEXT
   );
   ''';
 
@@ -161,7 +162,7 @@ ON "book_chapter" (
     if (_database != null) {
       return Future.value(_database);
     }
-    return await openDatabase(DB_PATH, version: 2,
+    return await openDatabase(DB_PATH, version: 3,
         onCreate: (Database db, int version) async {
       await _executeMultiSQL(db, _SQL_CREATE_BOOK_SOURCES);
       await _executeMultiSQL(db, _SQL_INDEX_SOURCE);
@@ -175,6 +176,13 @@ ON "book_chapter" (
       if(oldVersion == 1 && newVersion == 2){
         //配置增加字体路径
         await db.execute("ALTER TABLE display_config ADD COLUMN fontPath TEXT");
+      }else if(oldVersion == 1 && newVersion ==3){
+        await db.execute("ALTER TABLE display_config ADD COLUMN fontPath TEXT");
+        await db.execute("ALTER TABLE display_config ADD COLUMN extConfig TEXT");
+
+      }else if(oldVersion == 2 && newVersion ==3){
+        // await db.execute("ALTER TABLE display_config ADD COLUMN fontPath TEXT");
+        await db.execute("ALTER TABLE display_config ADD COLUMN extConfig TEXT");
       }
         });
   }
