@@ -72,10 +72,11 @@ class _PageSourceAddState extends State<PageSourceAdd> {
                           padding: const EdgeInsets.all(10.0),
                           child: Text('''
 书源的导入：
-方式一：在上方输入网址，点击按钮开始导入。
+方式一：在上方输入书源链接，点击按钮开始导入。
 方式二：复制配置文件内容到粘贴板，点击【粘贴板导入】按钮。
 暂不支持编辑和修改，同网址书源每次导入均覆盖内容。
 规则参考:https://alanskycn.gitee.io/teachme
+推荐微信小程序[三目小仓库]获取书源
                           ''',style: isLandscape?theme.textTheme.headline6:theme.textTheme.subtitle2,),
                         ),
                         VSpace(10),
@@ -155,8 +156,7 @@ class _PageSourceAddState extends State<PageSourceAdd> {
 仅支持JSOUP格式和CSS格式的书源，导入自动过滤
 参考:https://alanskycn.gitee.io/teachme/
 你可以从搜索引擎，gitee,github，酷安等社区获取别人分享的书源。
-推荐关注公众号[开源阅读]获取书源。
-推荐从下面Tab【社区】中浏览社区并导入书源。
+推荐微信小程序[三目小仓库]获取书源。
 新手上路？点击使用热门书源,导入开始搜索!
 '''),
         actions: [

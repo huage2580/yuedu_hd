@@ -305,6 +305,13 @@ ON "book_chapter" (
     }));
   }
 
+  Future<Map<String,dynamic>?> queryBookSourceMapById(int id) async{
+    return await withDB().then((db) => db.query(TABLE_SOURCE,where: '_id = $id').then((value){
+      if(value.isEmpty){return null;}
+      return value[0];
+    }));
+  }
+
   /// 删除书源
   dynamic deleteBookSourceByIds(List<int> ids) async {
     var args = ids.fold(

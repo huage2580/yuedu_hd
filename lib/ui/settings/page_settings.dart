@@ -40,7 +40,7 @@ class _PageSettingsState extends State<PageSettings> {
                   Container(margin: EdgeInsets.only(top: 10,bottom: 10),child: Text('阅读设置',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),)),
                   MoreStyleSettingsMenu(),
                   Container(margin: EdgeInsets.only(top: 10,bottom: 10),child: Text('关于',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),)),
-                  AboutListTile(applicationName: '三目阅读',applicationVersion: 'ver 2.0.5',applicationLegalese: '开源地址\nhttps://github.com/huage2580/yuedu_hd\n参考实现[阅读安卓版]:\n https://github.com/gedoor/legado',),
+                  AboutListTile(applicationName: '三目阅读',applicationVersion: 'ver 2.0.6',applicationLegalese: '开源地址\nhttps://github.com/huage2580/yuedu_hd\n参考实现[阅读安卓版]:\n https://github.com/gedoor/legado',),
                   ListTile(title: Text('用户协议'),trailing: Icon(Icons.arrow_forward_ios_rounded),onTap: (){
                     pushTextPage('用户协议', '''
 4.10 您了解并同意，本平台不对因下述任一情况而导致您的任何损害赔偿承担责任，包括但不限于利润财产、商誉、数据等方面的损失或其它损失的损害赔偿(无论本平台是否已被告知该等损害赔偿的可能性)：

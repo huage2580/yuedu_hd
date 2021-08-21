@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:yuedu_hd/db/BookSourceBean.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
+import 'package:yuedu_hd/db/source_verify_helper.dart';
 import 'package:yuedu_hd/ui/YDRouter.dart';
 
 import '../widget/space.dart';
@@ -254,44 +257,99 @@ class _StateSourceList extends State<PageSourceList> {
 
   Widget _buildSourceItem(BuildContext context, BookSourceBean bean) {
     var theme = Theme.of(context);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Checkbox(
-          value: bean.localSelect,
-          onChanged: (b) {
-            setState(() {
-              _selectCount += b! ? 1 : -1;
-              bean.localSelect = b;
-            });
-          },
-          activeColor: theme.primaryColor,
-        ),
-        Container(
-            width: 180,
-            child: Text(
-              "${bean.bookSourceName}${bean.bookSourceGroup != null ? '(${bean.bookSourceGroup})' : ''}",
-              style: theme.textTheme.subtitle1,
-            )),
-        HSpace(20),
-        if(isLandscape)
-          Expanded(child: Text(bean.bookSourceUrl)),
-        if(!isLandscape)
-          Spacer(),
-        Switch(
-          value: bean.enabled,
-          onChanged: (b) {
-            bean.enabled = b;
-            setState((){
-              var helper = DatabaseHelper();
-              helper.updateBookSourceStateById(bean.id!,b);
-            });
-          },
-          activeColor: theme.primaryColor,
-        )
-      ],
+    return GestureDetector(
+      onTapDown: (e){
+        _showItemMenu(context,bean.id!,e.globalPosition);
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Checkbox(
+            value: bean.localSelect,
+            onChanged: (b) {
+              setState(() {
+                _selectCount += b! ? 1 : -1;
+                bean.localSelect = b;
+              });
+            },
+            activeColor: theme.primaryColor,
+          ),
+          Container(
+              width: 180,
+              child: Text(
+                "${bean.bookSourceName}${bean.bookSourceGroup != null ? '(${bean.bookSourceGroup})' : ''}",
+                style: theme.textTheme.subtitle1,
+              )),
+          HSpace(20),
+          if(isLandscape)
+            Expanded(child: Text(bean.bookSourceUrl)),
+          if(!isLandscape)
+            Spacer(),
+          Switch(
+            value: bean.enabled,
+            onChanged: (b) {
+              bean.enabled = b;
+              setState((){
+                var helper = DatabaseHelper();
+                helper.updateBookSourceStateById(bean.id!,b);
+              });
+            },
+            activeColor: theme.primaryColor,
+          )
+        ],
+      ),
     );
+  }
+
+
+  void _showItemMenu(BuildContext context,int sourceId, Offset position) async{
+    var result = await showMenu(context: context, position: RelativeRect.fromLTRB(position.dx, position.dy, 0, 0), items: [
+      PopupMenuItem(child: Text('校验书源'),value: 0,),
+      PopupMenuItem(child: Text('复制到剪贴板'),value: 1,),
+    ]);
+    if(result == 0){
+      _verifySource(sourceId);
+    }else if(result == 1){
+      _copySource(sourceId);
+    }
+  }
+
+  void _copySource(int sourceId) async{
+    print('copy..');
+
+    var source = await _getSourceMap(sourceId);
+    var s = jsonEncode(source);
+    Clipboard.setData(ClipboardData(text: s));
+    BotToast.showText(text: '已复制');
+
+  }
+
+  void _verifySource(int sourceId) async{
+    var source = await _getSourceMap(sourceId);
+    var cancel = BotToast.showLoading();
+    var success = await SourceVerifyHelper().verify(BookSourceBean.fromJson(source), (progressText, done) {
+
+    });
+    cancel();
+    BotToast.showText(text: success??false?'校验成功':'可能失效了');
+
+  }
+
+  dynamic _getSourceMap(int sourceId) async{
+    var source = await DatabaseHelper().queryBookSourceMapById(sourceId);
+    if(source == null){
+      return;
+    }
+    source = Map.from(source);
+    source['ruleExplore'] = jsonDecode(source['ruleExplore']);
+    source['ruleSearch'] = jsonDecode(source['ruleSearch']);
+    source['ruleBookInfo'] = jsonDecode(source['ruleBookInfo']);
+    source['ruleToc'] = jsonDecode(source['ruleToc']);
+    source['ruleContent'] = jsonDecode(source['ruleContent']);
+
+
+    return Future.value(source);
   }
 
   dynamic _fetchListAndUpdate(String? title) async {
