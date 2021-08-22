@@ -258,6 +258,7 @@ class _StateSourceList extends State<PageSourceList> {
   Widget _buildSourceItem(BuildContext context, BookSourceBean bean) {
     var theme = Theme.of(context);
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTapDown: (e){
         _showItemMenu(context,bean.id!,e.globalPosition);
       },
@@ -342,6 +343,9 @@ class _StateSourceList extends State<PageSourceList> {
       return;
     }
     source = Map.from(source);
+    source.remove('_id');
+    source['enabled'] = source['enabled'] == 1;
+    source['enabledExplore'] = source['enabledExplore'] == 1;
     source['ruleExplore'] = jsonDecode(source['ruleExplore']);
     source['ruleSearch'] = jsonDecode(source['ruleSearch']);
     source['ruleBookInfo'] = jsonDecode(source['ruleBookInfo']);
