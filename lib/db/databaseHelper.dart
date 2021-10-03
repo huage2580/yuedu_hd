@@ -325,7 +325,7 @@ ON "book_chapter" (
   }
   /// 启用or禁用
   dynamic updateBookSourceStateById(int id,bool enabled) async{
-    return await withDB().then((db) => db.update(TABLE_SOURCE, {'enabled':enabled?1:0},where: '_id = $id'));
+    return withDB().then((db) => db.update(TABLE_SOURCE, {'enabled':enabled?1:0},where: '_id = $id'));
   }
   /// 启用 or 禁用
   dynamic updateBookSourceStateByIds(List<int> ids,bool enabled) async{

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:yuedu_hd/db/BookSourceBean.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
+import 'package:yuedu_hd/db/source_verify_batch_helper.dart';
 import 'package:yuedu_hd/db/source_verify_helper.dart';
 import 'package:yuedu_hd/ui/YDRouter.dart';
 
@@ -27,6 +28,10 @@ class _StateSourceList extends State<PageSourceList> {
   int _selectCount = 0;
   TextEditingController _searchController = TextEditingController();
   var isLandscape = false;
+
+  bool isVerifyProgress = false;
+  String verifyHint = 'loading';
+  SourceVerifyBatchHelper _sourceVerifyBatchHelper = SourceVerifyBatchHelper();
 
   @override
   void initState() {
@@ -138,6 +143,22 @@ class _StateSourceList extends State<PageSourceList> {
 
   Widget _buildBottomBar(BuildContext context) {
     var theme = Theme.of(context);
+    if(isVerifyProgress){
+      return Row(
+        children: [
+          Text('（校验中...失效书源会被禁用）$verifyHint'),
+          Spacer(),
+          OutlinedButton(
+            onPressed: () {
+              _stopBatchVerify();
+            },
+            child: Text('停止'),
+          ),
+        ],
+      );
+    }
+
+
     return Row(
       children: [
         Checkbox(
@@ -151,7 +172,7 @@ class _StateSourceList extends State<PageSourceList> {
           '全选 ($_selectCount/${bookSourceList.length})',
         ),
         Spacer(),
-        OutlineButton(
+        OutlinedButton(
           onPressed: () {
             _reverseSelect();
           },
@@ -159,7 +180,7 @@ class _StateSourceList extends State<PageSourceList> {
         ),
         HSpace(8),
         if(isLandscape)
-          OutlineButton(
+          OutlinedButton(
             onPressed: () {_deleteSelect();},
             child: Text('删除'),
           ),
@@ -173,10 +194,17 @@ class _StateSourceList extends State<PageSourceList> {
                   _stateSelect(false);
                   break;
                 case 2:
-                  BotToast.showText(text: '当前无法校验书源');
+                  // BotToast.showText(text: '当前无法校验书源');
+                  _verifySelect();
                   break;
                 case 3:
                   _deleteSelect();
+                  break;
+                case 4:
+                  _selectAllDisable();
+                  break;
+                case 5:
+                  _selectAllEnable();
                   break;
               }
             },
@@ -185,9 +213,13 @@ class _StateSourceList extends State<PageSourceList> {
               return [
                 PopupMenuItem(child: Text('启用所选'),value: 0,),
                 PopupMenuItem(child: Text('禁用所选'),value: 1,),
-                // PopupMenuItem(child: Text('校验所选'),value: 2,),
+                PopupMenuItem(child: Text('校验所选'),value: 2,),
                 if(!isLandscape)
                   PopupMenuItem(child: Text('删除所选'),value: 3,),
+                PopupMenuItem(child: Text('选择所有禁用'),value: 4,),
+                PopupMenuItem(child: Text('选择所有启用'),value: 5,),
+
+
               ];
             }),
       ],
@@ -409,6 +441,36 @@ class _StateSourceList extends State<PageSourceList> {
     await _fetchListAndUpdate(null);
   }
 
+  void _verifySelect() async{
+    if(_selectCount==0){
+      return;
+    }
+    isVerifyProgress = true;
+    setState(() {
+
+    });
+
+    List<int> ids = [];
+    for (var value in bookSourceList) {
+      if(value.localSelect){
+        ids.add(value.id!);
+      }
+    }
+    await _sourceVerifyBatchHelper.verify(ids,(hint){
+      verifyHint = hint;
+      setState(() {
+
+      });
+    });
+
+    isVerifyProgress = false;
+    setState(() {
+
+    });
+    BotToast.showText(text: '校验完成');
+    await _fetchListAndUpdate(null);
+  }
+
   void _stateSelect(bool enabled) async{
     if(_selectCount==0){
       return;
@@ -422,5 +484,30 @@ class _StateSourceList extends State<PageSourceList> {
     var helper = DatabaseHelper();
     await helper.updateBookSourceStateByIds(ids,enabled);
     await _fetchListAndUpdate(null);
+  }
+
+  void _stopBatchVerify(){
+    _sourceVerifyBatchHelper.working = false;
+    verifyHint = '停止中...';
+    setState(() {
+
+    });
+  }
+
+  void _selectAllDisable() {
+    _selectCount = 0;
+    for (var s in bookSourceList) {
+      s.localSelect = !s.enabled;
+      _selectCount += s.localSelect ? 1 : 0;
+    }
+    setState(() {});
+  }
+  void _selectAllEnable() {
+    _selectCount = 0;
+    for (var s in bookSourceList) {
+      s.localSelect = s.enabled;
+      _selectCount += s.localSelect ? 1 : 0;
+    }
+    setState(() {});
   }
 }
