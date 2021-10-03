@@ -25,6 +25,7 @@ class DisplayConfig{
   String? fontPath = "";//选择字体
   int direction = 0;//0 默认跟随系统，1竖直，2横屏
   bool animPage = true;//点击翻页是否有动画
+  bool paragraphSpace = false;//段落空行
 
   static DisplayConfig? _default;
 
@@ -64,6 +65,7 @@ class DisplayConfig{
     Map<String,dynamic> extConfig = jsonDecode(map['extConfig']??"{}");
     direction = extConfig['direction']??0;
     animPage = extConfig['animPage']??true;
+    paragraphSpace = extConfig['paragraphSpace']??false;
 
     _default = this;
   }
@@ -92,6 +94,7 @@ class DisplayConfig{
     Map<String,dynamic> extConfig = Map();
     extConfig['direction'] = direction;
     extConfig['animPage'] = animPage;
+    extConfig['paragraphSpace'] = paragraphSpace;
 
     map['extConfig'] = jsonEncode(extConfig);
 

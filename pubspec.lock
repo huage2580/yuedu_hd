@@ -84,7 +84,7 @@ packages:
       name: extended_image
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "4.1.0"
+    version: "4.2.1"
   extended_image_library:
     dependency: transitive
     description:
@@ -112,7 +112,7 @@ packages:
       name: fast_gbk
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.0-rc"
+    version: "1.0.0"
   ffi:
     dependency: transitive
     description:
@@ -138,7 +138,7 @@ packages:
       name: flutter_colorpicker
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.4.0"
+    version: "0.6.0"
   http:
     dependency: transitive
     description:
@@ -180,7 +180,7 @@ packages:
       name: meta
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.3.0"
+    version: "1.7.0"
   nested:
     dependency: transitive
     description:
@@ -201,14 +201,14 @@ packages:
       name: path_provider
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.2"
+    version: "2.0.5"
   path_provider_linux:
     dependency: transitive
     description:
       name: path_provider_linux
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.0"
   path_provider_macos:
     dependency: transitive
     description:
@@ -243,21 +243,21 @@ packages:
       name: petitparser
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "4.1.0"
+    version: "4.3.0"
   platform:
     dependency: transitive
     description:
       name: platform
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.0.0"
+    version: "3.0.2"
   plugin_platform_interface:
     dependency: transitive
     description:
       name: plugin_platform_interface
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.2"
   process:
     dependency: transitive
     description:
@@ -284,7 +284,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: a10e133a1b2795a6e0e0b5cec5db47ef1964f933
+      resolved-ref: "114f3a9f60f026dcaf122ef9911512c3ed42a916"
       url: "git@github.com:huage2580/reader_parser2.git"
     source: git
     version: "0.0.1"
@@ -294,7 +294,7 @@ packages:
       name: rxdart
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.27.1"
+    version: "0.27.2"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -313,28 +313,28 @@ packages:
       name: sqflite
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.0+3"
+    version: "2.0.0+4"
   sqflite_common:
     dependency: transitive
     description:
       name: sqflite_common
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.0+2"
+    version: "2.0.1+1"
   sqflite_common_ffi:
     dependency: "direct dev"
     description:
       name: sqflite_common_ffi
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.0+1"
+    version: "2.0.0+3"
   sqlite3:
     dependency: transitive
     description:
       name: sqlite3
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.1.2"
+    version: "1.2.0"
   stack_trace:
     dependency: transitive
     description:
@@ -390,21 +390,42 @@ packages:
       name: webview_flutter
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.12"
+    version: "2.1.1"
+  webview_flutter_android:
+    dependency: transitive
+    description:
+      name: webview_flutter_android
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.0.15"
+  webview_flutter_platform_interface:
+    dependency: transitive
+    description:
+      name: webview_flutter_platform_interface
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.0"
+  webview_flutter_wkwebview:
+    dependency: transitive
+    description:
+      name: webview_flutter_wkwebview
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.0.14"
   win32:
     dependency: transitive
     description:
       name: win32
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.2.5"
+    version: "2.2.9"
   worker_manager:
     dependency: "direct main"
     description:
       name: worker_manager
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "4.2.2"
+    version: "4.2.4"
   xdg_directories:
     dependency: transitive
     description:
@@ -413,5 +434,5 @@ packages:
     source: hosted
     version: "0.2.0"
 sdks:
-  dart: ">=2.13.0 <3.0.0"
-  flutter: ">=2.2.0"
+  dart: ">=2.14.0 <3.0.0"
+  flutter: ">=2.5.0"

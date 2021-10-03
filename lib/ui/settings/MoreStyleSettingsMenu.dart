@@ -72,6 +72,11 @@ class _MoreStyleSettingsMenuState extends State<MoreStyleSettingsMenu> {
             _saveConfig();
           }
         },),
+        //段落间空行
+        SwitchListTile(title: Text('段落间距'),subtitle:Text('每个段落之间空一行'),activeColor: theme.primaryColor,value: config.paragraphSpace,onChanged: (b){
+          config.paragraphSpace = b;
+          _saveConfig();
+        },),
         ListTile(title: Text('正文颜色'),trailing: ColorCircleWidget(Color(config.textColor)),onTap: (){
           showDialog<Color>(context: context,builder: (_)=>ColorPickerDialog(initColor: Color(config.textColor),)).then((value){
             if(value!=null){

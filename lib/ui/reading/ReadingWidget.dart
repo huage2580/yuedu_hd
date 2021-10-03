@@ -443,7 +443,9 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     result = result.replaceAll(RegExp(r'[ ]{4,}'), '  ');
     //内容中每个段落开头的空格
     var spaceForParagraph = ' ' * config.spaceParagraph;
-    result = spaceForParagraph + result.replaceAll('\n', '\n$spaceForParagraph');
+    //段落间空行
+    var lineSpace = config.paragraphSpace?'\n':'';
+    result = spaceForParagraph + result.replaceAll('\n', '\n$lineSpace$spaceForParagraph');
 
 
     return result;

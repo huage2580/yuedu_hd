@@ -49,13 +49,13 @@ dependencies:
   # toast
   bot_toast: ^4.0.1
   # 颜色选择
-  flutter_colorpicker: ^0.4.0
+  flutter_colorpicker: ^0.6.0
   #gbk
   fast_gbk: ^1.0.0-rc
   #isolate
   isolate: ^2.1.1
   #webview 只支持mobile
-  webview_flutter: ^2.0.10
+  webview_flutter: ^2.1.1
   #扩展的图片，用来支持本地缓存
   extended_image: ^4.0.0
 
