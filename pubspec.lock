@@ -243,7 +243,7 @@ packages:
       name: petitparser
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "4.3.0"
+    version: "4.4.0"
   platform:
     dependency: transitive
     description:
@@ -278,7 +278,7 @@ packages:
       name: quiver
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.0.1"
+    version: "3.0.1+1"
   reader_parser2:
     dependency: "direct main"
     description:
@@ -294,7 +294,7 @@ packages:
       name: rxdart
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.27.2"
+    version: "0.27.3"
   sky_engine:
     dependency: transitive
     description: flutter

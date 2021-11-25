@@ -191,6 +191,10 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     }else{
       initChapterName = widget.initChapterName;
       initReadPage = 1;
+      //当前章节重新加载的情况下，保存阅读记录
+      if(widget.initChapterName == bookInfoBean.lastReadChapter){
+        initReadPage = bookInfoBean.lastReadPage;
+      }
     }
     await _fetchChapters();
   }
