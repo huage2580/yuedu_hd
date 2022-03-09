@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scrollBehavior: MyCustomScrollBehavior(),
       builder: BotToastInit(), //1. call BotToastInit
       navigatorObservers: [BotToastNavigatorObserver()],
       navigatorKey: YDRouter.mainRouter,
@@ -62,4 +64,14 @@ class MyApp extends StatelessWidget {
       home: HomePage(),
     );
   }
+}
+
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    // etc.
+  };
 }
