@@ -27,10 +27,10 @@ class BookContentHelper{
   }
 
   ///根据章节id获取内容，优先数据库获取，没有缓存从网络获取 [nextChapterId]用来判断内容分页，有些下一页就是下一章节
-  Future<String> getChapterContent(int chapterId,int? nextChapterId) async{
+  Future<String> getChapterContent(int chapterId,int? nextChapterId,{bool refreshCache = false}) async{
     developer.log('企图获取章节内容 $chapterId');
     var contentFromDB = await DatabaseHelper().queryChapterContent(chapterId);
-    if(contentFromDB.isNotEmpty){
+    if(contentFromDB.isNotEmpty && !refreshCache){
       return Future.value(contentFromDB);
     }
     return fetchContentFromNetwork(chapterId,nextChapterId);

@@ -86,8 +86,13 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
         child: Row(
           children: [
             Expanded(child: Text('${bean.name}',maxLines: 1,overflow: TextOverflow.ellipsis,)),
+            if(bean.name == widget.readChapterName)
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Icon(Icons.adjust,size: 18,color: Colors.blueGrey,),
+              ),
             if(bean.length != null)
-              Icon(Icons.cloud_done,size: 16,color: Colors.grey,)
+              Icon(Icons.cloud_done,size: 16,color: Colors.grey,),
           ],
         ),
       ),

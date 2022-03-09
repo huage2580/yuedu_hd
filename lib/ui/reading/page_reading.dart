@@ -16,6 +16,7 @@ import 'package:yuedu_hd/ui/reading/event/NextChapterEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/NextPageEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/PreviousChapterEvent.dart';
 import 'package:yuedu_hd/ui/reading/event/PreviousPageEvent.dart';
+import 'package:yuedu_hd/ui/reading/event/ReloadEvent.dart';
 import 'package:yuedu_hd/ui/settings/MoreStyleSettingsMenu.dart';
 import 'package:yuedu_hd/ui/widget/PopupMenu.dart';
 
@@ -246,12 +247,14 @@ class _PageReadingState extends State<PageReading> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+
                         IconButton(
                             icon: Icon(CupertinoIcons.repeat,
                                 color: theme.accentColor),
                             onPressed: () {
                               _showSourceSelectDialog(context);
                             }),
+
                         PopupMenuButton(
                           tooltip: '缓存',
                           onSelected: (i){
@@ -317,9 +320,22 @@ class _PageReadingState extends State<PageReading> {
               padding: EdgeInsets.all(8),
               width: double.maxFinite,
               color: theme.canvasColor,
-              child: Text(bookInfo == null
-                  ? '获取书籍信息...'
-                  : '${bookInfo!.name}[${bookInfo!.author}] $currChapterName \n${bookInfo!.bookUrl}',maxLines: 2,overflow: TextOverflow.ellipsis,),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      child: Text(bookInfo == null
+                          ? '获取书籍信息...'
+                          : '${bookInfo!.name}[${bookInfo!.author}] $currChapterName \n${bookInfo!.bookUrl}',maxLines: 3,overflow: TextOverflow.ellipsis,),
+                    ),
+                  ),
+                  IconButton(
+                      icon: Icon(Icons.refresh),
+                      onPressed: () {
+                        _reloadCurrChapter();
+                      }),
+                ],
+              ),
             )
           ],
         ),
@@ -454,5 +470,10 @@ class _PageReadingState extends State<PageReading> {
     setState(() {
       showMenuBar = false;
     });
+  }
+
+  void _reloadCurrChapter() {
+    _hideMenuBar();
+    ReloadEvent.getInstance().reload(-1);
   }
 }

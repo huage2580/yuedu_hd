@@ -77,9 +77,15 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     });
     //事件监听
     reloadCallBack = () {
-      var errorPage = DisplayCache.getInstance().get(ReloadEvent.getInstance().pageIndex);
-      print('重新加载...${ReloadEvent.getInstance().pageIndex}');
-      _loadChapter(errorPage!.chapterIndex!, errorPage.viewPageIndex!, errorPage.fromEnd!);
+      var pageIndex = ReloadEvent.getInstance().pageIndex;
+      if(pageIndex != -1){//网络错误重新加载
+        var errorPage = DisplayCache.getInstance().get(pageIndex);
+        print('重新加载...${ReloadEvent.getInstance().pageIndex}');
+        _loadChapter(errorPage!.chapterIndex!, errorPage.viewPageIndex!, errorPage.fromEnd!);
+      }else{//主动刷新章节
+        _reloadChapter();
+      }
+
     };
     ReloadEvent.getInstance().addListener(reloadCallBack);
     nextChapterCallBack = (){
@@ -258,7 +264,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
 
   }
   ///[fromEnd]为true,[initIndex]为最后一页，需要从后往前填充内容
-  Future<int> _loadChapter(int chapterIndex,int pageIndex,bool fromEnd) async{
+  Future<int> _loadChapter(int chapterIndex,int pageIndex,bool fromEnd,{bool refreshCache = false}) async{
     if(chapterIndex < 0 || chapterIndex >= chaptersList.length){
       return Future.value(-1);
     }
@@ -270,7 +276,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       }
     });
     //获取正文
-    String chapterContent = await contentHelper.getChapterContent(chaptersList[chapterIndex].id,mayNextChapterId(chapterIndex)).catchError((e){
+    String chapterContent = await contentHelper.getChapterContent(chaptersList[chapterIndex].id,mayNextChapterId(chapterIndex),refreshCache: refreshCache).catchError((e){
       DisplayCache.getInstance().put(pageIndex, DisplayPage(DisplayPage.STATUS_ERROR, null,errorMsg:e.toString(),chapterIndex: chapterIndex,currPage: 1,fromEnd: fromEnd,viewPageIndex: pageIndex,));
       setState(() {
         //失败?
@@ -425,6 +431,14 @@ class _ReadingWidgetState extends State<ReadingWidget> {
       _controller.jumpToPage(INIT_PAGE);
       notifyPageChanged(INIT_PAGE);
     }
+  }
+
+  void _reloadChapter() async{
+    DisplayCache.getInstance().clear();
+    firstPage = INIT_PAGE;
+    await _loadChapter(currChapterIndex, INIT_PAGE, false,refreshCache: true);
+    _controller.jumpToPage(INIT_PAGE);
+    notifyPageChanged(INIT_PAGE);
   }
 
   void _previousChapter() async{
