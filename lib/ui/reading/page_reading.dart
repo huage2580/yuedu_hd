@@ -87,24 +87,23 @@ class _PageReadingState extends State<PageReading> {
         focusNode: FocusNode(),
         onKey: (e){
           if(e is RawKeyDownEvent){
-            switch(e.logicalKey.keyId){
-              case 0x00000000061://A
-                _hideMenuBar();
-                PreviousPageEvent.getInstance().emit();
-                break;
-              case 0x00000000064://D
-                _hideMenuBar();
-                NextPageEvent.getInstance().emit();
-                break;
-              case 0x00100070050://左
-                _hideMenuBar();
-                PreviousPageEvent.getInstance().emit();
-                break;
-              case 0x0010007004f://右
-                _hideMenuBar();
-                NextPageEvent.getInstance().emit();
-                break;
+            if(e.logicalKey.keyId == LogicalKeyboardKey.keyA.keyId){
+              _hideMenuBar();
+              PreviousPageEvent.getInstance().emit();
             }
+            if(e.logicalKey.keyId == LogicalKeyboardKey.keyD.keyId){
+              _hideMenuBar();
+              NextPageEvent.getInstance().emit();
+            }
+            if(e.logicalKey.keyId == LogicalKeyboardKey.arrowLeft.keyId){
+              _hideMenuBar();
+              PreviousPageEvent.getInstance().emit();
+            }
+            if(e.logicalKey.keyId == LogicalKeyboardKey.arrowRight.keyId){
+              _hideMenuBar();
+              NextPageEvent.getInstance().emit();
+            }
+
           }
         },
         child: GestureDetector(
