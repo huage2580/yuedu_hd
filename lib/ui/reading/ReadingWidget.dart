@@ -235,7 +235,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     //当前阅读的章节，找到章节id
     for(var i =0;i<chaptersList.length;i++){
       var value = chaptersList[i];
-      if(value.name == initChapterName){
+      if(value.name?.trim() == initChapterName.toString().trim()){
         initChapterId = value.id;
         currChapterIndex =i;
         break;
