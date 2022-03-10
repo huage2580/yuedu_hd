@@ -396,6 +396,7 @@ class _ReadingWidgetState extends State<ReadingWidget> {
     //更新阅读记录
     if(displayPage.status == DisplayPage.STATUS_SUCCESS){
       DatabaseHelper().updateLastReadChapter(widget.bookId, chaptersList[displayPage.chapterIndex!].name,displayPage.currPage!);
+      currChapterIndex = displayPage.chapterIndex!;
     }
 
     //如果是章节第一页，加载前一章

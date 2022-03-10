@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
@@ -8,6 +11,7 @@ import 'package:yuedu_hd/db/BookShelfBean.dart';
 import 'package:yuedu_hd/db/book_toc_helper.dart';
 import 'package:yuedu_hd/db/databaseHelper.dart';
 import 'package:yuedu_hd/ui/YDRouter.dart';
+import 'package:yuedu_hd/ui/widget/WheelScroll4Desktop.dart';
 import 'package:yuedu_hd/ui/widget/space.dart';
 import 'package:yuedu_hd/ui/style/ycolors.dart';
 
@@ -24,6 +28,8 @@ class _PageBookShelfState extends State<PageBookShelf>
   var _tocHelper = BookTocHelper.getInstance();
 
   var currSortType = 1; //0添加顺序，1上次阅读时间
+
+  var _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -137,6 +143,7 @@ class _PageBookShelfState extends State<PageBookShelf>
   }
 
   Widget _buildList(context, bool isPortrait) {
+
     if (_bookList.isEmpty) {
       return Center(
         child: Text('你的书架空空如也~\n\n\n😀\n\n请先添加书源:\n下方【书源】->点击【添加书源】\n然后点击右下角[+]按钮开始搜索书籍',textAlign: TextAlign.center,),
@@ -147,14 +154,23 @@ class _PageBookShelfState extends State<PageBookShelf>
       onRefresh: () async {
         return await _updateToc();
       },
-      child: MediaQuery.removePadding(
-        context: context,
-        removeTop: true,
-        child: WaterfallFlow.builder(
-          gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
-              crossAxisCount: isPortrait ? 1 : 2),
-          itemBuilder: (ctx, index) => _buildBookItem(ctx, _bookList[index]),
-          itemCount: _bookList.length,
+      child: WheelScroll4Desktop(
+        scrollController: _scrollController,
+        child: MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+              PointerDeviceKind.touch,PointerDeviceKind.mouse
+            }),
+            child: WaterfallFlow.builder(
+              controller: _scrollController,
+              gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: isPortrait ? 1 : 2),
+              itemBuilder: (ctx, index) => _buildBookItem(ctx, _bookList[index]),
+              itemCount: _bookList.length,
+            ),
+          ),
         ),
       ),
       // child: GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
