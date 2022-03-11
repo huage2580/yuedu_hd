@@ -1,4 +1,6 @@
-# 三目阅读 
+# 三目阅读   
+
+处于不维护阶段，解析库使用go语言实现。
 
 ## 声明
 感谢 飞哥的开源项目[阅读](https://github.com/gedoor/legado)  
@@ -9,10 +11,10 @@ https://github.com/huage2580/yuedu_hd
 
 ## releases
 [安卓apk,和windows版本](https://github.com/huage2580/yuedu_hd/releases)  
-[IOS](https://apps.apple.com/cn/app/%E9%98%85%E8%AF%BBHD/id1544754759) 也可以appstore 搜索'三目阅读'  
+[IOS](https://apps.apple.com/cn/app/%E9%98%85%E8%AF%BBHD/id1544754759) 也可以appstore 搜索'三目阅读' 已下架，暂无重新上架计划  
 
 ## 推荐书源  
-微信搜索小程序 【三目小仓库】分享和获取书源（ps:请筛选条件：兼容或者经过校验的书源）  
+找阅读3.0的书源，校验一遍再使用    
 
 ## Windows说明  
 电脑端无法使用社区，自行导入书源。阅读界面，A、D或者左、右键快捷翻页，如果没反应，先点一下窗口获取焦点。  
