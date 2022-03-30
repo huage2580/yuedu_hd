@@ -158,14 +158,14 @@ class HomeState extends State<HomePage> {
         //     switchPageTo(PAGE_EXPLORE);
         //   },
         // ),
-        _HomeMenuItem(
-          Icons.apps_outlined,
-          "社区",
-          isSelected: currPage == PAGE_STORE,
-          onTap: () {
-            switchPageTo(PAGE_STORE);
-          },
-        ),
+        // _HomeMenuItem(
+        //   Icons.apps_outlined,
+        //   "社区",
+        //   isSelected: currPage == PAGE_STORE,
+        //   onTap: () {
+        //     switchPageTo(PAGE_STORE);
+        //   },
+        // ),
         _HomeMenuItem(
           Icons.cloud_circle_outlined,
           "书源",
@@ -200,17 +200,17 @@ class HomeState extends State<HomePage> {
           },
           orientation: Orientation.portrait,
         ),),
-        Expanded(child:  _HomeMenuItem(
-          Icons.apps_outlined,
-          "社区",
-          isSelected: currPage == PAGE_STORE,
-          onTap: () {
-            switchPageTo(PAGE_STORE);
-          },
-          orientation: Orientation.portrait,
-
-        ),
-        ),
+        // Expanded(child:  _HomeMenuItem(
+        //   Icons.apps_outlined,
+        //   "社区",
+        //   isSelected: currPage == PAGE_STORE,
+        //   onTap: () {
+        //     switchPageTo(PAGE_STORE);
+        //   },
+        //   orientation: Orientation.portrait,
+        //
+        // ),
+        // ),
         Expanded(child:  _HomeMenuItem(
           Icons.cloud_circle_outlined,
           "书源",
@@ -267,15 +267,15 @@ class HomeState extends State<HomePage> {
           homeContainerKey.currentState?.pushNamedAndRemoveUntil(YDRouter.DOWNLOAD,ModalRoute.withName(YDRouter.DOWNLOAD));
         });
         break;
-      case PAGE_STORE:
-        if(Platform.isWindows){
-          BotToast.showText(text: "电脑端不支持社区！自己去网页导入书源(●'◡'●)");
-          return;
-        }
-        setState(() {
-          homeContainerKey.currentState?.pushNamedAndRemoveUntil(YDRouter.STORE,ModalRoute.withName(YDRouter.STORE));
-        });
-        break;
+      // case PAGE_STORE:
+      //   if(Platform.isWindows){
+      //     BotToast.showText(text: "电脑端不支持社区！自己去网页导入书源(●'◡'●)");
+      //     return;
+      //   }
+      //   setState(() {
+      //     homeContainerKey.currentState?.pushNamedAndRemoveUntil(YDRouter.STORE,ModalRoute.withName(YDRouter.STORE));
+      //   });
+      //   break;
 
 
     }

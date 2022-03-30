@@ -164,6 +164,7 @@ class _PageBookShelfState extends State<PageBookShelf>
               PointerDeviceKind.touch,PointerDeviceKind.mouse
             }),
             child: WaterfallFlow.builder(
+              physics: AlwaysScrollableScrollPhysics(),
               controller: _scrollController,
               gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
                   crossAxisCount: isPortrait ? 1 : 2),
